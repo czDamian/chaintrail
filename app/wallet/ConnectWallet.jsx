@@ -27,14 +27,20 @@ const Web3WalletConnectComponent = () => {
 
   useEffect(() => {
     if (active && account) {
-      const shortAddress = `${account.slice(0, 5)}...${account.slice(-5)}`;
-      setWalletAddress(shortAddress);
+      setWalletAddress(formatAddress(account));
       fetchBalance();
     } else {
       setWalletAddress("");
       setWalletBalance("");
     }
   }, [active, account, provider]);
+
+  const formatAddress = (address) => {
+    if (address && address.length >= 10) {
+      return `${address.slice(0, 5)}...${address.slice(-5)}`;
+    }
+    return address || "";
+  };
 
   const fetchBalance = async () => {
     if (provider && account) {
