@@ -95,7 +95,7 @@ CHAIN TRAIL uses a microservices architecture with a web frontend and a backend.
 ## Creating a Quest (for Whitelisted Telegram Accounts/Wallets)
 
 1. **Login to admin dashboard**
-   - Open your preferred web browser and navigate to the admin endpoint of the site by entering the URL: [https://chaintrail.vercel.app/admin/new-quest](#).
+   - Open your preferred web browser and navigate to the admin endpoint of the site by entering the URL: [https://chaintrail.vercel.app/Admin/new-quest](#).
 2. **Enter Quest Name**
    - Come up with a unique name for your quest.
 3. **Quest Image URL**
