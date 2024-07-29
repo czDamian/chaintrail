@@ -17,6 +17,7 @@ const SideNav = () => {
     { href: "/more", title: "Earn More Points" },
     { href: "/Admin/new-quest", title: "Create Quest" },
     { href: "/Admin/new-question", title: "Add Questions" },
+    { href: "/Admin/delete-quest", title: "Delete Quest" },
 
   ];
 
