@@ -26,27 +26,39 @@ const Web3WalletConnectComponent = () => {
   const [walletBalance, setWalletBalance] = useState("");
 
   useEffect(() => {
+    console.log("useEffect triggered");
+    console.log("active:", active);
+    console.log("account:", account);
+    console.log("provider:", provider);
+
     if (active && account) {
+      console.log("Setting wallet address");
       setWalletAddress(formatAddress(account));
       fetchBalance();
     } else {
+      console.log("Resetting wallet address and balance");
       setWalletAddress("");
       setWalletBalance("");
     }
   }, [active, account, provider]);
 
   const formatAddress = (address) => {
-    if (address && address.length >= 10) {
+    console.log("Formatting address:", address);
+    if (typeof address === 'string' && address.length >= 10) {
       return `${address.slice(0, 5)}...${address.slice(-5)}`;
     }
     return address || "";
   };
 
   const fetchBalance = async () => {
+    console.log("Fetching balance");
+    console.log("provider:", provider);
+    console.log("account:", account);
     if (provider && account) {
       try {
         const balance = await provider.getBalance(account);
         const balanceInEther = ethers.formatEther(balance);
+        console.log("Balance fetched:", balanceInEther);
         setWalletBalance(`${balanceInEther} CORE`);
       } catch (error) {
         console.error("Error fetching balance:", error);
@@ -56,6 +68,7 @@ const Web3WalletConnectComponent = () => {
   };
 
   const connectWallet = async (connectorType) => {
+    console.log("Connecting wallet:", connectorType);
     try {
       if (connectorType === "injected") {
         await activate(injected);
@@ -70,6 +83,7 @@ const Web3WalletConnectComponent = () => {
   };
 
   const disconnectWallet = async () => {
+    console.log("Disconnecting wallet");
     try {
       deactivate();
       toast.success("Disconnected from wallet successfully!");
@@ -78,6 +92,11 @@ const Web3WalletConnectComponent = () => {
       toast.error("Error disconnecting wallet. Please try again.");
     }
   };
+
+  console.log("Rendering component");
+  console.log("active:", active);
+  console.log("walletAddress:", walletAddress);
+  console.log("walletBalance:", walletBalance);
 
   return (
     <div className="bg-neutral-900 my-6 p-5">
