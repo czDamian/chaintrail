@@ -2,44 +2,57 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
-import { useWeb3React, Web3ReactProvider } from "@web3-react/core";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import "react-toastify/dist/ReactToastify.css";
 
-const injected = new InjectedConnector({
-  supportedChainIds: [1, 3, 4, 5, 42, 1115], // Add chain IDs you want to support, including Core Testnet
-});
-
-const walletConnect = new WalletConnectConnector({
-  rpc: {
-    1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
-    4: "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID",
-    1115: "https://rpc.test.btcs.network", // Core Testnet
-  },
-  bridge: "https://bridge.walletconnect.org",
-  qrcode: true,
-  pollingInterval: 12000,
-});
-
-const Web3WalletConnectComponent = () => {
-  const { activate, active, account, library, chainId } = useWeb3React();
+const Web3WalletConnect = () => {
+  const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
+  const [connected, setConnected] = useState(false);
+  const [provider, setProvider] = useState(null);
 
   useEffect(() => {
-    if (active && account && library) {
-      const fetchBalance = async () => {
-        const balance = await library.getBalance(account);
-        setWalletBalance(ethers.utils.formatEther(balance));
-      };
-
-      fetchBalance();
+    if (localStorage.getItem("connected") === "true") {
+      setWalletAddress(localStorage.getItem("address"));
+      setWalletBalance(localStorage.getItem("balance"));
+      setConnected(true);
     }
-  }, [active, account, library]);
+  }, []);
 
-  const connectWallet = async (connector) => {
+  const connectWallet = async () => {
     try {
-      await activate(connector);
+      // Create WalletConnect Provider with a public RPC URL
+      const walletConnectProvider = new WalletConnectProvider({
+        rpc: {
+          1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID", // Mainnet
+          4: "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID", // Rinkeby
+          1115: "https://rpc.test.btcs.network" // Core Testnet
+        },
+        qrcodeModalOptions: {
+          mobileLinks: ["metamask", "trust", "okx", "bybit"], // List of supported wallets
+        },
+      });
+
+      // Enable session (triggers QR Code modal)
+      await walletConnectProvider.enable();
+
+      const ethersProvider = new ethers.providers.Web3Provider(walletConnectProvider);
+      setProvider(ethersProvider);
+
+      const signer = ethersProvider.getSigner();
+      const address = await signer.getAddress();
+      const shortAddress = `${address.slice(0, 5)}...${address.slice(-5)}`;
+      const balance = await ethersProvider.getBalance(address);
+      const balanceInEther = ethers.utils.formatEther(balance);
+
+      setWalletAddress(shortAddress);
+      setWalletBalance(`${balanceInEther} CORE`);
+      setConnected(true);
+
+      localStorage.setItem("connected", "true");
+      localStorage.setItem("address", shortAddress);
+      localStorage.setItem("balance", balanceInEther);
+
       toast.success("Connected to wallet successfully!");
     } catch (error) {
       console.error("Error connecting to wallet:", error);
@@ -56,26 +69,22 @@ const Web3WalletConnectComponent = () => {
           After connecting, click on connect wallet again to switch to Core
           testnet
         </p>
-        {!active ? (
-          <>
-            <button
-              className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-              onClick={() => connectWallet(injected)}
-            >
-              Connect MetaMask
-            </button>
-            <button
-              className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-              onClick={() => connectWallet(walletConnect)}
-            >
-              Connect WalletConnect
-            </button>
-          </>
+        {!connected ? (
+          <button
+            id="connectButton"
+            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
+            onClick={connectWallet}
+          >
+            Connect Wallet
+          </button>
         ) : (
           <div>
-            <p className="mt-4">{`Connected: ${account}`}</p>
-            <p className="mt-2">{`Balance: ${walletBalance} ETH`}</p>
-            <p className="mt-2">{`Network: ${chainId === 1115 ? 'Core Testnet' : chainId}`}</p>
+            <p
+              id="walletAddress"
+              className="mt-4">{`Connected: ${walletAddress}`}</p>
+            <p
+              id="walletBalance"
+              className="mt-2">{`Balance: ${walletBalance}`}</p>
           </div>
         )}
       </div>
@@ -84,15 +93,5 @@ const Web3WalletConnectComponent = () => {
     </div>
   );
 };
-
-const getLibrary = (provider) => {
-  return new ethers.providers.Web3Provider(provider);
-};
-
-const Web3WalletConnect = () => (
-  <Web3ReactProvider getLibrary={getLibrary}>
-    <Web3WalletConnectComponent />
-  </Web3ReactProvider>
-);
 
 export default Web3WalletConnect;
