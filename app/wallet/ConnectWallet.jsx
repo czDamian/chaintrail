@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
-import FormData from "form-data";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -97,37 +96,48 @@ const Web3WalletConnect = () => {
   };
 
   const pinFileToIPFS = async () => {
-    const formData = new FormData();
-    const src = "path/to/file.png";
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
 
-    const file = fs.createReadStream(src);
-    formData.append("file", file);
+    if (!file) {
+      toast.error("No file selected. Please select a file to upload.");
+      return;
+    }
 
-    const pinataMetadata = JSON.stringify({ name: "File name" });
-    formData.append("pinataMetadata", pinataMetadata);
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
 
-    const pinataOptions = JSON.stringify({ cidVersion: 0 });
-    formData.append("pinataOptions", pinataOptions);
-
-    try {
-      const res = await fetch(
-        "https://api.pinata.cloud/pinning/pinFileToIPFS",
-        {
-          method: "POST",
-          body: formData,
-          headers: {
-            Authorization: `Bearer ${JWT}`,
-          },
-        }
+    reader.onloadend = async () => {
+      const arrayBuffer = reader.result;
+      const base64File = btoa(
+        new Uint8Array(arrayBuffer)
+          .reduce((data, byte) => data + String.fromCharCode(byte), "")
       );
 
-      const data = await res.json();
-      console.log(data);
-      toast.success("File pinned to IPFS successfully!");
-    } catch (error) {
-      console.error("Error pinning file to IPFS:", error);
-      toast.error("Error pinning file to IPFS. Please try again.");
-    }
+      const requestBody = JSON.stringify({
+        file: base64File,
+        pinataMetadata: { name: "File name" },
+        pinataOptions: { cidVersion: 0 },
+      });
+
+      try {
+        const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+          method: "POST",
+          body: requestBody,
+          headers: {
+            Authorization: `Bearer ${JWT}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        const data = await res.json();
+        console.log(data);
+        toast.success("File pinned to IPFS successfully!");
+      } catch (error) {
+        console.error("Error pinning file to IPFS:", error);
+        toast.error("Error pinning file to IPFS. Please try again.");
+      }
+    };
   };
 
   useEffect(() => {
@@ -147,7 +157,8 @@ const Web3WalletConnect = () => {
           <button
             id="connectButton"
             className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-            onClick={connectWallet}>
+            onClick={connectWallet}
+          >
             Connect Wallet
           </button>
         ) : (
@@ -161,6 +172,7 @@ const Web3WalletConnect = () => {
           </div>
         )}
       </div>
+      <input type="file" id="fileInput" className="mt-4" />
       <h1 className="text-2xl font-bold mt-6">My NFTs</h1>
       <div id="nftContainer" className="mt-4"></div>
     </div>
