@@ -1,8 +1,6 @@
-// app/api/quests/route.js
-
 import { NextResponse } from "next/server";
 import connectDb from "@/lib/mongodb";
-import Quest from "@/models/QuestQuestionSchema";
+import Quest from "@/models/Quest";
 
 export async function POST(request) {
   try {
