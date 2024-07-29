@@ -1,4 +1,5 @@
 import SideNav from "../components/Reusable/SideNav";
+import Web3WalletConnect from "../wallet/ConnectWallet";
 
 
 const MoreCoins = () => {
@@ -38,6 +39,7 @@ const MoreCoins = () => {
           </div>
         </div>
       </div>
+      <Web3WalletConnect/>
     </section>
   );
 };
