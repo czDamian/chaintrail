@@ -1,7 +1,8 @@
+import connectDb from "@/lib/mongodb"; // Your MongoDB connection utility
+import Quest from "@/models/Quest"; // Import models after clearing cache
 import { NextResponse } from "next/server";
-import connectDb from "@/lib/mongodb";
-import Quest from "@/models/Quest";
 
+// POST method to create a new quest
 export async function POST(request) {
   try {
     // Connect to the database
@@ -28,10 +29,18 @@ export async function POST(request) {
   }
 }
 
+// GET method to retrieve all quests
 export async function GET() {
   try {
+    // Connect to the database
     await connectDb();
+    console.log("Connected to the database");
+
+    // Fetch all quests from the database
     const quests = await Quest.find({});
+    console.log("Retrieved quests from database:", quests);
+
+    // Return the quests as the response
     return NextResponse.json(quests);
   } catch (error) {
     console.error("Error fetching quests:", error);

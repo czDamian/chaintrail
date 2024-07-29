@@ -1,17 +1,20 @@
-// app/components/CreateQuestQuestion.js
 "use client";
 import { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
+
 export default function CreateQuestQuestion() {
   const [quests, setQuests] = useState([]);
   const [selectedQuestId, setSelectedQuestId] = useState("");
   const [question, setQuestion] = useState({
-    questImage1: "",
-    questImage2: "",
-    questImage3: "",
-    questImage4: "",
-    questHints: "",
-    questPossibleAnswers: ["", "", "", ""],
+    img1: "",
+    img2: "",
+    img3: "",
+    img4: "",
+    hint: "",
+    questAnswer: "",
+    scrambledAnswer: "",
     isAnswered: false,
   });
 
@@ -33,7 +36,7 @@ export default function CreateQuestQuestion() {
       }
     } catch (error) {
       console.error("Error fetching quests:", error);
-      alert("Failed to fetch quests. Please try again.");
+      toast.error("Failed to fetch quests. Please try again.");
     }
   };
 
@@ -41,33 +44,25 @@ export default function CreateQuestQuestion() {
     setQuestion({ ...question, [e.target.name]: e.target.value });
   };
 
-  const handleAnswerChange = (index, value) => {
-    const newAnswers = [...question.questPossibleAnswers];
-    newAnswers[index] = value;
-    setQuestion({ ...question, questPossibleAnswers: newAnswers });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting question:", question);
     try {
       const response = await fetch(`/api/quests/${selectedQuestId}/questions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(question),
       });
-      console.log("Response status:", response.status);
       if (response.ok) {
         const data = await response.json();
-        console.log("Response data:", data);
-        alert("Quest question added successfully!");
+        toast.success("Question added successfully!");
         setQuestion({
-          questImage1: "",
-          questImage2: "",
-          questImage3: "",
-          questImage4: "",
-          questHints: "",
-          questPossibleAnswers: ["", "", "", ""],
+          img1: "",
+          img2: "",
+          img3: "",
+          img4: "",
+          hint: "",
+          questAnswer: "",
+          scrambledAnswer: "",
           isAnswered: false,
         });
       } else {
@@ -77,7 +72,7 @@ export default function CreateQuestQuestion() {
       }
     } catch (error) {
       console.error("Error adding quest question:", error);
-      alert("server error. Please try again.");
+      toast.error("Server error. Please try again.");
     }
   };
 
@@ -108,54 +103,65 @@ export default function CreateQuestQuestion() {
               ))}
             </select>
           </div>
-          {["questImage1", "questImage2", "questImage3", "questImage4"].map(
-            (field) => (
-              <div key={field}>
-                <label htmlFor={field} className="block text-gray-700 mb-2">
-                  {field} URL
-                </label>
-                <input
-                  type="text"
-                  id={field}
-                  name={field}
-                  value={question[field]}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                />
-              </div>
-            )
-          )}
-          <div>
-            <label htmlFor="questHints" className="block text-gray-700 mb-2">
-              Quest Hints
-            </label>
-            <textarea
-              id="questHints"
-              name="questHints"
-              value={question.questHints}
-              onChange={handleChange}
-              required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
-            />
-          </div>
-          {question.questPossibleAnswers.map((answer, index) => (
-            <div key={index}>
-              <label
-                htmlFor={`answer${index}`}
-                className="block text-gray-700 mb-2">
-                Possible Answer {index + 1}
+          {["img1", "img2", "img3", "img4"].map((field) => (
+            <div key={field}>
+              <label htmlFor={field} className="block text-gray-700 mb-2">
+                {field} URL
               </label>
               <input
                 type="text"
-                id={`answer${index}`}
-                value={answer}
-                onChange={(e) => handleAnswerChange(index, e.target.value)}
+                id={field}
+                name={field}
+                value={question[field]}
+                onChange={handleChange}
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
               />
             </div>
           ))}
+          <div>
+            <label htmlFor="hint" className="block text-gray-700 mb-2">
+              Hint
+            </label>
+            <textarea
+              id="hint"
+              name="hint"
+              value={question.hint}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </div>
+          <div>
+            <label htmlFor="questAnswer" className="block text-gray-700 mb-2">
+              Correct Answer
+            </label>
+            <input
+              type="text"
+              id="questAnswer"
+              name="questAnswer"
+              value={question.questAnswer}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </div>
+          <div>
+            <label
+              htmlFor="scrambledAnswer"
+              className="block text-gray-700 mb-2">
+              Scrambled Answer
+            </label>
+            <input
+              type="text"
+              id="scrambledAnswer"
+              name="scrambledAnswer"
+              value={question.scrambledAnswer}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+            />
+          </div>
           <button
             type="submit"
             className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition duration-300">
@@ -163,6 +169,7 @@ export default function CreateQuestQuestion() {
           </button>
         </form>
       </div>
+      <ToastContainer />
     </section>
   );
 }

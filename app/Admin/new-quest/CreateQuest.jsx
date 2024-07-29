@@ -1,6 +1,7 @@
-// /CreateQuest.js
 "use client";
 import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"; // Import CSS for toastify
 import SideNav from "@/app/components/Reusable/SideNav";
 
 export default function CreateQuest() {
@@ -8,7 +9,6 @@ export default function CreateQuest() {
     questName: "",
     questImage: "",
     questStatus: "locked",
-    questQuestions: [],
   });
 
   const handleChange = (e) => {
@@ -24,19 +24,18 @@ export default function CreateQuest() {
         body: JSON.stringify(quest),
       });
       if (response.ok) {
-        alert("Quest created successfully!");
+        toast.success("Quest created successfully!");
         setQuest({
           questName: "",
           questImage: "",
           questStatus: "locked",
-          questQuestions: [],
         });
       } else {
         throw new Error("Failed to create quest");
       }
     } catch (error) {
       console.error("Error creating quest:", error);
-      alert("Failed to create quest. Please try again.");
+      toast.error("Failed to create quest. Please try again.");
     }
   };
 
@@ -45,7 +44,6 @@ export default function CreateQuest() {
       <div className="flex justify-end mr-4 mt-20">
         <SideNav />
       </div>
-
       <div className="max-w-md mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-yellow-600">
           Create New Quest
@@ -101,6 +99,7 @@ export default function CreateQuest() {
           </button>
         </form>
       </div>
+      <ToastContainer /> {/* Add this to render toast notifications */}
     </section>
   );
 }
