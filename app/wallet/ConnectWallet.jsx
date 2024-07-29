@@ -1,4 +1,3 @@
-"use client";
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
@@ -66,6 +65,13 @@ const Web3WalletConnect = () => {
         }
 
         await ethereum.request({ method: "eth_requestAccounts" });
+
+        if (!ethers.providers.Web3Provider) {
+          console.error("Ethers providers not available");
+          toast.error("Ethers providers not available. Please try again.");
+          return;
+        }
+
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const address = await signer.getAddress();
@@ -94,7 +100,7 @@ const Web3WalletConnect = () => {
   };
 
   return (
-    <div className=" bg-neutral-900 text-yellow-500 p-5">
+    <div className="bg-neutral-900 my-6 p-5">
       <ToastContainer />
       <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
