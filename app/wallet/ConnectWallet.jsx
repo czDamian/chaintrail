@@ -21,7 +21,7 @@ const walletconnect = new WalletConnectConnector({
 });
 
 const Web3WalletConnectComponent = () => {
-  const { active, account, library, activate, deactivate } = useWeb3React();
+  const { active, account, provider, activate, deactivate } = useWeb3React();
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
 
@@ -34,13 +34,13 @@ const Web3WalletConnectComponent = () => {
       setWalletAddress("");
       setWalletBalance("");
     }
-  }, [active, account, library]);
+  }, [active, account, provider]);
 
   const fetchBalance = async () => {
-    if (library && account) {
+    if (provider && account) {
       try {
-        const balance = await library.getBalance(account);
-        const balanceInEther = ethers.utils.formatEther(balance);
+        const balance = await provider.getBalance(account);
+        const balanceInEther = ethers.formatEther(balance);
         setWalletBalance(`${balanceInEther} CORE`);
       } catch (error) {
         console.error("Error fetching balance:", error);
@@ -117,7 +117,7 @@ const Web3WalletConnectComponent = () => {
 
 const Web3WalletConnect = () => {
   return (
-    <Web3ReactProvider getLibrary={(provider) => new ethers.providers.Web3Provider(provider)}>
+    <Web3ReactProvider getLibrary={(provider) => new ethers.BrowserProvider(provider)}>
       <Web3WalletConnectComponent />
     </Web3ReactProvider>
   );
