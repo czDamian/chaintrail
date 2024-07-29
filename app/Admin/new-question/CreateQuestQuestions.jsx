@@ -81,13 +81,13 @@ export default function CreateQuestQuestion() {
       <div className="flex justify-end mr-4 mt-20">
         <SideNav />
       </div>
-      <div className="max-w-md mx-auto mt-4 p-6 bg-gray-100 rounded-lg shadow-xl">
+      <div className="max-w-md mx-auto mt-4 p-6 bg-neutral-700 rounded-lg shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-yellow-600">
           Add Quest Question
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="questSelect" className="block text-gray-700 mb-2">
+            <label htmlFor="questSelect" className="block   mb-2">
               Select Quest
             </label>
             <select
@@ -95,7 +95,7 @@ export default function CreateQuestQuestion() {
               value={selectedQuestId}
               onChange={(e) => setSelectedQuestId(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+              className="w-full px-3 py-2 border border-gray-300 rounded-md   ">
               {quests.map((quest) => (
                 <option key={quest._id} value={quest._id}>
                   {quest.questName}
@@ -105,7 +105,7 @@ export default function CreateQuestQuestion() {
           </div>
           {["img1", "img2", "img3", "img4"].map((field) => (
             <div key={field}>
-              <label htmlFor={field} className="block text-gray-700 mb-2">
+              <label htmlFor={field} className="block   mb-2">
                 {field} URL
               </label>
               <input
@@ -115,12 +115,12 @@ export default function CreateQuestQuestion() {
                 value={question[field]}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md   "
               />
             </div>
           ))}
           <div>
-            <label htmlFor="hint" className="block text-gray-700 mb-2">
+            <label htmlFor="hint" className="block   mb-2">
               Hint
             </label>
             <textarea
@@ -129,11 +129,11 @@ export default function CreateQuestQuestion() {
               value={question.hint}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md   "
             />
           </div>
           <div>
-            <label htmlFor="questAnswer" className="block text-gray-700 mb-2">
+            <label htmlFor="questAnswer" className="block   mb-2">
               Correct Answer
             </label>
             <input
@@ -143,13 +143,13 @@ export default function CreateQuestQuestion() {
               value={question.questAnswer}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md   "
             />
           </div>
           <div>
             <label
               htmlFor="scrambledAnswer"
-              className="block text-gray-700 mb-2">
+              className="block   mb-2">
               Scrambled Answer
             </label>
             <input
@@ -159,12 +159,12 @@ export default function CreateQuestQuestion() {
               value={question.scrambledAnswer}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md   "
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition duration-300">
+            className="w-full bg-yellow-600 text-black font-bold py-2 px-4 rounded-md hover:bg-yellow-700 transition duration-300">
             Add Question
           </button>
         </form>

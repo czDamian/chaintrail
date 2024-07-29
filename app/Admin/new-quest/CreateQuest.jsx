@@ -9,6 +9,7 @@ export default function CreateQuest() {
     questName: "",
     questImage: "",
     questStatus: "locked",
+    questDescription: "", // Added questDescription field
   });
 
   const handleChange = (e) => {
@@ -29,6 +30,7 @@ export default function CreateQuest() {
           questName: "",
           questImage: "",
           questStatus: "locked",
+          questDescription: "", // Reset questDescription field
         });
       } else {
         throw new Error("Failed to create quest");
@@ -44,13 +46,13 @@ export default function CreateQuest() {
       <div className="flex justify-end mr-4 mt-20">
         <SideNav />
       </div>
-      <div className="max-w-md mx-auto mt-10 p-6 bg-gray-100 rounded-lg shadow-xl">
+      <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-yellow-600">
           Create New Quest
         </h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="questName" className="block text-gray-700 mb-2">
+            <label htmlFor="questName" className="block mb-2">
               Quest Name
             </label>
             <input
@@ -60,11 +62,12 @@ export default function CreateQuest() {
               value={quest.questName}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              autoFocus
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-yellow-500"
             />
           </div>
           <div>
-            <label htmlFor="questImage" className="block text-gray-700 mb-2">
+            <label htmlFor="questImage" className="block mb-2">
               Quest Image URL
             </label>
             <input
@@ -78,7 +81,7 @@ export default function CreateQuest() {
             />
           </div>
           <div>
-            <label htmlFor="questStatus" className="block text-gray-700 mb-2">
+            <label htmlFor="questStatus" className="block mb-2">
               Quest Status
             </label>
             <select
@@ -86,15 +89,28 @@ export default function CreateQuest() {
               name="questStatus"
               value={quest.questStatus}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500">
+              className="w-full px-3 py-2 rounded-md">
               <option value="locked">Locked</option>
               <option value="open">Open</option>
               <option value="completed">Completed</option>
             </select>
           </div>
+          <div>
+            <label htmlFor="questDescription" className="block mb-2">
+              Quest Description
+            </label>
+            <textarea
+              id="questDescription"
+              name="questDescription"
+              value={quest.questDescription}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+            />
+          </div>
           <button
             type="submit"
-            className="w-full bg-yellow-500 text-white py-2 px-4 rounded-md hover:bg-yellow-600 transition duration-300">
+            className="w-full bg-yellow-600 text-black py-2 px-4 rounded-md font-bold hover:bg-yellow-700 transition duration-300">
             Create Quest
           </button>
         </form>
