@@ -21,44 +21,25 @@ const walletconnect = new WalletConnectConnector({
 });
 
 const Web3WalletConnectComponent = () => {
-  const { active, account, provider, activate, deactivate } = useWeb3React();
+  const { active, account, library, activate, deactivate } = useWeb3React();
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
 
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("active:", active);
-    console.log("account:", account);
-    console.log("provider:", provider);
-
-    if (active && account) {
-      console.log("Setting wallet address");
-      setWalletAddress(formatAddress(account));
+    if (active && account && library) {
+      setWalletAddress(account); // Display full address
       fetchBalance();
     } else {
-      console.log("Resetting wallet address and balance");
       setWalletAddress("");
       setWalletBalance("");
     }
-  }, [active, account, provider]);
-
-  const formatAddress = (address) => {
-    console.log("Formatting address:", address);
-    if (typeof address === 'string' && address.length >= 10) {
-      return `${address.slice(0, 5)}...${address.slice(-5)}`;
-    }
-    return address || "";
-  };
+  }, [active, account, library]);
 
   const fetchBalance = async () => {
-    console.log("Fetching balance");
-    console.log("provider:", provider);
-    console.log("account:", account);
-    if (provider && account) {
+    if (library && account) {
       try {
-        const balance = await provider.getBalance(account);
-        const balanceInEther = ethers.formatEther(balance);
-        console.log("Balance fetched:", balanceInEther);
+        const balance = await library.getBalance(account);
+        const balanceInEther = ethers.utils.formatEther(balance);
         setWalletBalance(`${balanceInEther} CORE`);
       } catch (error) {
         console.error("Error fetching balance:", error);
@@ -68,7 +49,6 @@ const Web3WalletConnectComponent = () => {
   };
 
   const connectWallet = async (connectorType) => {
-    console.log("Connecting wallet:", connectorType);
     try {
       if (connectorType === "injected") {
         await activate(injected);
@@ -83,7 +63,6 @@ const Web3WalletConnectComponent = () => {
   };
 
   const disconnectWallet = async () => {
-    console.log("Disconnecting wallet");
     try {
       deactivate();
       toast.success("Disconnected from wallet successfully!");
@@ -92,11 +71,6 @@ const Web3WalletConnectComponent = () => {
       toast.error("Error disconnecting wallet. Please try again.");
     }
   };
-
-  console.log("Rendering component");
-  console.log("active:", active);
-  console.log("walletAddress:", walletAddress);
-  console.log("walletBalance:", walletBalance);
 
   return (
     <div className="bg-neutral-900 my-6 p-5">
