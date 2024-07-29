@@ -18,6 +18,8 @@ const Web3WalletConnect = () => {
   }, []);
 
   const connectWallet = async () => {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     if (typeof window.ethereum !== "undefined") {
       try {
         const coreTestnetId = "0x45B";
@@ -67,12 +69,6 @@ const Web3WalletConnect = () => {
 
         await ethereum.request({ method: "eth_requestAccounts" });
 
-        if (!ethers.providers.Web3Provider) {
-          console.error("Ethers providers not available");
-          toast.error("Ethers providers not available. Please try again.");
-          return;
-        }
-
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const address = await signer.getAddress();
@@ -93,6 +89,11 @@ const Web3WalletConnect = () => {
         console.error("Error connecting to wallet:", error);
         toast.error("Error connecting to wallet. Please try again.");
       }
+    } else if (isMobile) {
+      // Attempt to open a web3 wallet app on mobile
+      const dappUrl = "https://your-dapp-url.com"; // Replace with your DApp URL
+      const deepLink = `https://metamask.app.link/dapp/${dappUrl}`;
+      window.location.href = deepLink;
     } else {
       toast.error(
         "MetaMask is not installed. Please install MetaMask and try again."
