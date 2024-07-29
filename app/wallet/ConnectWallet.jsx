@@ -4,8 +4,6 @@ import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const JWT = "YOUR_JWT_HERE";
-
 const Web3WalletConnect = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
@@ -95,57 +93,8 @@ const Web3WalletConnect = () => {
     }
   };
 
-  const pinFileToIPFS = async () => {
-    const fileInput = document.getElementById("fileInput");
-    const file = fileInput.files[0];
-
-    if (!file) {
-      toast.error("No file selected. Please select a file to upload.");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.readAsArrayBuffer(file);
-
-    reader.onloadend = async () => {
-      const arrayBuffer = reader.result;
-      const base64File = btoa(
-        new Uint8Array(arrayBuffer)
-          .reduce((data, byte) => data + String.fromCharCode(byte), "")
-      );
-
-      const requestBody = JSON.stringify({
-        file: base64File,
-        pinataMetadata: { name: "File name" },
-        pinataOptions: { cidVersion: 0 },
-      });
-
-      try {
-        const res = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
-          method: "POST",
-          body: requestBody,
-          headers: {
-            Authorization: `Bearer ${JWT}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await res.json();
-        console.log(data);
-        toast.success("File pinned to IPFS successfully!");
-      } catch (error) {
-        console.error("Error pinning file to IPFS:", error);
-        toast.error("Error pinning file to IPFS. Please try again.");
-      }
-    };
-  };
-
-  useEffect(() => {
-    pinFileToIPFS();
-  }, []);
-
   return (
-    <div className="min-h-screen bg-neutral-900 text-yellow-500 p-5">
+    <div className=" bg-neutral-900 text-yellow-500 p-5">
       <ToastContainer />
       <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
@@ -172,7 +121,6 @@ const Web3WalletConnect = () => {
           </div>
         )}
       </div>
-      <input type="file" id="fileInput" className="mt-4" />
       <h1 className="text-2xl font-bold mt-6">My NFTs</h1>
       <div id="nftContainer" className="mt-4"></div>
     </div>
