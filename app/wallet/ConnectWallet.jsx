@@ -2,102 +2,48 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
+import { useWeb3React, Web3ReactProvider } from "@web3-react/core";
+import { InjectedConnector } from "@web3-react/injected-connector";
+import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import "react-toastify/dist/ReactToastify.css";
 
-const Web3WalletConnect = () => {
-  const [walletAddress, setWalletAddress] = useState("");
+const injected = new InjectedConnector({
+  supportedChainIds: [1, 3, 4, 5, 42, 1115], // Add chain IDs you want to support, including Core Testnet
+});
+
+const walletConnect = new WalletConnectConnector({
+  rpc: {
+    1: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+    4: "https://rinkeby.infura.io/v3/YOUR_INFURA_PROJECT_ID",
+    1115: "https://rpc.test.btcs.network", // Core Testnet
+  },
+  bridge: "https://bridge.walletconnect.org",
+  qrcode: true,
+  pollingInterval: 12000,
+});
+
+const Web3WalletConnectComponent = () => {
+  const { activate, active, account, library, chainId } = useWeb3React();
   const [walletBalance, setWalletBalance] = useState("");
-  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("connected") === "true") {
-      setWalletAddress(localStorage.getItem("address"));
-      setWalletBalance(localStorage.getItem("balance"));
-      setConnected(true);
+    if (active && account && library) {
+      const fetchBalance = async () => {
+        const balance = await library.getBalance(account);
+        setWalletBalance(ethers.utils.formatEther(balance));
+      };
+
+      fetchBalance();
     }
-  }, []);
+  }, [active, account, library]);
 
-  const connectWallet = async () => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (typeof window.ethereum !== "undefined") {
-      try {
-        const coreTestnetId = "0x45B";
-        const networkId = await ethereum.request({ method: "net_version" });
-
-        if (networkId !== coreTestnetId) {
-          try {
-            await ethereum.request({
-              method: "wallet_switchEthereumChain",
-              params: [{ chainId: coreTestnetId }],
-            });
-          } catch (switchError) {
-            if (switchError.code === 4902) {
-              try {
-                await ethereum.request({
-                  method: "wallet_addEthereumChain",
-                  params: [
-                    {
-                      chainId: coreTestnetId,
-                      chainName: "Core Testnet",
-                      rpcUrls: ["https://rpc.test.btcs.network"],
-                      nativeCurrency: {
-                        name: "Core",
-                        symbol: "tCORE",
-                        decimals: 18,
-                      },
-                      blockExplorerUrls: ["https://scan.test.btcs.network"],
-                    },
-                  ],
-                });
-              } catch (addError) {
-                console.error("Error adding Core testnet:", addError);
-                toast.error(
-                  "Failed to add Core testnet to MetaMask. Please try again."
-                );
-                return;
-              }
-            } else {
-              console.error("Error switching to Core testnet:", switchError);
-              toast.error(
-                "Failed to switch to Core testnet. Please try again."
-              );
-              return;
-            }
-          }
-        }
-
-        await ethereum.request({ method: "eth_requestAccounts" });
-
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        const shortAddress = `${address.slice(0, 5)}...${address.slice(-5)}`;
-        const balance = await provider.getBalance(address);
-        const balanceInEther = ethers.utils.formatEther(balance);
-
-        setWalletAddress(shortAddress);
-        setWalletBalance(`${balanceInEther} CORE`);
-        setConnected(true);
-
-        localStorage.setItem("connected", "true");
-        localStorage.setItem("address", shortAddress);
-        localStorage.setItem("balance", balanceInEther);
-
-        toast.success("Connected to wallet successfully!");
-      } catch (error) {
-        console.error("Error connecting to wallet:", error);
-        toast.error("Error connecting to wallet. Please try again.");
-      }
-    } else if (isMobile) {
-      // Attempt to open a web3 wallet app on mobile
-      const dappUrl = "https://your-dapp-url.com"; // Replace with your DApp URL
-      const deepLink = `https://metamask.app.link/dapp/${dappUrl}`;
-      window.location.href = deepLink;
-    } else {
-      toast.error(
-        "MetaMask is not installed. Please install MetaMask and try again."
-      );
+  const connectWallet = async (connector) => {
+    try {
+      await activate(connector);
+      toast.success("Connected to wallet successfully!");
+    } catch (error) {
+      console.error("Error connecting to wallet:", error);
+      toast.error("Error connecting to wallet. Please try again.");
     }
   };
 
@@ -110,22 +56,26 @@ const Web3WalletConnect = () => {
           After connecting, click on connect wallet again to switch to Core
           testnet
         </p>
-        {!connected ? (
-          <button
-            id="connectButton"
-            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
-            onClick={connectWallet}
-          >
-            Connect Wallet
-          </button>
+        {!active ? (
+          <>
+            <button
+              className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
+              onClick={() => connectWallet(injected)}
+            >
+              Connect MetaMask
+            </button>
+            <button
+              className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
+              onClick={() => connectWallet(walletConnect)}
+            >
+              Connect WalletConnect
+            </button>
+          </>
         ) : (
           <div>
-            <p
-              id="walletAddress"
-              className="mt-4">{`Connected: ${walletAddress}`}</p>
-            <p
-              id="walletBalance"
-              className="mt-2">{`Balance: ${walletBalance}`}</p>
+            <p className="mt-4">{`Connected: ${account}`}</p>
+            <p className="mt-2">{`Balance: ${walletBalance} ETH`}</p>
+            <p className="mt-2">{`Network: ${chainId === 1115 ? 'Core Testnet' : chainId}`}</p>
           </div>
         )}
       </div>
@@ -135,4 +85,5 @@ const Web3WalletConnect = () => {
   );
 };
 
-export default Web3WalletConnect;
+const Web3WalletConnect = () => (
+  <Web3ReactProvider getLibrary={(provider)
