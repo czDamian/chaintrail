@@ -85,5 +85,14 @@ const Web3WalletConnectComponent = () => {
   );
 };
 
+const getLibrary = (provider) => {
+  return new ethers.providers.Web3Provider(provider);
+};
+
 const Web3WalletConnect = () => (
-  <Web3ReactProvider getLibrary={(provider)
+  <Web3ReactProvider getLibrary={getLibrary}>
+    <Web3WalletConnectComponent />
+  </Web3ReactProvider>
+);
+
+export default Web3WalletConnect;
