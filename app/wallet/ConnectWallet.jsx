@@ -1,94 +1,115 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import { ToastContainer, toast } from "react-toastify";
-import { Web3ReactProvider, useWeb3React } from "@web3-react/core";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { WalletConnectConnector } from "@web3-react/walletconnect-connector";
 import "react-toastify/dist/ReactToastify.css";
 
-const injected = new InjectedConnector({
-  supportedChainIds: [1, 4, 1115], // Mainnet, Rinkeby, Core Testnet
-});
-
-const walletconnect = new WalletConnectConnector({
-  rpc: {
-    1: "https://ethereum.publicnode.com",
-    4: "https://rinkeby.publicnode.com",
-    1115: "https://rpc.test.btcs.network",
-  },
-  qrcode: true,
-});
-
-const Web3WalletConnectComponent = () => {
-  const { active, account, provider, activate, deactivate } = useWeb3React();
+const Web3WalletConnect = () => {
+  const [provider, setProvider] = useState(null);
+  const [signer, setSigner] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
 
-  useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("active:", active);
-    console.log("account:", account);
-    console.log("provider:", provider);
+  const CORE_TESTNET_CHAIN_ID = "0x45b"; // Chain ID for Core Testnet
 
-    if (active && account) {
-      console.log("Setting wallet address");
-      setWalletAddress(account); // Removed address formatting
+  useEffect(() => {
+    if (provider && walletAddress) {
       fetchBalance();
-    } else {
-      console.log("Resetting wallet address and balance");
-      setWalletAddress("");
-      setWalletBalance("");
     }
-  }, [active, account, provider]);
+  }, [provider, walletAddress]);
 
   const fetchBalance = async () => {
-    console.log("Fetching balance");
-    console.log("provider:", provider);
-    console.log("account:", account);
-    if (provider && account) {
-      try {
-        const balance = await provider.getBalance(account);
-        const balanceInEther = ethers.formatEther(balance);
-        console.log("Balance fetched:", balanceInEther);
-        setWalletBalance(`${balanceInEther} CORE`);
-      } catch (error) {
-        console.error("Error fetching balance:", error);
-        toast.error("Error fetching balance. Please try again.");
+    try {
+      const balance = await provider.getBalance(walletAddress);
+      const balanceInCore = ethers.formatEther(balance);
+      setWalletBalance(`${balanceInCore} CORE`);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      toast.error("Error fetching balance. Please try again.");
+    }
+  };
+
+  const switchToCoreTestnet = async () => {
+    try {
+      await window.ethereum.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: CORE_TESTNET_CHAIN_ID }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainId: CORE_TESTNET_CHAIN_ID,
+                chainName: "Core Testnet",
+                nativeCurrency: {
+                  name: "tCore",
+                  symbol: "tCORE",
+                  decimals: 18,
+                },
+                rpcUrls: ["https://rpc.test.btcs.network"],
+                blockExplorerUrls: ["https://scan.test.btcs.network"],
+              },
+            ],
+          });
+        } catch (addError) {
+          console.error("Error adding Core Testnet:", addError);
+          toast.error("Failed to add Core Testnet. Please add it manually.");
+        }
+      } else {
+        console.error("Error switching to Core Testnet:", switchError);
+        toast.error(
+          "Failed to switch to Core Testnet. Please switch manually."
+        );
       }
     }
   };
 
-  const connectWallet = async (connectorType) => {
-    console.log("Connecting wallet:", connectorType);
+  const connectWallet = async () => {
     try {
-      if (connectorType === "injected") {
-        await activate(injected);
-      } else if (connectorType === "walletconnect") {
-        await activate(walletconnect);
+      if (window.ethereum) {
+        const web3Provider = new ethers.BrowserProvider(window.ethereum);
+        await web3Provider.send("eth_requestAccounts", []);
+
+        const network = await web3Provider.getNetwork();
+        if (network.chainId.toString(16) !== CORE_TESTNET_CHAIN_ID.slice(2)) {
+          await switchToCoreTestnet();
+          const updatedProvider = new ethers.BrowserProvider(window.ethereum);
+          setProvider(updatedProvider);
+        } else {
+          setProvider(web3Provider);
+        }
+
+        const walletSigner = await web3Provider.getSigner();
+        setSigner(walletSigner);
+
+        const address = await walletSigner.getAddress();
+        setWalletAddress(address);
+
+        toast.success("Connected to wallet successfully!");
+      } else {
+        toast.error("No web3 provider found. Please install MetaMask.");
       }
-      toast.success("Connected to wallet successfully!");
     } catch (error) {
       console.error("Error connecting to wallet:", error);
       toast.error("Error connecting to wallet. Please try again.");
     }
   };
 
-  const disconnectWallet = async () => {
-    console.log("Disconnecting wallet");
-    try {
-      deactivate();
-      toast.success("Disconnected from wallet successfully!");
-    } catch (error) {
-      console.error("Error disconnecting wallet:", error);
-      toast.error("Error disconnecting wallet. Please try again.");
-    }
+  const disconnectWallet = () => {
+    setProvider(null);
+    setSigner(null);
+    setWalletAddress("");
+    setWalletBalance("");
+    toast.success("Disconnected from wallet successfully!");
   };
 
-  console.log("Rendering component");
-  console.log("active:", active);
-  console.log("walletAddress:", walletAddress);
-  console.log("walletBalance:", walletBalance);
+  const trimWalletAddress = (address) => {
+    return `${address.slice(0, 5)}...${address.slice(-5)}`;
+  };
 
   return (
     <div className="bg-neutral-900 my-6 p-5">
@@ -96,47 +117,34 @@ const Web3WalletConnectComponent = () => {
       <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
         <p>
-          After connecting, you may need to switch networks manually to access the Core testnet
+          Only Core Testnet is supported. You will be prompted to switch if
+          necessary.
         </p>
-        {!active ? (
+        {!walletAddress ? (
           <div>
             <button
               className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600 mr-2"
-              onClick={() => connectWallet("injected")}
-            >
+              onClick={connectWallet}>
               Connect with MetaMask
-            </button>
-            <button
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600"
-              onClick={() => connectWallet("walletconnect")}
-            >
-              Connect with WalletConnect
             </button>
           </div>
         ) : (
           <div>
-            <p className="mt-4">{`Connected: ${walletAddress}`}</p>
+            <p className="mt-4">{`Connected: ${trimWalletAddress(
+              walletAddress
+            )}`}</p>
             <p className="mt-2">{`Balance: ${walletBalance}`}</p>
             <button
               className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
-              onClick={disconnectWallet}
-            >
+              onClick={disconnectWallet}>
               Disconnect Wallet
             </button>
           </div>
         )}
       </div>
-      <h1 className="text-2xl font-bold mt-6">My NFTs</h1>
+      {/* <h1 className="text-2xl font-bold mt-6">My NFTs</h1> */}
       <div id="nftContainer" className="mt-4"></div>
     </div>
-  );
-};
-
-const Web3WalletConnect = () => {
-  return (
-    <Web3ReactProvider getLibrary={(provider) => new ethers.BrowserProvider(provider)}>
-      <Web3WalletConnectComponent />
-    </Web3ReactProvider>
   );
 };
 
