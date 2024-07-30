@@ -28,7 +28,7 @@ const Navbar = () => {
     "/referrals",
     "/collection",
     "/referrals",
-    "/play",
+    "/quests",
     "/more",
   ];
   const showNavbar = pathname

@@ -134,12 +134,12 @@ export const Complete = () => {
             </div>
             <div className="flex text-xs gap-2 my-6">
               <Button
-                href="/play"
+                href="/quests"
                 className="bg-neutral-950 text-yellow-500 hover:bg-slate-950 z-10  border border-yellow-700">
                 Back
               </Button>
               <Button
-                href="/play/quest2"
+                href="/quests"
                 className="bg-yellow-600 hover:bg-yellow-700">
                 Next Quest
               </Button>

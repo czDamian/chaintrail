@@ -1,3 +1,4 @@
+//api/quests/route.js
 import connectDb from "@/lib/mongodb";
 import Quest from "@/models/Quest"; 
 import { NextResponse } from "next/server";

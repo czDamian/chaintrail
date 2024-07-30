@@ -1,25 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { RiMenu3Fill } from "react-icons/ri";
 import { MdDelete } from "react-icons/md";
 import Points from "@/app/components/user/Points";
-import { questQuestions } from "./questions";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import SideNav from "@/app/components/Reusable/SideNav";
 import Modal from "@/app/components/Reusable/Modal";
 import { Success } from "@/app/components/Reusable/Popup";
 import { Wrong } from "@/app/components/Reusable/Popup";
 import { Complete } from "@/app/components/Reusable/Popup";
+import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
-const questions = questQuestions;
-
-const QuestionComponent = () => {
+const QuestionComponent = ({ questId }) => {
   const { updatePoints } = useTelegramAuth();
-
-  const router = useRouter();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -27,9 +19,11 @@ const QuestionComponent = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
+  const [questions, setQuestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
-  const currentQuestion = questions[currentQuestionIndex];
   const buttonSound =
     typeof Audio !== "undefined" ? new Audio("/btn/pick.mp3") : null;
   const SuccessSound =
@@ -39,8 +33,28 @@ const QuestionComponent = () => {
   const congratsSound =
     typeof Audio !== "undefined" ? new Audio("/btn/congrats.mp3") : null;
 
+  const fetchQuestions = async () => {
+    try {
+      const res = await fetch(`/api/quests/${questId}/questions`);
+      if (!res.ok) {
+        throw new Error("Network response was not ok.");
+      }
+      const data = await res.json();
+      setQuestions(data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (questId) {
+      fetchQuestions();
+    }
+  }, [questId]);
+
   const handleAnswerClick = (answer) => {
-    // Play the button sound
     if (buttonSound) {
       buttonSound
         .play()
@@ -50,14 +64,16 @@ const QuestionComponent = () => {
     const newSelectedAnswers = [...selectedAnswers, answer];
     setSelectedAnswers(newSelectedAnswers);
 
-    // Check if the answer length matches the correct answer length
-    if (newSelectedAnswers.length === currentQuestion.correctAnswer.length) {
+    const currentQuestion = questions[currentQuestionIndex] || {};
+    if (
+      currentQuestion.questAnswer &&
+      newSelectedAnswers.length === currentQuestion.questAnswer.length
+    ) {
       handleSubmit(newSelectedAnswers);
     }
   };
 
   const deleteLast = () => {
-    // Play the button sound
     if (buttonSound) {
       buttonSound
         .play()
@@ -65,15 +81,14 @@ const QuestionComponent = () => {
     }
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
-
   const handleSubmit = (answers = selectedAnswers) => {
+    const currentQuestion = questions[currentQuestionIndex] || {};
     const submittedAnswer = answers.join("");
-    const correct = submittedAnswer === currentQuestion.correctAnswer;
+    const correct = submittedAnswer === (currentQuestion.questAnswer || "");
     setIsCorrect(correct);
     setShowPopup(true);
 
     if (correct) {
-      // Play the button sound
       if (SuccessSound) {
         SuccessSound.play().catch((error) =>
           console.error("Error playing sound:", error)
@@ -81,40 +96,35 @@ const QuestionComponent = () => {
       }
       updatePoints(1000);
     } else {
-      // Play the wrong answer sound
       if (wrongSound) {
-        wrongSound.play().catch((error) =>
-          console.error("Error playing wrong sound:", error)
-        );
+        wrongSound
+          .play()
+          .catch((error) => console.error("Error playing wrong sound:", error));
       }
     }
 
-
-   if (currentQuestionIndex === questions.length - 1) {
-     setIsCompleted(true);
-     // Set a timer to show the Complete page after 4 seconds
-     setTimeout(() => {
-       setShowComplete(true);
-       // Play the congratulations sound 1 second after showing the complete page
-       setTimeout(() => {
-         if (congratsSound) {
-           congratsSound
-             .play()
-             .catch((error) => console.error("Error playing sound:", error));
-         }
-       }, 1000);
-     }, 4000);
-   } else {
-     // Set a timer to move to the next question
-     setTimeout(() => {
-       handleNext();
-     }, 1500);
-   }
+    if (currentQuestionIndex === questions.length - 1) {
+      setIsCompleted(true);
+      setTimeout(() => {
+        setShowComplete(true);
+        setTimeout(() => {
+          if (congratsSound) {
+            congratsSound
+              .play()
+              .catch((error) => console.error("Error playing sound:", error));
+          }
+        }, 1000);
+      }, 4000);
+    } else {
+      setTimeout(() => {
+        handleNext();
+      }, 1500);
+    }
   };
+
   const handleNext = () => {
     if (isCompleted || showComplete) {
-      
-      console.log("Quest completed"); // Redirect to homepage when completed or console a message
+      console.log("Quest completed");
     } else {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedAnswers([]);
@@ -131,10 +141,19 @@ const QuestionComponent = () => {
     }
   }, [showPopup, isCompleted]);
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!questions.length) {
+    return <div>No questions available</div>;
+  }
+
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
     <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
       <QuesUI />
-      {/* header starts */}
       <div className="py-4 flex justify-between items-center text-sm">
         <div className="flex items-center gap-2">
           <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
@@ -150,43 +169,52 @@ const QuestionComponent = () => {
         </div>
         <SideNav />
       </div>
-      {/* header ends and image list starts */}
       <section className="max-w-[320px]">
         <div className="grid grid-cols-2 gap-4">
-          {currentQuestion.images.map((image, index) => (
-            <img
-              key={index}
-              loading="lazy"
-              src={image}
-              className="rounded-lg w-full h-32 object-cover hover:brightness-75 transition-all"
-              alt={`question ${currentQuestionIndex + 1} image ${index + 1}`}
-            />
-          ))}
+          {currentQuestion &&
+            ["img1", "img2", "img3", "img4"].map(
+              (key, index) =>
+                currentQuestion[key] && (
+                  <img
+                    key={index}
+                    loading="lazy"
+                    src={currentQuestion[key]}
+                    className="rounded-lg w-full h-32 object-cover hover:brightness-75 transition-all"
+                    alt={`question ${currentQuestionIndex + 1} image ${
+                      index + 1
+                    }`}
+                  />
+                )
+            )}
         </div>
-        {/* style for input area */}
         <div className="text-white py-4 flex justify-center">
           <div className="flex">
-            {Array.from({ length: currentQuestion.correctAnswer.length }).map(
-              (_, index) => (
-                <span
-                  key={index}
-                  className="w-8 h-10 bg-gray-700 rounded mx-1 flex items-center justify-center text-lg">
-                  {selectedAnswers[index] || ""}
-                </span>
-              )
-            )}
+            {currentQuestion &&
+              currentQuestion.questAnswer &&
+              currentQuestion.questAnswer.length > 0 &&
+              Array.from({ length: currentQuestion.questAnswer.length }).map(
+                (_, index) => (
+                  <span
+                    key={index}
+                    className="w-8 h-10 bg-gray-700 rounded mx-1 flex items-center justify-center text-lg">
+                    {selectedAnswers[index] || ""}
+                  </span>
+                )
+              )}
           </div>
         </div>
         <div className="my-4">
           <div className="flex flex-wrap justify-center gap-2">
-            {currentQuestion.possibleAnswers.map((answer, index) => (
-              <button
-                key={index}
-                className="bg-black hover:bg-yellow-700 active:bg-yellow-900 text-white py-2 px-4 rounded-md text-lg"
-                onClick={() => handleAnswerClick(answer)}>
-                {answer}
-              </button>
-            ))}
+            {currentQuestion &&
+              currentQuestion.scrambledAnswer &&
+              currentQuestion.scrambledAnswer.split("").map((answer, index) => (
+                <button
+                  key={index}
+                  className="bg-black hover:bg-yellow-700 active:bg-yellow-900 text-white py-2 px-4 rounded-md text-lg"
+                  onClick={() => handleAnswerClick(answer)}>
+                  {answer}
+                </button>
+              ))}
           </div>
         </div>
         <div className="flex items-center gap-4 my-4">
@@ -199,7 +227,7 @@ const QuestionComponent = () => {
           </button>
           <Modal
             isOpen={isModalOpen}
-            hintText="please set the hint text dynamically. "
+            hintText={currentQuestion.hint || "No hint available"}
             onClose={closeModal}
           />
           <button
@@ -208,7 +236,7 @@ const QuestionComponent = () => {
             <MdDelete className="text-xl" />
             <span className="text-xs">Del</span>
           </button>
-        </div>{" "}
+        </div>
         {showPopup && (
           <div>
             {isCompleted && showComplete ? (
@@ -229,14 +257,14 @@ export default QuestionComponent;
 
 const QuesUI = () => {
   return (
-    <div className="fixed inset-0 -z-30 flex items-center justify-center bg-black  font-bold text-lg">
-      <div className="relative w-screen h-screen ">
+    <div className="fixed inset-0 -z-30 flex items-center justify-center bg-black font-bold text-lg">
+      <div className="relative w-screen h-screen">
         <Image
           src="/btn/success.png"
           alt="success background"
           width={1000}
           height={1000}
-          className="absolute inset-0 w-full h-full "
+          className="absolute inset-0 w-full h-full"
         />
         <div className="absolute inset-0 bg-black bg-opacity-80"></div>
         <div className="absolute inset-0 flex items-center justify-center"></div>

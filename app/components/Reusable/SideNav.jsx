@@ -10,7 +10,7 @@ const SideNav = () => {
 
   const navLinks = [
     { href: "/", title: "Home" },
-    { href: "/play", title: "Quests" },
+    { href: "/quests", title: "Quests" },
     { href: "/collection", title: "My Collections" },
     { href: "/referrals", title: "Referrals" },
     { href: "/daily-reward", title: "Daily Rewards" },
