@@ -21,7 +21,7 @@ export async function POST(request) {
     const savedQuest = await newQuest.save();
     console.log("Saved quest to database:", savedQuest);
 
-    // Return the saved quest as the response
+    // Return the saved quest
     return NextResponse.json(savedQuest, { status: 201 });
   } catch (error) {
     console.error("Error creating quest:", error);
