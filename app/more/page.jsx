@@ -2,6 +2,12 @@ import SideNav from "../components/Reusable/SideNav";
 import Web3WalletConnect from "../wallet/ConnectWallet";
 
 
+
+export const metadata = {
+  title: "Earn More Coins",
+  description: "Earn NFTs while playing your favorite game",
+};
+
 const MoreCoins = () => {
   return (
     <section>

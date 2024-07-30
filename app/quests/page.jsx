@@ -1,7 +1,7 @@
 import FetchQuestsFromDb from "./FetchQuests";
 
 export const metadata = {
-  title: "Quests",
+  title: "Quest List",
   description: "Earn NFTs while playing your favorite game",
 };
 

@@ -1,6 +1,11 @@
 import { IoCopy } from "react-icons/io5";
 import SideNav from "../components/Reusable/SideNav";
 
+
+export const metadata = {
+  title: "Referrals",
+  description: "Earn NFTs while playing your favorite game",
+};
 const Referrals = () => {
   return (
     <section className="px-8">

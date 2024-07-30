@@ -1,5 +1,10 @@
 import SideNav from "../components/Reusable/SideNav";
 
+export const metadata = {
+  title: "My Collections",
+  description: "Earn NFTs while playing your favorite game",
+};
+
 const images = [
   {
     img1: "mainNft1.svg",

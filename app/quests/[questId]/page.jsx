@@ -1,6 +1,11 @@
 // app/quests/[questId]/page.js
 import QuestionComponent from "./Question1";
 
+
+export const metadata = {
+  title: "Quest",
+  description: "Earn NFTs while playing your favorite game",
+};
 const QuestPage = ({ params }) => {
   const { questId } = params; // Extract questId from URL
 

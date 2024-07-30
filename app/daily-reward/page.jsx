@@ -3,6 +3,12 @@ import { FaTasks } from "react-icons/fa";
 import Button from "../components/Reusable/Button";
 import SideNav from "../components/Reusable/SideNav";
 
+
+export const metadata = {
+  title: "Daily Rewards",
+  description: "Earn NFTs while playing your favorite game",
+};
+
 const DailyReward = () => {
   return (
     <section>
