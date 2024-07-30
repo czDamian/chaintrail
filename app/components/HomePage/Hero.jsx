@@ -15,7 +15,7 @@ const Hero = () => {
   if (isLoading) {
     return (
       <Button
-        href="/play"
+        href="/quests"
         className="flex mx-auto text-yellow-500 text-sm md:text-lg gap-2">
         play now
         <span className="animate-pulse text-xl">
@@ -49,14 +49,14 @@ const Hero = () => {
           Embark on Word Trails, learn about blockchain
         </p>
         <Button
-          href="/play"
+          href="/quests"
           className="flex px-8 mb-4 mx-auto text-sm gap-2 text-black bg-yellow-500 py-3">
           play now
         </Button>
 
         {userInfo ? (
           <Button
-            href="/play"
+            href="/quests"
             className="flex mx-auto text-sm gap-2 md:text-2xl">
             play now
             <span className="animate-pulse text-xl">

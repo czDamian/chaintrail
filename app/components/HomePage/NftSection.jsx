@@ -32,7 +32,7 @@ const NFTSection = () => {
       <div className="text-center mt-10">
         <Button
           className="bg-yellow-700 hover:bg-yellow-600 text-black py-3"
-          href="/play">
+          href="/quests">
           Play Now
         </Button>
       </div>
