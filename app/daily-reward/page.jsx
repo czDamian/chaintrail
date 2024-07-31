@@ -5,6 +5,10 @@ import SideNav from "../components/Reusable/SideNav";
 import ClaimDailyPass from "./ClaimDailyPass";
 import ClaimDailyReward from "./ClaimDailyReward";
 import FetchPoints from "../components/user/FetchPoints";
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2e8ff52d36ba331a1a34e519a4a420337e758db4
 
 export const metadata = {
   title: "Daily Rewards",
@@ -20,7 +24,11 @@ const DailyReward = () => {
           <SideNav />
         </div>
         <div className="flex mt-10 items-center justify-between gap-2  rounded-md mx-4">
+<<<<<<< HEAD
           <div className=" flex flex-col items-center justify-center flex-shrink-0justify-center gap-8 w-24 h-28 md:w-32 md:w-30 p-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
+=======
+          <div className=" flex flex-col items-center flex-shrink-0justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
+>>>>>>> 2e8ff52d36ba331a1a34e519a4a420337e758db4
             <BsCalendar2Date className="text-3xl " />
             <p className="text-[12px]">Daily Reward</p>
           </div>
@@ -34,11 +42,17 @@ const DailyReward = () => {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
       <div className="mx-auto flex flex-col items-center justify-between">
         <FetchPoints />
         <ClaimDailyPass />
         <ClaimDailyReward />
       </div>
+=======
+      <FetchPoints />
+      <ClaimDailyPass />
+      <ClaimDailyReward />
+>>>>>>> 2e8ff52d36ba331a1a34e519a4a420337e758db4
       <DailyBonus />
     </section>
   );
