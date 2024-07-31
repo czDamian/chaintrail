@@ -69,14 +69,16 @@ export async function PUT(request) {
         });
       }
 
-      user.points += 200;
+      user.points += 1200;
       user.lastClaimTimestamp = now;
       await user.save();
 
       return NextResponse.json({
         message: "Daily reward claimed",
         points: user.points,
-        nextClaimTime: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+        nextClaimTime: new Date(
+          now.getTime() + 24 * 60 * 60 * 1000
+        ).toISOString(),
       });
     } else if (type === "pass") {
       const lastClaimPass = user.lastClaimPassTimestamp
@@ -100,7 +102,9 @@ export async function PUT(request) {
       return NextResponse.json({
         message: "Daily pass claimed",
         playPass: user.playPass,
-        nextClaimPassTime: new Date(now.getTime() + 6 * 60 * 60 * 1000),
+        nextClaimPassTime: new Date(
+          now.getTime() + 6 * 60 * 60 * 1000
+        ).toISOString(),
       });
     } else {
       return NextResponse.json(

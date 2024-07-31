@@ -20,7 +20,7 @@ const ClaimDailyReward = () => {
           setCanClaimReward(true);
         } else {
           setCanClaimReward(false);
-          setNextClaimTime(nextClaimTime);
+          setNextClaimTime(new Date(data.nextClaimTime));
         }
       } else {
         console.error("Error checking reward status:", data.message);

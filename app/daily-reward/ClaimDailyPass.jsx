@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
-
 const ClaimDailyPass = () => {
   const { userInfo } = useTelegramAuth();
   const [message, setMessage] = useState("");
@@ -21,7 +20,7 @@ const ClaimDailyPass = () => {
           setCanClaimPass(true);
         } else {
           setCanClaimPass(false);
-          setNextClaimPassTime(nextClaimPassTime);
+          setNextClaimPassTime(new Date(data.nextClaimPassTime));
         }
       } else {
         console.error("Error checking pass status:", data.message);
@@ -74,7 +73,7 @@ const ClaimDailyPass = () => {
           Next claim pass time: {new Date(nextClaimPassTime).toLocaleString()}
         </p>
       )}
-      <TotalPasses/>
+      <TotalPasses />
     </div>
   );
 };
