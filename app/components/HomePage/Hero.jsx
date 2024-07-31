@@ -30,7 +30,7 @@ const Hero = () => {
         </h1>
 
         <p
-          className={`${raleway.className} text-white font-lato max-w-[340px] mb-8 text-md md:text-xl`}>
+          className={`${raleway.className} text-white font-lato max-w-[340px] sm:max-w-[600px] mb-8 text-md md:text-xl`}>
           Embark on Word Trail, where every level takes you a step closer to a
           unique nFT.
         </p>
