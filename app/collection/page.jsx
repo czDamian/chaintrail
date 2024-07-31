@@ -1,5 +1,4 @@
 import SideNav from "../components/Reusable/SideNav";
-import FetchPoints from "../components/user/FetchPoints";
 
 export const metadata = {
   title: "My Collections",
@@ -26,7 +25,6 @@ const Collection = () => {
     <div className="my-6 w-full">
       <div className="flex justify-between items-center bg-yellow-800 gap-8 rounded mb-4">
         <h1 className="my-4 px-4">MY COLLECTIONS</h1>
-        <h1> <FetchPoints/> </h1>
         <SideNav />
       </div>
 

@@ -1,3 +1,5 @@
+// delete this later
+
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
 export default function Points() {

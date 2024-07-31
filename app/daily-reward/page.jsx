@@ -2,6 +2,9 @@ import { BsCalendar2Date } from "react-icons/bs";
 import { FaTasks } from "react-icons/fa";
 import Button from "../components/Reusable/Button";
 import SideNav from "../components/Reusable/SideNav";
+import ClaimDailyPass from "./ClaimDailyPass";
+import ClaimDailyReward from "./ClaimDailyReward";
+import FetchPoints from "../components/user/FetchPoints";
 
 
 export const metadata = {
@@ -18,7 +21,7 @@ const DailyReward = () => {
           <SideNav />
         </div>
         <div className="flex mt-10 items-center justify-between gap-2  rounded-md mx-4">
-          <div className=" flex flex-col items-center justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
+          <div className=" flex flex-col items-center flex-shrink-0justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
             <BsCalendar2Date className="text-3xl " />
             <p className="text-[12px]">Daily Reward</p>
           </div>
@@ -32,6 +35,9 @@ const DailyReward = () => {
           </div>
         </div>
       </div>
+      <FetchPoints />
+      <ClaimDailyPass />
+      <ClaimDailyReward />
       <DailyBonus />
     </section>
   );
