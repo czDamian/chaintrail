@@ -1,9 +1,9 @@
 import { BsCalendar2Date } from "react-icons/bs";
 import { FaTasks } from "react-icons/fa";
-import Button from "../components/Reusable/Button";
 import SideNav from "../components/Reusable/SideNav";
 import ClaimDailyReward from "./ClaimDailyReward";
 import FetchPoints from "../components/user/FetchPoints";
+import FetchPass from "../components/user/FetchPass";
 
 export const metadata = {
   title: "Daily Rewards",
@@ -34,51 +34,13 @@ const DailyReward = () => {
         </div>
       </div>
       <div className="mx-auto flex flex-col items-center justify-between">
-        <FetchPoints />
+        <div className="flex gap-2">
+          <FetchPoints />
+          <FetchPass />
+        </div>
         <ClaimDailyReward />
       </div>
-      <DailyBonus />
     </section>
   );
 };
 export default DailyReward;
-
-const DailyBonus = () => {
-  return (
-    <div className="flex flex-col items-center justify-center my-10">
-      <div className="bg-neutral-800 p-6 rounded-lg shadow-lg">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">DAILY BONUS</h1>
-          <p className="text-sm mb-6">
-            Free Coins for logging into the game daily without skipping
-          </p>
-        </div>
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
-            <img
-              src="/coins.png"
-              alt="Chain Points"
-              className="w-12 h-12 mb-2"
-            />
-            <span className="text-xl mb-2 font-bold">+1200</span>
-            <span className="text-sm">Chain Points</span>
-          </div>
-          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
-            <img
-              src="/ticketIcon.svg"
-              alt="Play Passes"
-              className="w-12 h-12 mb-2"
-            />
-            <span className="text-xl font-bold">4</span>
-            <span className="text-sm mb-2">Play Passes</span>
-          </div>
-        </div>
-        <div className="text-center">
-          <Button className="px-20 py-2 bg-yellow-500 hover:bg-yellow-400 active:scale-105 text-black font-bold rounded-md">
-            CLAIM
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-};

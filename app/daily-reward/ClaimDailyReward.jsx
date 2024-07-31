@@ -3,11 +3,14 @@ import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Button from "../components/Reusable/Button";
+import { useRouter } from "next/navigation";
 
 const ClaimDailyReward = () => {
   const { userInfo } = useTelegramAuth();
   const [nextClaimTime, setNextClaimTime] = useState(null);
   const [canClaim, setCanClaim] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     checkClaimStatus();
@@ -21,6 +24,7 @@ const ClaimDailyReward = () => {
       if (response.ok) {
         const now = new Date();
         const nextClaimTime = new Date(data.nextClaimTime);
+        router.refresh();
         if (now >= nextClaimTime) {
           setCanClaim(true);
         } else {
@@ -99,14 +103,14 @@ const ClaimDailyReward = () => {
           </div>
         </div>
         <div className="text-center">
-          <button
+          <Button
             onClick={claimRewardAndPass}
             disabled={!canClaim}
             className={`px-20 py-2 bg-yellow-500 hover:bg-yellow-400 active:scale-105 text-black font-bold rounded-md ${
-              !canClaim ? "opacity-50 cursor-not-allowed" : ""
+              !canClaim ? "opacity-50 cursor-not-allowed text-xs" : ""
             }`}>
-            {canClaim ? "CLAIM" : "Login to Claim"}
-          </button>
+            {canClaim ? "CLAIM" : "Already Claimed"}
+          </Button>
         </div>
         {nextClaimTime && (
           <div className="text-center mt-4">

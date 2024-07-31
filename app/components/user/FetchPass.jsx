@@ -2,14 +2,14 @@
 import { useEffect, useState } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
-const FetchPoints = () => {
+const FetchPass = () => {
   const { userInfo, isLoading } = useTelegramAuth();
-  const [points, setPoints] = useState(null);
+  const [playPass, setPlayPass] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchUserPoints = async (userId) => {
+    const fetchUserPasses = async (userId) => {
       try {
         const response = await fetch(`/api/register?userId=${userId}`, {
           method: "GET",
@@ -19,12 +19,12 @@ const FetchPoints = () => {
         });
         const data = await response.json();
         if (response.ok) {
-          setPoints(data.points);
+          setPlayPass(data.playPass);
         } else {
-          setError(data.message || "Failed to fetch points");
+          setError(data.message || "Failed to fetch passes");
         }
       } catch (error) {
-        console.error("Error fetching points:", error);
+        console.error("Error fetching passes:", error);
         setError("Server error");
       } finally {
         setLoading(false);
@@ -32,23 +32,35 @@ const FetchPoints = () => {
     };
 
     if (userInfo && userInfo.id) {
-      fetchUserPoints(userInfo.id);
+      fetchUserPasses(userInfo.id);
     }
   }, [userInfo]);
 
   if (isLoading || loading) {
-    return <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">login to view points balance...</div>;
+    return (
+      <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">
+        Login to view pass balance...
+      </div>
+    );
   }
 
   if (!userInfo) {
-    return <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">User not logged in</div>;
+    return (
+      <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">
+        User not logged in
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="text-xs text-red-500">{error}</div>;
+    return (
+      <div className="text-xs border p-2 rounded bg-neutral-950 mt-4 text-red-500">
+        {error}
+      </div>
+    );
   }
 
-  return <div>Points: {points}</div>;
+  return <div>Play Passes: {playPass}</div>;
 };
 
-export default FetchPoints;
+export default FetchPass;
