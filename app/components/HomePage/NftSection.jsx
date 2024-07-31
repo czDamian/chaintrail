@@ -2,10 +2,10 @@
 import Image from "next/image";
 import Button from "../Reusable/Button";
 import { useRef } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi"; // React Icons
+import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const NFTSection = () => {
-  const nftImages = ["/nft01.png", "/nft1.png", "/nft2.png"];
+  const nftImages = ["/nft1.png", "/nft01.png", "/nft2.png"];
   const carouselRef = useRef(null);
 
   const scrollCarousel = (direction) => {
