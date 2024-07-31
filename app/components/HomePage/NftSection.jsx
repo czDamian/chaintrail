@@ -14,7 +14,7 @@ const NFTSection = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 lg:grid-cols-3 px-4 sm:px-8 place-content-center  place-items-center">
+      <div className="flex flex-row items-center justify-center flex-shrink px-4 sm:px-8 place-content-center  place-items-center">
         {nftImages.map((nftImage, index) => (
           <div
             key={index}
