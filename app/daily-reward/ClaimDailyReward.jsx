@@ -1,16 +1,42 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
 const ClaimDailyReward = () => {
   const { userInfo } = useTelegramAuth();
   const [message, setMessage] = useState("");
   const [nextClaimTime, setNextClaimTime] = useState(null);
+  const [canClaimReward, setCanClaimReward] = useState(false);
+
+  const checkRewardStatus = async () => {
+    if (!userInfo || !userInfo.id) return;
+    try {
+      const response = await fetch(`/api/register?userId=${userInfo.id}`);
+      const data = await response.json();
+      if (response.ok) {
+        const now = new Date();
+        const nextClaimTime = new Date(data.nextClaimTime);
+        if (now >= nextClaimTime) {
+          setCanClaimReward(true);
+        } else {
+          setCanClaimReward(false);
+          setNextClaimTime(nextClaimTime);
+        }
+      } else {
+        console.error("Error checking reward status:", data.message);
+      }
+    } catch (error) {
+      console.error("Error checking reward status:", error);
+    }
+  };
+
+  useEffect(() => {
+    checkRewardStatus();
+  }, [userInfo]);
 
   const claimReward = async () => {
     console.log("Claim reward initiated");
     try {
-      console.log("Sending request to /api/register");
       const response = await fetch("/api/register", {
         method: "PUT",
         headers: {
@@ -26,6 +52,7 @@ const ClaimDailyReward = () => {
       if (response.ok) {
         setMessage(data.message);
         setNextClaimTime(data.nextClaimTime);
+        setCanClaimReward(false);
       } else {
         setMessage(data.message);
       }
@@ -36,8 +63,10 @@ const ClaimDailyReward = () => {
   };
 
   return (
-    <div>
-      <button onClick={claimReward}>Claim Daily Reward</button>
+    <div className="bg-neutral-950 p-2">
+      <button onClick={claimReward} disabled={!canClaimReward}>
+        {canClaimReward ? "Claim Daily Reward" : "Reward not available yet"}
+      </button>
       {message && <p>{message}</p>}
       {nextClaimTime && (
         <p>Next claim time: {new Date(nextClaimTime).toLocaleString()}</p>
