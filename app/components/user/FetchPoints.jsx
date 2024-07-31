@@ -11,12 +11,11 @@ const FetchPoints = () => {
   useEffect(() => {
     const fetchUserPoints = async (userId) => {
       try {
-        const response = await fetch("/api/register", {
-          method: "POST",
+        const response = await fetch(`/api/register?userId=${userId}`, {
+          method: "GET",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ userId }),
         });
         const data = await response.json();
         if (response.ok) {
