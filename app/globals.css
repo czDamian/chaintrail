@@ -2,6 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Krona+One:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
 
 
 @tailwind base;
@@ -9,7 +10,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-[#1F1F1F] text-white w-full max-w-[450px]  sm:max-w-[1400px] m-0 p-0;
+  @apply bg-black text-white w-full max-w-[400px]  sm:max-w-[1400px] m-0 p-0;
 }
 
 input[type=file]{

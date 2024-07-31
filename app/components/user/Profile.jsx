@@ -15,7 +15,7 @@ export default function Profile() {
         <div
           onClick={openPopup}
           className="animate-bounce-in-down focus:outline-none">
-          <Button className="bg-yellow-700 hover:bg-yellow-600">CONNECT</Button>
+          <Button className="bg-black hover:scale-105 text-xs">CONNECT</Button>
         </div>
         <Popup isOpen={isPopupOpen} onClose={closePopup} />
       </>
@@ -28,7 +28,9 @@ export default function Profile() {
         <div
           onClick={openPopup}
           className="animate-bounce-in-down focus:outline-none">
-          <Button className="border border-white">CONNECT</Button>
+          <Button className="border border-white bg-black hover:border-gold-500 text-xs">
+            CONNECT
+          </Button>
         </div>
         <Popup isOpen={isPopupOpen} onClose={closePopup} />
       </>
@@ -36,7 +38,7 @@ export default function Profile() {
   }
 
   return (
-    <div>
+    <div className="text-xs">
       <p>Hi, {userInfo.username || userInfo.first_name}!</p>
       <Popup isOpen={isPopupOpen} onClose={closePopup} />
     </div>

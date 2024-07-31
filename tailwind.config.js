@@ -24,18 +24,25 @@ module.exports = {
             transform: "translateY(0)",
           },
         },
+        rotate: {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(40deg)" },
+        },
       },
       fontFamily: {
         lato: ["Lato", "sans-serif"],
         cinzel: ["Cinzel", "serif"],
         kronaOne: ["Krona One", "sans-serif"],
+        raleway: ["Raleway", "sans-serif"],
       },
       animation: {
         "bounce-in-down": "bounce-in-down 1s ease-out",
+        rotate: "rotate 10s linear infinite",
       },
-      
+      colors: {
+        "gold-500": "#E4AD00",
+      },
     },
   },
-
   plugins: [],
 };

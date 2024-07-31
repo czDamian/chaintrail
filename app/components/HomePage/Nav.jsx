@@ -43,7 +43,7 @@ const Navbar = () => {
         cinzel.className
       } ${
         isSticky
-          ? "bg-gradient-to-b from-neutral-950 from-5% to-yellow-500 shadow-md"
+          ? "bg-gradient-to-b from-neutral-950 from-5% to-neutral-900 shadow-md"
           : "bg-black"
       }`}>
       <div className="mx-auto px-4 py-3 sm:py-5 flex justify-between items-center">
@@ -55,8 +55,9 @@ const Navbar = () => {
             alt="Logo"
             width={30}
             height={30}
+            className="w-6 md:w-7 lg:w-8"
           />
-          <span className="text-xl font-extrabold hover:text-yellow-500">
+          <span className="text-xl font-extrabold hover:text-gold-500">
             CHAIN TRAIL
           </span>
         </Link>
