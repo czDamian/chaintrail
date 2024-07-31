@@ -143,7 +143,7 @@ export default function CreateQuestQuestion() {
               value={question.questAnswer}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md   "
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
           <div>
