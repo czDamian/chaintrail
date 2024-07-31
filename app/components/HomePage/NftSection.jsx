@@ -1,69 +1,38 @@
 "use client";
 import Image from "next/image";
 import Button from "../Reusable/Button";
-import { useRef } from "react";
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 
 const NFTSection = () => {
   const nftImages = ["/nft1.png", "/nft01.png", "/nft2.png"];
-  const carouselRef = useRef(null);
-
-  const scrollCarousel = (direction) => {
-    if (carouselRef.current) {
-      const scrollAmount =
-        direction === "left"
-          ? -carouselRef.current.offsetWidth
-          : carouselRef.current.offsetWidth;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
-  };
 
   return (
     <div className="bg-[#151515] py-12">
       <div className="text-center mb-8">
         <h2 className="text-4xl font-bold mb-4">UNIQUE NFTS</h2>
         <p className="text-lg text-gray-300">
-          Earn Unique NFTS on completing each game & quest
+          Earn Unique NFTs on completing each game & quest
         </p>
       </div>
 
-      {/* Carousel Container */}
-      <div className="relative">
-        {/* Navigation Buttons for Mobile */}
-        <button
-          className="absolute top-1/2 left-0 transform -translate-y-1/2 bg-gray-700 text-white p-3 rounded-full hover:bg-gray-600 sm:hidden z-50"
-          onClick={() => scrollCarousel("left")}>
-          <FiChevronLeft size={24} />
-        </button>
-        <button
-          className="absolute top-1/2 right-0 transform -translate-y-1/2 z-50 bg-gray-700 text-white p-3 rounded-full hover:bg-gray-600 sm:hidden"
-          onClick={() => scrollCarousel("right")}>
-          <FiChevronRight size={24} />
-        </button>
-
-        {/* Carousel Wrapper */}
-        <div
-          ref={carouselRef}
-          className="flex items-center justify-center snap-x scroll-smooth overflow-hidden">
-          {nftImages.map((nftImage, index) => (
-            <div
-              key={index}
-              className="flex-shrink-0 max-w-[200px] overflow-hidden snap-start md:w-80 md:h-96 flex items-center justify-center p-2 rounded-xl">
-              <Image
-                src={nftImage}
-                alt={`NFT ${index + 1}`}
-                width={800}
-                height={1200}
-                className="w-full hover:scale-105 h-auto overflow-hidden object-cover rounded-lg"
-              />
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-3 gap-1 sm:grid-cols-2 lg:grid-cols-3 px-4 sm:px-8 place-content-center  place-items-center">
+        {nftImages.map((nftImage, index) => (
+          <div
+            key={index}
+            className="flex items-center justify-center p-2 rounded-xl">
+            <Image
+              src={nftImage}
+              alt={`NFT ${index + 1}`}
+              width={800}
+              height={1200}
+              className="w-full h-auto overflow-hidden object-cover rounded-lg hover:scale-105 transition-transform max-w-[150px] md:max-w-[180px] duration-300"
+            />
+          </div>
+        ))}
       </div>
 
       <div className="text-center mt-10">
         <Button
-          className="bg-gradient-to-b from-indigo-700 text-white from-60% to-yellow-500 hover:from-indigo-600 hover:to-yellow-400 py-3 px-6 rounded hover:scale-105"
+          className="bg-yellow-500 text-black py-3 px-6 rounded hover:scale-105 transition-transform duration-300"
           href="/quests">
           Play Now
         </Button>
