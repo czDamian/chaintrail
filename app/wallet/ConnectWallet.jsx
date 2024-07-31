@@ -1,14 +1,15 @@
 "use client";
-import Web3Modal from "web3modal";
-import { ethers } from "ethers";
 import { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import Web3Modal from "web3modal";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import WalletConnectProvider from "@walletconnect/web3-provider";
 
-const CORE_TESTNET_CHAIN_ID = "0x45b"; // Chain ID for Core Testnet
+const CORE_TESTNET_CHAIN_ID = 1115; // Chain ID for Core Testnet
+const CORE_TESTNET_RPC_URL = "https://rpc.test.btcs.network";
 
-const Web3WalletConnect = () => {
+const Web3ModalConnect = () => {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
@@ -16,29 +17,22 @@ const Web3WalletConnect = () => {
   const [web3Modal, setWeb3Modal] = useState(null);
 
   useEffect(() => {
-    const newWeb3Modal = new Web3Modal({
-      cacheProvider: false,
-      providerOptions: {
-        walletconnect: {
-          package: WalletConnectProvider,
-          options: {
-            rpc: {
-              1116: "https://rpc.test.btcs.network",
-            },
-            qrcode: true,
-            qrcodeModalOptions: {
-              mobileLinks: [
-                "metamask",
-                "trust",
-                "rainbow",
-                "argent",
-                "imtoken",
-              ],
-            },
+    const providerOptions = {
+      walletconnect: {
+        package: WalletConnectProvider,
+        options: {
+          rpc: {
+            [CORE_TESTNET_CHAIN_ID]: CORE_TESTNET_RPC_URL,
           },
         },
       },
+    };
+
+    const newWeb3Modal = new Web3Modal({
+      cacheProvider: true,
+      providerOptions,
     });
+
     setWeb3Modal(newWeb3Modal);
   }, []);
 
@@ -55,24 +49,24 @@ const Web3WalletConnect = () => {
     }
   };
 
-  const switchToCoreTestnet = async () => {
+  const switchToCoreTestnet = async (provider) => {
     try {
       await provider.send("wallet_switchEthereumChain", [
-        { chainId: CORE_TESTNET_CHAIN_ID },
+        { chainId: `0x${CORE_TESTNET_CHAIN_ID.toString(16)}` },
       ]);
     } catch (switchError) {
       if (switchError.code === 4902) {
         try {
           await provider.send("wallet_addEthereumChain", [
             {
-              chainId: CORE_TESTNET_CHAIN_ID,
+              chainId: `0x${CORE_TESTNET_CHAIN_ID.toString(16)}`,
               chainName: "Core Testnet",
               nativeCurrency: {
                 name: "tCore",
                 symbol: "tCORE",
                 decimals: 18,
               },
-              rpcUrls: ["https://rpc.test.btcs.network"],
+              rpcUrls: [CORE_TESTNET_RPC_URL],
               blockExplorerUrls: ["https://scan.test.btcs.network"],
             },
           ]);
@@ -89,84 +83,45 @@ const Web3WalletConnect = () => {
     }
   };
 
-  const isMobile = () => {
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-      navigator.userAgent
-    );
-  };
-
   const connectWallet = async () => {
     try {
-      let instance;
-      if (isMobile()) {
-        instance = await web3Modal.connectTo("walletconnect");
-      } else {
-        instance = await web3Modal.connect();
-      }
-
+      const instance = await web3Modal.connect();
       const web3Provider = new ethers.BrowserProvider(instance);
+      const signer = await web3Provider.getSigner();
+      const address = await signer.getAddress();
 
-      // Ensure the user is connected before proceeding
-      await web3Provider.send("eth_requestAccounts", []);
-
-      const network = await web3Provider.getNetwork();
-      if (network.chainId.toString(16) !== CORE_TESTNET_CHAIN_ID.slice(2)) {
-        await switchToCoreTestnet();
-        const updatedProvider = new ethers.BrowserProvider(instance);
-        setProvider(updatedProvider);
-      } else {
-        setProvider(web3Provider);
-      }
-
-      const walletSigner = await web3Provider.getSigner();
-      setSigner(walletSigner);
-      const address = await walletSigner.getAddress();
+      setProvider(web3Provider);
+      setSigner(signer);
       setWalletAddress(address);
+
+      await switchToCoreTestnet(web3Provider);
+
+      instance.on("accountsChanged", async (accounts) => {
+        const newSigner = await web3Provider.getSigner();
+        setSigner(newSigner);
+        setWalletAddress(accounts[0]);
+      });
+
+      instance.on("chainChanged", () => {
+        window.location.reload();
+      });
+
       toast.success("Connected to wallet successfully!");
-
-      // Set up event listeners for disconnect and account change
-      instance.on("disconnect", () => {
-        disconnectWallet();
-      });
-
-      instance.on("accountsChanged", (accounts) => {
-        if (accounts.length === 0) {
-          disconnectWallet();
-        } else {
-          setWalletAddress(accounts[0]);
-        }
-      });
+      await fetchBalance();
     } catch (error) {
       console.error("Error connecting to wallet:", error);
-      if (isMobile()) {
-        if (error.message.includes("User rejected")) {
-          toast.error("Connection rejected. Please try again.");
-        } else if (error.message.includes("No provider found")) {
-          toast.error(
-            "No compatible wallet found. Please install a Web3 wallet app."
-          );
-        } else {
-          toast.error(
-            "Error connecting on mobile. Please try again or use a desktop browser."
-          );
-        }
-      } else {
-        toast.error("Error connecting to wallet. Please try again.");
-      }
+      toast.error("Error connecting to wallet. Please try again.");
     }
   };
 
-  const disconnectWallet = () => {
+  const disconnectWallet = async () => {
+    if (web3Modal) {
+      await web3Modal.clearCachedProvider();
+    }
     setProvider(null);
     setSigner(null);
     setWalletAddress("");
     setWalletBalance("");
-
-    // Clear the cached provider
-    if (web3Modal) {
-      web3Modal.clearCachedProvider();
-    }
-
     toast.success("Disconnected from wallet successfully!");
   };
 
@@ -175,7 +130,9 @@ const Web3WalletConnect = () => {
   };
 
   useEffect(() => {
-    fetchBalance();
+    if (provider && walletAddress) {
+      fetchBalance();
+    }
   }, [provider, walletAddress]);
 
   return (
@@ -193,7 +150,7 @@ const Web3WalletConnect = () => {
           <button
             className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600 text-sm sm:text-base"
             onClick={connectWallet}>
-            Connect with Wallet
+            Connect Wallet
           </button>
         ) : (
           <div>
@@ -214,4 +171,4 @@ const Web3WalletConnect = () => {
   );
 };
 
-export default Web3WalletConnect;
+export default Web3ModalConnect;
