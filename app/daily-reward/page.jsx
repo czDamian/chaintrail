@@ -2,7 +2,9 @@ import { BsCalendar2Date } from "react-icons/bs";
 import { FaTasks } from "react-icons/fa";
 import Button from "../components/Reusable/Button";
 import SideNav from "../components/Reusable/SideNav";
-
+import ClaimDailyPass from "./ClaimDailyPass";
+import ClaimDailyReward from "./ClaimDailyReward";
+import FetchPoints from "../components/user/FetchPoints";
 
 export const metadata = {
   title: "Daily Rewards",
@@ -18,19 +20,24 @@ const DailyReward = () => {
           <SideNav />
         </div>
         <div className="flex mt-10 items-center justify-between gap-2  rounded-md mx-4">
-          <div className=" flex flex-col items-center justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
+          <div className=" flex flex-col items-center justify-center flex-shrink-0justify-center gap-8 w-24 h-28 md:w-32 md:w-30 p-3 rounded-xl bg-neutral-700 text-yellow-500 hover:bg-neutral-950 cursor-pointer">
             <BsCalendar2Date className="text-3xl " />
             <p className="text-[12px]">Daily Reward</p>
           </div>
-          <div className=" flex flex-col items-center justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 hover:bg-neutral-950 cursor-pointer">
+          <div className=" flex flex-col items-center justify-center gap-8w-24 h-28 md:w-32 md:w-30 p-3 rounded-xl bg-neutral-700 hover:bg-neutral-950 cursor-pointer">
             <FaTasks className="text-3xl " />
             <p className="text-sm">Daily Tasks</p>
           </div>
-          <div className=" flex flex-col items-center justify-center gap-8 w-32 h-30 py-3 rounded-xl bg-neutral-700 hover:bg-neutral-950 cursor-pointer">
+          <div className=" flex flex-col items-center justify-center gap-8 w-24 h-28 md:w-32 md:w-30 p-3 rounded-xl bg-neutral-700 hover:bg-neutral-950 cursor-pointer">
             <img src="challengeIcon.svg" alt="daily challenge" />
             <p className="text-sm">Challenges</p>
           </div>
         </div>
+      </div>
+      <div className="mx-auto flex flex-col items-center justify-between">
+        <FetchPoints />
+        <ClaimDailyPass />
+        <ClaimDailyReward />
       </div>
       <DailyBonus />
     </section>

@@ -37,7 +37,7 @@ const FetchPoints = () => {
   }, [userInfo]);
 
   if (isLoading || loading) {
-    return <div className="text-xs">Loading...</div>;
+    return <div className="text-xs">login to continue...</div>;
   }
 
   if (!userInfo) {
