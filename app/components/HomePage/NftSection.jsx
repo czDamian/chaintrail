@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi"; // React Icons
 
 const NFTSection = () => {
-  const nftImages = ["/nft0.png", "/nft1.png", "/nft2.png"];
+  const nftImages = ["/nft01.png", "/nft1.png", "/nft2.png"];
   const carouselRef = useRef(null);
 
   const scrollCarousel = (direction) => {
@@ -63,7 +63,7 @@ const NFTSection = () => {
 
       <div className="text-center mt-10">
         <Button
-          className="bg-gradient-to-b from-indigo-500 from-60% to-yellow-500 hover:from-indigo-600 hover:to-yellow-400 text-black py-3 px-6 rounded hover:scale-105"
+          className="bg-gradient-to-b from-indigo-700 text-white from-60% to-yellow-500 hover:from-indigo-600 hover:to-yellow-400 py-3 px-6 rounded hover:scale-105"
           href="/quests">
           Play Now
         </Button>
