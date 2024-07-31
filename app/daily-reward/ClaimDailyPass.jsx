@@ -1,97 +1,49 @@
 "use client";
-
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
 const ClaimDailyPass = () => {
-  const { userInfo, isLoading } = useTelegramAuth();
-  const [playPass, setPlayPass] = useState(0);
-  const [canClaimPass, setCanClaimPass] = useState(false);
-  const [timeUntilNextClaimPass, setTimeUntilNextClaimPass] = useState(null);
+  const { userInfo } = useTelegramAuth();
+  const [message, setMessage] = useState("");
+  const [nextClaimPassTime, setNextClaimPassTime] = useState(null);
 
-  useEffect(() => {
-    if (userInfo && userInfo.id) {
-      checkDailyPassStatus(userInfo.id);
-    }
-  }, [userInfo]);
-
-  const claimDailyPass = async () => {
-    if (!userInfo || !userInfo.id) return;
-
+  const claimPass = async () => {
+    console.log("Claim pass initiated");
     try {
+      console.log("Sending request to /api/register");
       const response = await fetch("/api/register", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: userInfo.id }),
+        body: JSON.stringify({ userId: userInfo.id, type: "pass" }),
       });
+
+      console.log("Response received from /api/register:", response);
       const data = await response.json();
+      console.log("Parsed response data:", data);
+
       if (response.ok) {
-        setPlayPass(data.playPass);
-        setCanClaimPass(false);
-        updateNextClaimPassTime(new Date(data.nextClaimPassTime));
+        setMessage(data.message);
+        setNextClaimPassTime(data.nextClaimPassTime);
       } else {
-        console.error("Failed to claim daily pass:", data.message);
+        setMessage(data.message);
       }
     } catch (error) {
-      console.error("Error claiming daily pass:", error);
+      console.error("Error claiming pass:", error);
+      setMessage("Error claiming pass");
     }
   };
-
-  const checkDailyPassStatus = async (userId) => {
-    try {
-      const response = await fetch("/api/register", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setCanClaimPass(true);
-      } else {
-        updateNextClaimPassTime(new Date(data.nextClaimPassTime));
-      }
-    } catch (error) {
-      console.error("Error checking daily pass status:", error);
-    }
-  };
-
-  const updateNextClaimPassTime = (nextClaimPassTime) => {
-    const updateTimer = () => {
-      const now = new Date();
-      const timeDiff = nextClaimPassTime - now;
-      if (timeDiff <= 0) {
-        setCanClaimPass(true);
-        setTimeUntilNextClaimPass(null);
-      } else {
-        const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-        setTimeUntilNextClaimPass(`${hours}h ${minutes}m ${seconds}s`);
-        setTimeout(updateTimer, 1000);
-      }
-    };
-    updateTimer();
-  };
-
-  if (isLoading || !userInfo) {
-    return <div className="text-xs">login to continue...</div>;
-  }
 
   return (
     <div>
-      <div>Play Pass: {playPass}</div>
-      <button
-        className="my-4 text-center border bg-blue-800 text-white block p-2 rounded-lg hover:bg-blue-700 cursor-pointer"
-        onClick={claimDailyPass}
-        disabled={!canClaimPass}>
-        {canClaimPass
-          ? "Claim Daily Pass"
-          : `Next claim in ${timeUntilNextClaimPass || "Loading..."}`}
-      </button>
+      <button onClick={claimPass}>Claim Daily Pass</button>
+      {message && <p>{message}</p>}
+      {nextClaimPassTime && (
+        <p>
+          Next claim pass time: {new Date(nextClaimPassTime).toLocaleString()}
+        </p>
+      )}
     </div>
   );
 };

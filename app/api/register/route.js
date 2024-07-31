@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import User from "@/models/User";
 import connectDb from "@/lib/mongodb";
 
+// Connect to the database
 await connectDb();
 
 export async function POST(request) {
@@ -43,7 +44,7 @@ export async function GET(request) {
   }
 }
 
-// Route for claiming daily reward
+// Route for claiming daily reward or pass
 export async function PUT(request) {
   const { userId, type } = await request.json();
 
