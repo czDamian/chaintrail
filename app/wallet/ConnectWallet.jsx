@@ -61,21 +61,45 @@ const Web3WalletConnect = () => {
     }
   };
 
+  const isMobile = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
+  };
+
   const connectWallet = async () => {
     try {
       const web3Modal = new Web3Modal({
-        cacheProvider: true, // optional
+        cacheProvider: true,
         providerOptions: {
           walletconnect: {
             package: WalletConnectProvider,
             options: {
+              rpc: {
+                1116: "https://rpc.test.btcs.network",
+              },
               qrcode: true,
+              qrcodeModalOptions: {
+                mobileLinks: [
+                  "metamask",
+                  "trust",
+                  "rainbow",
+                  "argent",
+                  "imtoken",
+                ],
+              },
             },
           },
         },
       });
 
-      const instance = await web3Modal.connect();
+      let instance;
+      if (isMobile()) {
+        instance = await web3Modal.connectTo("walletconnect");
+      } else {
+        instance = await web3Modal.connect();
+      }
+
       const web3Provider = new ethers.BrowserProvider(instance);
 
       const network = await web3Provider.getNetwork();
@@ -94,7 +118,21 @@ const Web3WalletConnect = () => {
       toast.success("Connected to wallet successfully!");
     } catch (error) {
       console.error("Error connecting to wallet:", error);
-      toast.error("Error connecting to wallet. Please try again.");
+      if (isMobile()) {
+        if (error.message.includes("User rejected")) {
+          toast.error("Connection rejected. Please try again.");
+        } else if (error.message.includes("No provider found")) {
+          toast.error(
+            "No compatible wallet found. Please install a Web3 wallet app."
+          );
+        } else {
+          toast.error(
+            "Error connecting on mobile. Please try again or use a desktop browser."
+          );
+        }
+      } else {
+        toast.error("Error connecting to wallet. Please try again.");
+      }
     }
   };
 
@@ -115,28 +153,30 @@ const Web3WalletConnect = () => {
   }, [provider, walletAddress]);
 
   return (
-    <div className="bg-neutral-900 my-6 p-5">
+    <div className="bg-neutral-900 my-6 p-3 sm:p-5">
       <ToastContainer />
-      <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
-        <p>
+      <div className="container mx-auto text-center bg-neutral-800 p-4 sm:p-6 rounded-lg shadow-lg">
+        <h1 className="text-xl sm:text-2xl font-bold mb-4">
+          Connect to Web3 Wallet
+        </h1>
+        <p className="text-sm sm:text-base">
           Only Core Testnet is supported. You will be prompted to switch if
           necessary.
         </p>
         {!walletAddress ? (
           <button
-            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
+            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600 text-sm sm:text-base"
             onClick={connectWallet}>
             Connect with Wallet
           </button>
         ) : (
           <div>
-            <p className="mt-4">{`Connected: ${trimWalletAddress(
+            <p className="mt-4 text-sm sm:text-base">{`Connected: ${trimWalletAddress(
               walletAddress
             )}`}</p>
-            <p className="mt-2">{`Balance: ${walletBalance}`}</p>
+            <p className="mt-2 text-sm sm:text-base">{`Balance: ${walletBalance}`}</p>
             <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600 text-sm sm:text-base"
               onClick={disconnectWallet}>
               Disconnect Wallet
             </button>
