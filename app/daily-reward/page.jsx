@@ -2,7 +2,6 @@ import { BsCalendar2Date } from "react-icons/bs";
 import { FaTasks } from "react-icons/fa";
 import Button from "../components/Reusable/Button";
 import SideNav from "../components/Reusable/SideNav";
-import ClaimDailyPass from "./ClaimDailyPass";
 import ClaimDailyReward from "./ClaimDailyReward";
 import FetchPoints from "../components/user/FetchPoints";
 
@@ -36,7 +35,6 @@ const DailyReward = () => {
       </div>
       <div className="mx-auto flex flex-col items-center justify-between">
         <FetchPoints />
-        <ClaimDailyPass />
         <ClaimDailyReward />
       </div>
       <DailyBonus />

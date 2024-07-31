@@ -1,14 +1,19 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ClaimDailyReward = () => {
   const { userInfo } = useTelegramAuth();
-  const [message, setMessage] = useState("");
   const [nextClaimTime, setNextClaimTime] = useState(null);
-  const [canClaimReward, setCanClaimReward] = useState(false);
+  const [canClaim, setCanClaim] = useState(false);
 
-  const checkRewardStatus = async () => {
+  useEffect(() => {
+    checkClaimStatus();
+  }, [userInfo]);
+
+  const checkClaimStatus = async () => {
     if (!userInfo || !userInfo.id) return;
     try {
       const response = await fetch(`/api/register?userId=${userInfo.id}`);
@@ -17,32 +22,28 @@ const ClaimDailyReward = () => {
         const now = new Date();
         const nextClaimTime = new Date(data.nextClaimTime);
         if (now >= nextClaimTime) {
-          setCanClaimReward(true);
+          setCanClaim(true);
         } else {
-          setCanClaimReward(false);
-          setNextClaimTime(new Date(data.nextClaimTime));
+          setCanClaim(false);
+          setNextClaimTime(nextClaimTime);
         }
       } else {
-        console.error("Error checking reward status:", data.message);
+        console.error("Error checking claim status:", data.message);
       }
     } catch (error) {
-      console.error("Error checking reward status:", error);
+      console.error("Error checking claim status:", error);
     }
   };
 
-  useEffect(() => {
-    checkRewardStatus();
-  }, [userInfo]);
-
-  const claimReward = async () => {
-    console.log("Claim reward initiated");
+  const claimRewardAndPass = async () => {
+    console.log("Claim reward and pass initiated");
     try {
       const response = await fetch("/api/register", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: userInfo.id, type: "reward" }),
+        body: JSON.stringify({ userId: userInfo.id }),
       });
 
       console.log("Response received from /api/register:", response);
@@ -50,27 +51,69 @@ const ClaimDailyReward = () => {
       console.log("Parsed response data:", data);
 
       if (response.ok) {
-        setMessage(data.message);
-        setNextClaimTime(data.nextClaimTime);
-        setCanClaimReward(false);
+        toast.success(data.message);
+        setNextClaimTime(new Date(data.nextClaimTime));
+        setCanClaim(false);
       } else {
-        setMessage(data.message);
+        if (data.nextClaimTime) {
+          toast.info("Already claimed, try again later.");
+          setNextClaimTime(new Date(data.nextClaimTime));
+        } else {
+          toast.error(data.message);
+        }
       }
     } catch (error) {
-      console.error("Error claiming reward:", error);
-      setMessage("Error claiming reward");
+      console.error("Error claiming reward and pass:", error);
+      toast.error("Error claiming reward and pass");
     }
   };
 
   return (
-    <div className="bg-neutral-950 p-2">
-      <button onClick={claimReward} disabled={!canClaimReward}>
-        {canClaimReward ? "Claim Daily Reward" : "Reward not available yet"}
-      </button>
-      {message && <p>{message}</p>}
-      {nextClaimTime && (
-        <p>Next claim time: {new Date(nextClaimTime).toLocaleString()}</p>
-      )}
+    <div className="flex flex-col items-center justify-center my-10">
+      <ToastContainer />
+      <div className="bg-neutral-800 p-6 rounded-lg shadow-lg">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">DAILY BONUS</h1>
+          <p className="text-sm mb-6">
+            Free Coins for logging into the game daily without skipping
+          </p>
+        </div>
+        <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
+            <img
+              src="/coins.png"
+              alt="Chain Points"
+              className="w-12 h-12 mb-2"
+            />
+            <span className="text-xl mb-2 font-bold">+1200</span>
+            <span className="text-sm">Chain Points</span>
+          </div>
+          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
+            <img
+              src="/ticketIcon.svg"
+              alt="Play Passes"
+              className="w-12 h-12 mb-2"
+            />
+            <span className="text-xl font-bold">4</span>
+            <span className="text-sm mb-2">Play Passes</span>
+          </div>
+        </div>
+        <div className="text-center">
+          <button
+            onClick={claimRewardAndPass}
+            disabled={!canClaim}
+            className={`px-20 py-2 bg-yellow-500 hover:bg-yellow-400 active:scale-105 text-black font-bold rounded-md ${
+              !canClaim ? "opacity-50 cursor-not-allowed" : ""
+            }`}>
+            {canClaim ? "CLAIM" : "Login to Claim"}
+          </button>
+        </div>
+        {nextClaimTime && (
+          <div className="text-center mt-4">
+            <p>Next claim time: {nextClaimTime.toLocaleString()}</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

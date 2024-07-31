@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import User from "@/models/User";
 import connectDb from "@/lib/mongodb";
 
-// Connect to the database
 await connectDb();
 
 export async function POST(request) {
@@ -24,16 +23,21 @@ export async function POST(request) {
   }
 }
 
-// GET route to fetch user points
+// GET route to fetch user points and next claim time
 export async function GET(request) {
   const userId = request.nextUrl.searchParams.get("userId");
 
   try {
     const user = await User.findOne({ userId });
     if (user) {
+      const nextClaimTime = user.lastClaimTimestamp
+        ? new Date(user.lastClaimTimestamp.getTime() + 24 * 60 * 60 * 1000)
+        : null;
+
       return NextResponse.json({
         points: user.points,
         playPass: user.playPass,
+        nextClaimTime: nextClaimTime ? nextClaimTime.toISOString() : null,
       });
     } else {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
@@ -44,9 +48,9 @@ export async function GET(request) {
   }
 }
 
-// Route for claiming daily reward or pass
+// Route for claiming daily reward and daily pass
 export async function PUT(request) {
-  const { userId, type } = await request.json();
+  const { userId } = await request.json();
 
   try {
     const user = await User.findOne({ userId });
@@ -55,63 +59,30 @@ export async function PUT(request) {
     }
 
     const now = new Date();
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const lastClaim = user.lastClaimTimestamp
+      ? new Date(user.lastClaimTimestamp)
+      : new Date(0);
+    const nextClaimTime = new Date(lastClaim.getTime() + oneDayMs);
 
-    if (type === "reward") {
-      const lastClaim = user.lastClaimTimestamp
-        ? new Date(user.lastClaimTimestamp)
-        : new Date(0);
-      const nextClaimTime = new Date(lastClaim.getTime() + 24 * 60 * 60 * 1000);
-
-      if (now < nextClaimTime) {
-        return NextResponse.json({
-          message: "Daily reward not available yet",
-          nextClaimTime,
-        });
-      }
-
-      user.points += 1200;
-      user.lastClaimTimestamp = now;
-      await user.save();
-
+    if (now < nextClaimTime) {
       return NextResponse.json({
-        message: "Daily reward claimed",
-        points: user.points,
-        nextClaimTime: new Date(
-          now.getTime() + 24 * 60 * 60 * 1000
-        ).toISOString(),
+        message: "Daily reward and pass not available yet",
+        nextClaimTime: nextClaimTime.toISOString(),
       });
-    } else if (type === "pass") {
-      const lastClaimPass = user.lastClaimPassTimestamp
-        ? new Date(user.lastClaimPassTimestamp)
-        : new Date(0);
-      const nextClaimPassTime = new Date(
-        lastClaimPass.getTime() + 6 * 60 * 60 * 1000
-      );
-
-      if (now < nextClaimPassTime) {
-        return NextResponse.json({
-          message: "Daily pass not available yet",
-          nextClaimPassTime,
-        });
-      }
-
-      user.playPass += 1;
-      user.lastClaimPassTimestamp = now;
-      await user.save();
-
-      return NextResponse.json({
-        message: "Daily pass claimed",
-        playPass: user.playPass,
-        nextClaimPassTime: new Date(
-          now.getTime() + 6 * 60 * 60 * 1000
-        ).toISOString(),
-      });
-    } else {
-      return NextResponse.json(
-        { message: "Invalid claim type" },
-        { status: 400 }
-      );
     }
+
+    user.points += 1200;
+    user.playPass += 4;
+    user.lastClaimTimestamp = now;
+    await user.save();
+
+    return NextResponse.json({
+      message: "Daily reward and pass claimed",
+      points: user.points,
+      playPass: user.playPass,
+      nextClaimTime: new Date(now.getTime() + oneDayMs).toISOString(),
+    });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
