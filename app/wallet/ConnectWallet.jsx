@@ -13,6 +13,34 @@ const Web3WalletConnect = () => {
   const [signer, setSigner] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
+  const [web3Modal, setWeb3Modal] = useState(null);
+
+  useEffect(() => {
+    const newWeb3Modal = new Web3Modal({
+      cacheProvider: false,
+      providerOptions: {
+        walletconnect: {
+          package: WalletConnectProvider,
+          options: {
+            rpc: {
+              1116: "https://rpc.test.btcs.network",
+            },
+            qrcode: true,
+            qrcodeModalOptions: {
+              mobileLinks: [
+                "metamask",
+                "trust",
+                "rainbow",
+                "argent",
+                "imtoken",
+              ],
+            },
+          },
+        },
+      },
+    });
+    setWeb3Modal(newWeb3Modal);
+  }, []);
 
   const fetchBalance = async () => {
     try {
@@ -69,30 +97,6 @@ const Web3WalletConnect = () => {
 
   const connectWallet = async () => {
     try {
-      const web3Modal = new Web3Modal({
-        cacheProvider: true,
-        providerOptions: {
-          walletconnect: {
-            package: WalletConnectProvider,
-            options: {
-              rpc: {
-                1116: "https://rpc.test.btcs.network",
-              },
-              qrcode: true,
-              qrcodeModalOptions: {
-                mobileLinks: [
-                  "metamask",
-                  "trust",
-                  "rainbow",
-                  "argent",
-                  "imtoken",
-                ],
-              },
-            },
-          },
-        },
-      });
-
       let instance;
       if (isMobile()) {
         instance = await web3Modal.connectTo("walletconnect");
@@ -101,6 +105,9 @@ const Web3WalletConnect = () => {
       }
 
       const web3Provider = new ethers.BrowserProvider(instance);
+
+      // Ensure the user is connected before proceeding
+      await web3Provider.send("eth_requestAccounts", []);
 
       const network = await web3Provider.getNetwork();
       if (network.chainId.toString(16) !== CORE_TESTNET_CHAIN_ID.slice(2)) {
@@ -116,6 +123,19 @@ const Web3WalletConnect = () => {
       const address = await walletSigner.getAddress();
       setWalletAddress(address);
       toast.success("Connected to wallet successfully!");
+
+      // Set up event listeners for disconnect and account change
+      instance.on("disconnect", () => {
+        disconnectWallet();
+      });
+
+      instance.on("accountsChanged", (accounts) => {
+        if (accounts.length === 0) {
+          disconnectWallet();
+        } else {
+          setWalletAddress(accounts[0]);
+        }
+      });
     } catch (error) {
       console.error("Error connecting to wallet:", error);
       if (isMobile()) {
@@ -141,6 +161,12 @@ const Web3WalletConnect = () => {
     setSigner(null);
     setWalletAddress("");
     setWalletBalance("");
+
+    // Clear the cached provider
+    if (web3Modal) {
+      web3Modal.clearCachedProvider();
+    }
+
     toast.success("Disconnected from wallet successfully!");
   };
 
