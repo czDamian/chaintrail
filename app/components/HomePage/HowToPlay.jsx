@@ -1,8 +1,7 @@
 "use client";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { FaCaretRight } from "react-icons/fa";
-import { FaCaretLeft } from "react-icons/fa";
+import { FaCaretRight, FaCaretLeft } from "react-icons/fa";
 
 const steps = [
   {
@@ -20,7 +19,7 @@ const steps = [
     step: "STEP 3",
     image: "coinsPana.svg",
     title:
-      "Think, Tap, Win . Earn points and NFTs for getting the correct word that represents the 4 pictures in the Quest.",
+      "Think, Tap, Win. Earn points and NFTs for getting the correct word that represents the 4 pictures in the Quest.",
   },
   {
     step: "STEP 4",
@@ -46,33 +45,30 @@ const HowToPlay = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       nextStep();
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [currentStep]);
+
   const nextStep = () => {
-    setTimeout(() => {
-      setCurrentStep((prev) => (prev + 1) % steps.length);
-    }, 2000);
+    setCurrentStep((prev) => (prev + 1) % steps.length);
   };
 
   const prevStep = () => {
-    setTimeout(() => {
-      setCurrentStep((prev) => (prev - 1 + steps.length) % steps.length);
-    }, 2000);
+    setCurrentStep((prev) => (prev - 1 + steps.length) % steps.length);
   };
 
   return (
-    <section className="bg-[#151515] py-12" id="how-to-play">
-      <h2 className="text-4xl font-bold text-white text-center mb-8">
+    <section className="bg-gray-900 py-12" id="how-to-play">
+      <h1 className="text-4xl font-bold text-white text-center mb-8">
         HOW TO PLAY
-      </h2>
+      </h1>
 
       <div className="max-w-3xl mx-auto px-4">
-        <div className="bg-neutral-950 lg:py-12 rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-gray-800 lg:py-12 rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 relative">
             <div className="transition-opacity duration-500">
-              <h1 className="text-2xl text-yellow-500 font-bold text-center mb-4">
+              <h1 className="text-2xl text-blue-400 font-bold text-center mb-4">
                 {steps[currentStep].step}
               </h1>
               <div className="flex justify-center mb-4">
@@ -85,24 +81,24 @@ const HowToPlay = () => {
                 />
               </div>
               <div className="text-center mb-4">
-                <h1 className="text-xl px-0 lg:px-20 text-yellow-500 font-semibold">
+                <p className="text-lg text-white px-0 lg:px-20">
                   {steps[currentStep].title}
-                </h1>
+                </p>
               </div>
             </div>
           </div>
-        <div className="flex justify-center mt-4 space-x-4">
-          <button
-            onClick={prevStep}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
-            <FaCaretLeft />
-          </button>
-          <button
-            onClick={nextStep}
-            className="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded">
-            <FaCaretRight />
-          </button>
-        </div>
+          <div className="flex justify-center mb-8 space-x-4">
+            <button
+              onClick={prevStep}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
+              <FaCaretLeft size={18} />
+            </button>
+            <button
+              onClick={nextStep}
+              className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded flex items-center">
+              <FaCaretRight size={18} />
+            </button>
+          </div>
         </div>
       </div>
     </section>

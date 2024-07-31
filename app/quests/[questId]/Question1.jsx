@@ -9,6 +9,7 @@ import { Success } from "@/app/components/Reusable/Popup";
 import { Wrong } from "@/app/components/Reusable/Popup";
 import { Complete } from "@/app/components/Reusable/Popup";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import Loader from "@/app/loader";
 
 const QuestionComponent = ({ questId }) => {
   const { updatePoints } = useTelegramAuth();
@@ -142,7 +143,7 @@ const QuestionComponent = ({ questId }) => {
   }, [showPopup, isCompleted]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div><Loader/></div>;
   }
 
   if (!questions.length) {
@@ -152,110 +153,120 @@ const QuestionComponent = ({ questId }) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-      <QuesUI />
-      <div className="py-4 flex justify-between items-center text-sm">
-        <div className="flex items-center gap-2">
-          <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
-          <span className="font-bold">
-            <Points />
-          </span>
+      <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+        <QuesUI />
+        <div className="py-4 flex justify-between items-center text-sm">
+          <div className="flex items-center gap-2">
+            <img
+              src="../chaincoins.svg"
+              alt="Chain Coins"
+              className="w-6 h-6"
+            />
+            <span className="font-bold">
+              <Points />
+            </span>
+          </div>
+          <div className="flex items-center">
+            <img src="../redImg.png" alt="level" className="w-12 h-11" />
+            <span className="relative text-xs -ml-7 mt-1 font-bold">
+              {currentQuestionIndex + 1}/{questions.length}
+            </span>
+          </div>
+          <SideNav />
         </div>
-        <div className="flex items-center">
-          <img src="../redImg.png" alt="level" className="w-12 h-11" />
-          <span className="relative text-xs -ml-7 mt-1 font-bold">
-            {currentQuestionIndex + 1}/{questions.length}
-          </span>
-        </div>
-        <SideNav />
-      </div>
-      <section className="max-w-[320px]">
-        <div className="grid grid-cols-2 gap-4">
-          {currentQuestion &&
-            ["img1", "img2", "img3", "img4"].map(
-              (key, index) =>
-                currentQuestion[key] && (
-                  <img
-                    key={index}
-                    loading="lazy"
-                    src={currentQuestion[key]}
-                    className="rounded-lg w-full h-32 object-cover hover:brightness-75 transition-all"
-                    alt={`question ${currentQuestionIndex + 1} image ${
-                      index + 1
-                    }`}
-                  />
-                )
-            )}
-        </div>
-        <div className="text-white py-4 flex justify-center">
-          <div className="flex">
+        <section className="max-w-[320px]">
+          <div className="grid grid-cols-2 gap-4">
             {currentQuestion &&
-              currentQuestion.questAnswer &&
-              currentQuestion.questAnswer.length > 0 &&
-              Array.from({ length: currentQuestion.questAnswer.length }).map(
-                (_, index) => (
-                  <span
-                    key={index}
-                    className="w-8 h-10 bg-gray-700 rounded mx-1 flex items-center justify-center text-lg">
-                    {selectedAnswers[index] || ""}
-                  </span>
-                )
+              ["img1", "img2", "img3", "img4"].map(
+                (key, index) =>
+                  currentQuestion[key] && (
+                    <img
+                      key={index}
+                      loading="lazy"
+                      src={currentQuestion[key]}
+                      className="rounded-lg w-full h-32 object-cover hover:brightness-75 transition-all"
+                      alt={`question ${currentQuestionIndex + 1} image ${
+                        index + 1
+                      }`}
+                    />
+                  )
               )}
           </div>
-        </div>
-        <div className="my-4">
-          <div className="flex flex-wrap justify-center gap-2">
-            {currentQuestion &&
-              currentQuestion.scrambledAnswer &&
-              currentQuestion.scrambledAnswer.split("").map((answer, index) => (
-                <button
-                  key={index}
-                  className="bg-black hover:bg-yellow-700 active:bg-yellow-900 text-white py-2 px-4 rounded-md text-lg"
-                  onClick={() => handleAnswerClick(answer)}>
-                  {answer}
-                </button>
-              ))}
+          <div className="text-white py-4 flex justify-center">
+            <div className="flex">
+              {currentQuestion &&
+                currentQuestion.questAnswer &&
+                currentQuestion.questAnswer.length > 0 &&
+                Array.from({ length: currentQuestion.questAnswer.length }).map(
+                  (_, index) => (
+                    <span
+                      key={index}
+                      className="w-8 h-10 bg-gray-700 rounded mx-1 flex items-center justify-center text-lg">
+                      {selectedAnswers[index] || ""}
+                    </span>
+                  )
+                )}
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-4 my-4">
-          <button
-            onClick={openModal}
-            className="flex-grow bg-white text-black py-2 px-4 rounded text-sm font-bold flex items-center justify-center">
-            GET HINT WITH
-            <img src="../chaincoins.svg" className="w-5 h-8 ml-2" alt="hint" />
-            <span className="ml-1">200</span>
-          </button>
-          <Modal
-            isOpen={isModalOpen}
-            hintText={currentQuestion.hint || "No hint available"}
-            onClose={closeModal}
-          />
-          <button
-            className="flex-shrink-0 bg-red-700 active:bg-red-500 px-4 py-2 rounded flex flex-col items-center justify-center"
-            onClick={deleteLast}>
-            <MdDelete className="text-xl" />
-            <span className="text-xs">Del</span>
-          </button>
-        </div>
-        {showPopup && (
-          <div>
-            {isCompleted && showComplete ? (
-              <Complete />
-            ) : isCorrect ? (
-              <Success />
-            ) : (
-              <Wrong />
-            )}
+          <div className="my-4">
+            <div className="flex flex-wrap justify-center gap-2">
+              {currentQuestion &&
+                currentQuestion.scrambledAnswer &&
+                currentQuestion.scrambledAnswer
+                  .split("")
+                  .map((answer, index) => (
+                    <button
+                      key={index}
+                      className="bg-black hover:bg-yellow-700 active:bg-yellow-900 text-white py-2 px-4 rounded-md text-lg"
+                      onClick={() => handleAnswerClick(answer)}>
+                      {answer}
+                    </button>
+                  ))}
+            </div>
           </div>
-        )}
+          <div className="flex items-center gap-4 my-4">
+            <button
+              onClick={openModal}
+              className="flex-grow bg-white text-black py-2 px-4 rounded text-sm font-bold flex items-center justify-center">
+              GET HINT WITH
+              <img
+                src="../chaincoins.svg"
+                className="w-5 h-8 ml-2"
+                alt="hint"
+              />
+              <span className="ml-1">200</span>
+            </button>
+            <Modal
+              isOpen={isModalOpen}
+              hintText={currentQuestion.hint || "No hint available"}
+              onClose={closeModal}
+            />
+            <button
+              className="flex-shrink-0 bg-red-700 active:bg-red-500 px-4 py-2 rounded flex flex-col items-center justify-center"
+              onClick={deleteLast}>
+              <MdDelete className="text-xl" />
+              <span className="text-xs">Del</span>
+            </button>
+          </div>
+          {showPopup && (
+            <div>
+              {isCompleted && showComplete ? (
+                <Complete />
+              ) : isCorrect ? (
+                <Success />
+              ) : (
+                <Wrong />
+              )}
+            </div>
+          )}
+        </section>
       </section>
-    </section>
   );
 };
 
 export default QuestionComponent;
 
-const QuesUI = () => {
+export const QuesUI = () => {
   return (
     <div className="fixed inset-0 -z-30 flex items-center justify-center bg-black font-bold text-lg">
       <div className="relative w-screen h-screen">

@@ -35,14 +35,18 @@ const Navbar = () => {
     ? !hiddenPaths.some((path) => pathname.startsWith(path))
     : true;
 
-  if (!showNavbar) return null; // Hide Navbar if the path starts with '/...'
+  if (!showNavbar) return null; // Hide Navbar if the path starts with '//'
 
   return (
     <nav
-      className={`fixed px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 ${
+      className={`fixed bg-black  px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 ${
         cinzel.className
-      } ${isSticky ? "bg-neutral-950 shadow-md" : "bg-transparent"}`}>
-      <div className="mx-auto px-4 py-2 flex justify-between items-center">
+      } ${
+        isSticky
+          ? "bg-gradient-to-b from-neutral-950 from-5% to-yellow-500 shadow-md"
+          : "bg-black"
+      }`}>
+      <div className="mx-auto px-4 py-3 sm:py-5 flex justify-between items-center">
         <Link
           href="/"
           className="flex items-center space-x-2 animate-bounce-in-down">
@@ -52,7 +56,9 @@ const Navbar = () => {
             width={30}
             height={30}
           />
-          <span className="text-xl font-extrabold hover:text-yellow-500">CHAIN TRAIL</span>
+          <span className="text-xl font-extrabold hover:text-yellow-500">
+            CHAIN TRAIL
+          </span>
         </Link>
         <div className="animate-bounce-in-down focus:outline-none">
           <Profile />

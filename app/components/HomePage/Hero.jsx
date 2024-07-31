@@ -1,63 +1,45 @@
 "use client";
 import Image from "next/image";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { useEffect, useState } from "react";
 import { FaTelegram } from "react-icons/fa";
 import Button from "../Reusable/Button";
+import CustomLoader from "./CustomLoader";
 
 const Hero = () => {
-  const [isVisible, setIsVisible] = useState(false);
-  useEffect(() => {
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
   const { userInfo, isLoading } = useTelegramAuth();
+
   if (isLoading) {
-    return (
-      <Button
-        href="/quests"
-        className="flex mx-auto text-yellow-500 text-sm md:text-lg gap-2">
-        play now
-        <span className="animate-pulse text-xl">
-          <FaTelegram />
-        </span>
-      </Button>
-    );
+    return <CustomLoader />;
   }
 
   return (
-    <div className="relative w-screen h-screen bg-black flex flex-col items-center justify-center">
+    <div className="relative mt-[-20px] md:mt-0 w-screen h-screen  flex flex-col items-center justify-center bg-black">
       <Image
         width={1000}
         height={1000}
-        src="/bg.png"
+        src="/bg0.png"
         alt="background"
-        className="absolute opacity-40 inset-0 w-full h-full object-cover"
+        className="absolute pt-4  max-w-[400px] max-h-[430px] sm:max-w-[750px] object-fill inset-0 w-full h-screen "
       />
 
-      <div className="z-10 text-center">
-        <h1
-          className={`text-5xl md:text-7xl font-serif text-white mb-4 transition-all duration-100 ease-out ${
-            isVisible
-              ? "translate-x-0 opacity-100"
-              : "-translate-x-full opacity-0"
-          }`}>
-          CHAIN TRAIL <div className="mt-4">STUDIO</div>
+      <div className="z-10 mt-[-150px] text-center">
+        <h1 className="text-5xl md:text-7xl  mb-4">
+          CHAIN TRAIL <span className="mt-4 block">STUDIO</span>
         </h1>
 
-        <p className="text-white mb-12 mx-12 text-lg md:text-xl ">
+        <p className="text-white font-lato mb-12 mx-12 text-lg md:text-xl">
           Embark on Word Trails, learn about blockchain
         </p>
         <Button
           href="/quests"
-          className="flex px-8 mb-4 mx-auto text-sm gap-2 text-black bg-yellow-500 py-3">
+          className="flex px-8 mb-4 mx-auto text-sm gap-2 text-black bg-yellow-500 hover:bg-yellow-400 transition-colors duration-300 py-3 hover:scale-105">
           play now
         </Button>
 
         {userInfo ? (
           <Button
             href="/quests"
-            className="flex mx-auto text-sm gap-2 md:text-2xl">
+            className="flex mx-auto text-sm gap-2 md:text-2xl hover:scale-105">
             play now
             <span className="animate-pulse text-xl">
               <FaTelegram />
@@ -65,8 +47,8 @@ const Hero = () => {
           </Button>
         ) : (
           <Button
-            href="https://t.me/ChainTrailBot" // Replace with your actual login page URL
-            className="flex mx-auto text-sm gap-2 bg-black hover:bg-neutral-950 outline">
+            href="https://t.me/ChainTrailBot"
+            className="flex mx-auto text-sm gap-2 bg-black hover:bg-neutral-950 text-white border border-white transition-colors duration-300 hover:scale-105">
             Play on
             <span className="animate-pulse text-xl">
               <FaTelegram />

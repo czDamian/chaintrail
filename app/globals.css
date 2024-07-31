@@ -1,3 +1,9 @@
+/* globals.css */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Krona+One:wght@400;700&display=swap');
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,4 +17,8 @@ input[type=file]{
 }
 input, select, textarea{
    @apply  bg-neutral-800 outline-none border border-neutral-600
+}
+
+h1{
+    @apply font-cinzel font-bold;
 }
