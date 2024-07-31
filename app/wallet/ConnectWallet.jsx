@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Button from "../components/Reusable/Button";
+import WalletConnectProvider from "@walletconnect/web3-provider";
 
 const CORE_TESTNET_CHAIN_ID = "0x45b"; // Chain ID for Core Testnet
 
@@ -65,7 +65,14 @@ const Web3WalletConnect = () => {
     try {
       const web3Modal = new Web3Modal({
         cacheProvider: true, // optional
-        providerOptions: {}, // required
+        providerOptions: {
+          walletconnect: {
+            package: WalletConnectProvider,
+            options: {
+              qrcode: true,
+            },
+          },
+        },
       });
 
       const instance = await web3Modal.connect();
@@ -96,7 +103,7 @@ const Web3WalletConnect = () => {
     setSigner(null);
     setWalletAddress("");
     setWalletBalance("");
-    toast.error("wallet disconnected!");
+    toast.success("Disconnected from wallet successfully!");
   };
 
   const trimWalletAddress = (address) => {
@@ -117,11 +124,11 @@ const Web3WalletConnect = () => {
           necessary.
         </p>
         {!walletAddress ? (
-          <Button
-            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow text-xs hover:bg-yellow-600"
+          <button
+            className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600"
             onClick={connectWallet}>
-            Connect Wallet
-          </Button>
+            Connect with Wallet
+          </button>
         ) : (
           <div>
             <p className="mt-4">{`Connected: ${trimWalletAddress(

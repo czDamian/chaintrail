@@ -10,11 +10,40 @@ const ClaimDailyReward = () => {
   const { userInfo } = useTelegramAuth();
   const [nextClaimTime, setNextClaimTime] = useState(null);
   const [canClaim, setCanClaim] = useState(false);
+  const [timeLeft, setTimeLeft] = useState({});
   const router = useRouter();
 
   useEffect(() => {
     checkClaimStatus();
   }, [userInfo]);
+
+  useEffect(() => {
+    if (nextClaimTime) {
+      const interval = setInterval(() => {
+        updateTimeLeft();
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up interval on component unmount
+    }
+  }, [nextClaimTime]);
+
+  const updateTimeLeft = () => {
+    const now = new Date();
+    const timeDifference = new Date(nextClaimTime) - now;
+
+    if (timeDifference <= 0) {
+      setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      setCanClaim(true);
+      setNextClaimTime(null); // Reset next claim time when it's time to claim
+    } else {
+      const seconds = Math.floor((timeDifference / 1000) % 60);
+      const minutes = Math.floor((timeDifference / 1000 / 60) % 60);
+      const hours = Math.floor((timeDifference / (1000 * 60 * 60)) % 24);
+      const days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+      setTimeLeft({ days, hours, minutes, seconds });
+      setCanClaim(false);
+    }
+  };
 
   const checkClaimStatus = async () => {
     if (!userInfo || !userInfo.id) return;
@@ -27,6 +56,7 @@ const ClaimDailyReward = () => {
         router.refresh();
         if (now >= nextClaimTime) {
           setCanClaim(true);
+          setNextClaimTime(null);
         } else {
           setCanClaim(false);
           setNextClaimTime(nextClaimTime);
@@ -114,7 +144,10 @@ const ClaimDailyReward = () => {
         </div>
         {nextClaimTime && (
           <div className="text-center mt-4">
-            <p>Next claim time: {nextClaimTime.toLocaleString()}</p>
+            <p>
+              Next claim time: {timeLeft.days}d {timeLeft.hours}h
+              {timeLeft.minutes}m {timeLeft.seconds}s
+            </p>
           </div>
         )}
       </div>
