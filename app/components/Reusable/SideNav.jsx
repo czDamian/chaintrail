@@ -16,10 +16,10 @@ const SideNav = () => {
     { href: "/daily-reward", title: "Daily Rewards" },
     { href: "/more", title: "Earn More Points" },
     { href: "/Admin/new-quest", title: "Create Quest" },
+    { href: "/Admin/edit-quest", title: "Edit Quest" },
+    { href: "/Admin/delete-quest", title: "Delete Quest" },
     { href: "/Admin/new-question", title: "Add Questions" },
     { href: "/Admin/edit-question", title: "Edit Question" },
-    { href: "/Admin/delete-quest", title: "Delete Quest" },
-
   ];
 
   return (
@@ -45,7 +45,7 @@ const SideNav = () => {
             <li key={index} className="mb-4">
               <Link
                 href={link.href}
-                className="block py-2 px-4  hover:bg-neutral-700 rounded transition duration-200 "
+                className="block py-2 px-4  hover:bg-neutral-700 rounded transition duration-200 text-sm "
                 onClick={toggleNav}>
                 {link.title}
               </Link>

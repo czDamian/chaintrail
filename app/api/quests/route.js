@@ -1,6 +1,6 @@
-//api/quests/route.js
+// api/quests/route.js
 import connectDb from "@/lib/mongodb";
-import Quest from "@/models/Quest"; 
+import Quest from "@/models/Quest";
 import { NextResponse } from "next/server";
 
 // POST method to create a new quest
@@ -49,8 +49,6 @@ export async function GET() {
   }
 }
 
-
-
 // DELETE method to remove a quest by ID
 export async function DELETE(request) {
   try {
@@ -84,6 +82,47 @@ export async function DELETE(request) {
     return NextResponse.json(deletedQuest, { status: 200 });
   } catch (error) {
     console.error("Error deleting quest:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+// PUT method to update an existing quest by ID
+export async function PUT(request) {
+  try {
+    // Connect to the database
+    await connectDb();
+    console.log("Connected to the database");
+
+    // Parse the request body
+    const body = await request.json();
+    console.log("Received quest data for update:", body);
+
+    const { id, ...updateData } = body;
+
+    // Ensure the ID is provided
+    if (!id) {
+      return NextResponse.json(
+        { error: "Quest ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Find and update the quest with the given ID
+    const updatedQuest = await Quest.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    // Check if a quest was updated
+    if (!updatedQuest) {
+      return NextResponse.json({ error: "Quest not found" }, { status: 404 });
+    }
+
+    console.log("Updated quest in database:", updatedQuest);
+
+    // Return the updated quest as the response
+    return NextResponse.json(updatedQuest, { status: 200 });
+  } catch (error) {
+    console.error("Error updating quest:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
