@@ -28,6 +28,20 @@ module.exports = {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(40deg)" },
         },
+        glow: {
+          "0%": {
+            boxShadow:
+              "0 0 5px rgba(255, 255, 0, 0.5), 0 0 10px rgba(255, 255, 0, 0.5), 0 0 20px rgba(255, 255, 0, 0.5)",
+          },
+          "50%": {
+            boxShadow:
+              "0 0 10px rgba(255, 255, 0, 1), 0 0 20px rgba(255, 255, 0, 1), 0 0 30px rgba(255, 255, 0, 1)",
+          },
+          "100%": {
+            boxShadow:
+              "0 0 5px rgba(255, 255, 0, 0.5), 0 0 10px rgba(255, 255, 0, 0.5), 0 0 20px rgba(255, 255, 0, 0.5)",
+          },
+        },
       },
       fontFamily: {
         lato: ["Lato", "sans-serif"],
@@ -38,9 +52,14 @@ module.exports = {
       animation: {
         "bounce-in-down": "bounce-in-down 1s ease-out",
         rotate: "rotate 10s linear infinite",
+        glow: "glow 1.5s infinite alternate",
       },
       colors: {
         "gold-500": "#E4AD00",
+        "dark-900": "#121212",
+        "dark-800": "#1E1E1E",
+        "dark-700": "#1E1E1E",
+        "light-400": "#444444",
       },
     },
   },

@@ -42,13 +42,13 @@ const Footer = () => {
   ];
 
   return (
-    <footer className=" w-full bg-neutral-900 py-12">
+    <footer className=" w-full bg-[#4a4a4a] py-12">
       <div className=" px-4">
         <div className="">
-          <div className="bg-neutral-800 p-2 my-4 rounded-lg">
-            <h1 className="text-3xl text-center font-bold mb-6">
+          <div className="p-2 my-4">
+            <h2 className="text-3xl text-center font-bold mb-6">
               Meet Our Team
-            </h1>
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
               {teamMembers.map((member, index) => (
                 <Link
@@ -66,16 +66,19 @@ const Footer = () => {
                       className=" w-[50px] h-[50px] rounded-full object-cover"
                     />
                     <div className="p-4">
-                      <h5 className="font-bold">{member.name}</h5>
-                      <p className="text-neutral-500">{member.role}</p>
+                      <h5 className="font-bold text-[#EEEEEE]">
+                        {member.name}
+                      </h5>
+                      <p className="text-[#D4D0E0]">{member.role}</p>
                     </div>
                   </div>
                 </Link>
               ))}
             </div>
           </div>
+          <hr className="m-x-8 my-16 md:my-20" />
 
-          <div className="footer-info">
+          <div className="">
             <h2 className="text-2xl font-bold mb-4">News & Information</h2>
             <ul className="space-y-2">
               <li>
@@ -100,10 +103,19 @@ const Footer = () => {
               </li>
             </ul>
           </div>
+          <hr className="m-x-8 my-16 md:my-20" />
+          <div className="my-6">
+            <h2 className="mb-6">Terms And Conditions</h2>
+            <div className="text-[#D4D0E0] my-2 flex items-center justify-between lg:justify-start lg:gap-16">
+              <Link href="#">Sitemap</Link>.
+              <Link href="#">Terms Of Service</Link>.
+              <Link href="#">Privacy</Link>
+            </div>
+          </div>
         </div>
       </div>
       <div className="mt-8 text-center">
-        <span>(c) 2024 CryptoTrail</span>
+        <span className="text-[#D4D0E0] text-xs">(c) 2024 CryptoTrail</span>
       </div>
     </footer>
   );
