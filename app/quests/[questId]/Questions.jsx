@@ -13,7 +13,7 @@ import FetchPoints from "@/app/components/user/FetchPoints";
 import FetchPass from "@/app/components/user/FetchPass";
 
 const QuestionComponent = ({ questId }) => {
-  const { updatePoints } = useTelegramAuth();
+  const { userInfo, updatePoints } = useTelegramAuth(); // Fetch userInfo from context
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -83,7 +83,8 @@ const QuestionComponent = ({ questId }) => {
     }
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
-  const handleSubmit = (answers = selectedAnswers) => {
+
+  const handleSubmit = async (answers = selectedAnswers) => {
     const currentQuestion = questions[currentQuestionIndex] || {};
     const submittedAnswer = answers.join("");
     const correct =
@@ -99,7 +100,51 @@ const QuestionComponent = ({ questId }) => {
           console.error("Error playing sound:", error)
         );
       }
-      updatePoints(1000);
+
+      if (userInfo) {
+        const { id } = userInfo;
+
+        // Fetch the user's current points and play pass balance
+        try {
+          const response = await fetch(`/api/register?userId=${id}`);
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch user data");
+          }
+
+          const { points, playPass } = data;
+
+          if (playPass > 0) {
+            // Update user points and play pass on the server
+            const updateResponse = await fetch("/api/register", {
+              method: "PATCH",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: id,
+                pointsDelta: 1000,
+                playPassDelta: -1,
+              }),
+            });
+
+            if (!updateResponse.ok) {
+              throw new Error("Failed to update points and play pass");
+            }
+
+            const updateData = await updateResponse.json();
+            setUserPoints(updateData.points);
+          } else {
+            throw new Error("No play passes available");
+          }
+        } catch (error) {
+          console.error("Error updating points:", error);
+          toast.error(
+            "An error occurred while updating points. Please try again."
+          );
+        }
+      }
     } else {
       if (wrongSound) {
         wrongSound

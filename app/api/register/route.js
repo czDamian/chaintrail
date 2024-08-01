@@ -88,3 +88,28 @@ export async function PUT(request) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
+// to update user points and pass
+export async function PATCH(request) {
+  const { userId, pointsDelta, playPassDelta } = await request.json();
+
+  try {
+    const user = await User.findOne({ userId });
+    if (!user) {
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    user.points += pointsDelta;
+    user.playPass += playPassDelta;
+    await user.save();
+
+    return NextResponse.json({
+      message: "User points and play pass updated",
+      points: user.points,
+      playPass: user.playPass,
+    });
+  } catch (err) {
+    console.error(err);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}
