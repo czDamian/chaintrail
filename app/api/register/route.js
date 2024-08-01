@@ -5,16 +5,29 @@ import connectDb from "@/lib/mongodb";
 await connectDb();
 
 export async function POST(request) {
-  const { userId, username } = await request.json();
+  const { userId, username, walletAddress } = await request.json();
 
   try {
     let user = await User.findOne({ userId });
-
     if (user) {
       return NextResponse.json({ message: "Welcome Back" });
     }
 
-    user = new User({ userId, username, points: 950, playPass: 0 });
+    user = await User.findOne({ walletAddress });
+    if (user) {
+      return NextResponse.json(
+        { message: "Wallet address already exists" },
+        { status: 400 }
+      );
+    }
+
+    user = new User({
+      userId,
+      username,
+      walletAddress,
+      points: 950,
+      playPass: 0,
+    });
     await user.save();
     return NextResponse.json({ message: "Successfully registered" });
   } catch (err) {

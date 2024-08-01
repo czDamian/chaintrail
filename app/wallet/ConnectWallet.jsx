@@ -1,34 +1,50 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { ethers } from "ethers";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+
+const ErrorMessage = ({ message, onClose }) => (
+  <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 text-center">
+    <p>{message}</p>
+    <button onClick={onClose} className="absolute top-2 right-2 text-white">
+      ✕
+    </button>
+  </div>
+);
 
 const Web3WalletConnect = () => {
   const [provider, setProvider] = useState(null);
   const [signer, setSigner] = useState(null);
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const CORE_TESTNET_CHAIN_ID = "0x45b"; // Chain ID for Core Testnet
+  const CORE_TESTNET_CHAIN_ID = "0x45b";
+
+  const fetchBalance = useCallback(async () => {
+    if (!provider || !walletAddress) {
+      console.error("Provider or wallet address is not set");
+      return;
+    }
+
+    console.log("Fetching balance for address:", walletAddress);
+
+    try {
+      const balance = await provider.getBalance(walletAddress);
+      console.log("Balance fetched:", balance);
+      const balanceInCore = ethers.formatEther(balance);
+      setWalletBalance(`${balanceInCore} CORE`);
+    } catch (error) {
+      console.error("Error fetching balance:", error);
+      setErrorMessage("Error fetching balance. Please try again.");
+    }
+  }, [provider, walletAddress]);
 
   useEffect(() => {
     if (provider && walletAddress) {
       fetchBalance();
     }
-  }, [provider, walletAddress]);
-
-  const fetchBalance = async () => {
-    try {
-      const balance = await provider.getBalance(walletAddress);
-      const balanceInCore = ethers.formatEther(balance);
-      setWalletBalance(`${balanceInCore} CORE`);
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-      toast.error("Error fetching balance. Please try again.");
-    }
-  };
+  }, [provider, walletAddress, fetchBalance]);
 
   const switchToCoreTestnet = async () => {
     try {
@@ -57,11 +73,13 @@ const Web3WalletConnect = () => {
           });
         } catch (addError) {
           console.error("Error adding Core Testnet:", addError);
-          toast.error("Failed to add Core Testnet. Please add it manually.");
+          setErrorMessage(
+            "Failed to add Core Testnet. Please add it manually."
+          );
         }
       } else {
         console.error("Error switching to Core Testnet:", switchError);
-        toast.error(
+        setErrorMessage(
           "Failed to switch to Core Testnet. Please switch manually."
         );
       }
@@ -75,12 +93,16 @@ const Web3WalletConnect = () => {
         await web3Provider.send("eth_requestAccounts", []);
 
         const network = await web3Provider.getNetwork();
+        console.log("Connected network:", network);
+
         if (network.chainId.toString(16) !== CORE_TESTNET_CHAIN_ID.slice(2)) {
           await switchToCoreTestnet();
           const updatedProvider = new ethers.BrowserProvider(window.ethereum);
           setProvider(updatedProvider);
+          console.log("Switched to Core Testnet");
         } else {
           setProvider(web3Provider);
+          console.log("Using existing provider");
         }
 
         const walletSigner = await web3Provider.getSigner();
@@ -88,14 +110,15 @@ const Web3WalletConnect = () => {
 
         const address = await walletSigner.getAddress();
         setWalletAddress(address);
+        console.log("Wallet Address:", address);
 
-        toast.success("Connected to wallet successfully!");
+        console.log("Connected to wallet successfully!");
       } else {
-        toast.error("No web3 provider found. Please install MetaMask.");
+        setErrorMessage("Copy the link and open it in metamask.");
       }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
-      toast.error("Error connecting to wallet. Please try again.");
+      setErrorMessage("Error connecting to wallet. Please try again.");
     }
   };
 
@@ -104,7 +127,7 @@ const Web3WalletConnect = () => {
     setSigner(null);
     setWalletAddress("");
     setWalletBalance("");
-    toast.success("Disconnected from wallet successfully!");
+    console.log("Disconnected from wallet successfully!");
   };
 
   const trimWalletAddress = (address) => {
@@ -113,7 +136,12 @@ const Web3WalletConnect = () => {
 
   return (
     <div className="bg-neutral-900 my-6 p-5">
-      <ToastContainer />
+      {errorMessage && (
+        <ErrorMessage
+          message={errorMessage}
+          onClose={() => setErrorMessage("")}
+        />
+      )}
       <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
         <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
         <p>
@@ -142,7 +170,6 @@ const Web3WalletConnect = () => {
           </div>
         )}
       </div>
-      {/* <h1 className="text-2xl font-bold mt-6">My NFTs</h1> */}
       <div id="nftContainer" className="mt-4"></div>
     </div>
   );
