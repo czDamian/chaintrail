@@ -47,7 +47,7 @@ export default function TelegramAuthProvider({ children }) {
       setUserPoints(data.points);
 
       if (response.ok) {
-        toast.success("Login successful!");
+        console.log("Login successful!");
       } else {
         toast.error("Registration failed. Please try again.");
       }

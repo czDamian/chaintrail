@@ -85,7 +85,6 @@ const QuestionComponent = ({ questId }) => {
     }
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
-
 const handleSubmit = async (answers = selectedAnswers) => {
   const currentQuestion = questions[currentQuestionIndex] || {};
   const submittedAnswer = answers.join("");
@@ -106,8 +105,8 @@ const handleSubmit = async (answers = selectedAnswers) => {
     if (userInfo) {
       const { id } = userInfo;
 
-      // Fetch the user's current points and play pass balance
       try {
+        // Fetch the user's current points and play pass balance
         const response = await fetch(`/api/register?userId=${id}`);
         const data = await response.json();
 
@@ -136,9 +135,9 @@ const handleSubmit = async (answers = selectedAnswers) => {
           }
 
           const updateData = await updateResponse.json();
-          setUserPoints(updateData.points);
+          setPoints(updateData.points); // Update context
+          setPlayPass(updateData.playPass); // Update context
 
-          // Proceed with showing success modal if points update is successful
           if (currentQuestionIndex === questions.length - 1) {
             setIsCompleted(true);
             setTimeout(() => {
@@ -166,7 +165,6 @@ const handleSubmit = async (answers = selectedAnswers) => {
         toast.error(
           "An error occurred while updating points. Please try again."
         );
-        // Prevent further action
         setShowPopup(false);
       }
     }
@@ -176,10 +174,10 @@ const handleSubmit = async (answers = selectedAnswers) => {
         .play()
         .catch((error) => console.error("Error playing wrong sound:", error));
     }
-    // Prevent further action on incorrect answer
     setShowPopup(false);
   }
 };
+
 
 
   const handleNext = () => {
