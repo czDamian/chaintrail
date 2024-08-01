@@ -6,11 +6,10 @@ import { NextResponse } from "next/server";
 // POST method to create a new quest
 export async function POST(request) {
   try {
-    // Connect to the database
+ 
     await connectDb();
     console.log("Connected to the database");
 
-    // Parse the request body
     const body = await request.json();
     console.log("Received quest data:", body);
 
@@ -33,15 +32,12 @@ export async function POST(request) {
 // GET method to retrieve all quests
 export async function GET() {
   try {
-    // Connect to the database
     await connectDb();
     console.log("Connected to the database");
 
-    // Fetch all quests from the database
     const quests = await Quest.find({});
     console.log("Retrieved quests from database:", quests);
 
-    // Return the quests as the response
     return NextResponse.json(quests);
   } catch (error) {
     console.error("Error fetching quests:", error);
@@ -52,15 +48,12 @@ export async function GET() {
 // DELETE method to remove a quest by ID
 export async function DELETE(request) {
   try {
-    // Connect to the database
     await connectDb();
     console.log("Connected to the database");
 
-    // Parse the request body to get the quest ID
     const { id } = await request.json();
     console.log("Received quest ID for deletion:", id);
 
-    // Ensure the ID is provided
     if (!id) {
       return NextResponse.json(
         { error: "Quest ID is required" },
@@ -68,10 +61,8 @@ export async function DELETE(request) {
       );
     }
 
-    // Find and delete the quest with the given ID
     const deletedQuest = await Quest.findByIdAndDelete(id);
 
-    // Check if a quest was deleted
     if (!deletedQuest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });
     }
@@ -89,17 +80,14 @@ export async function DELETE(request) {
 // PUT method to update an existing quest by ID
 export async function PUT(request) {
   try {
-    // Connect to the database
     await connectDb();
     console.log("Connected to the database");
 
-    // Parse the request body
     const body = await request.json();
     console.log("Received quest data for update:", body);
 
     const { id, ...updateData } = body;
 
-    // Ensure the ID is provided
     if (!id) {
       return NextResponse.json(
         { error: "Quest ID is required" },
@@ -107,7 +95,6 @@ export async function PUT(request) {
       );
     }
 
-    // Find and update the quest with the given ID
     const updatedQuest = await Quest.findByIdAndUpdate(id, updateData, {
       new: true,
     });

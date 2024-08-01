@@ -1,6 +1,8 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const TelegramAuthContext = createContext();
 
@@ -43,11 +45,18 @@ export default function TelegramAuthProvider({ children }) {
       console.log(data);
       setRegistrationStatus(data.message);
       setUserPoints(data.points);
-      // Set and fetch user points from registration response
+
+      if (response.ok) {
+        toast.success("Registration successful!");
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
     } catch (error) {
       console.error("Error registering user:", error);
+      toast.error("Registration failed. Please try again.");
     }
   };
+
   const fetchUserPoints = async (userId) => {
     try {
       const response = await fetch(`/api/register?userId=${userId}`);
@@ -59,47 +68,44 @@ export default function TelegramAuthProvider({ children }) {
       console.error("Error fetching user points:", error);
     }
   };
+
   useEffect(() => {
     if (userInfo && userInfo.id) {
       fetchUserPoints(userInfo.id);
     }
   }, [userInfo]);
 
-const updatePoints = async (increment) => {
-  setUserPoints((prevPoints) => prevPoints + increment);
+  const updatePoints = async (increment) => {
+    setUserPoints((prevPoints) => prevPoints + increment);
 
-  // API call to update the points on the server
-  try {
-    const response = await fetch("/api/points", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ userId: userInfo.id, increment }), // Assuming you have userInfo from the context
-    });
+    // API call to update the points on the server
+    try {
+      const response = await fetch("/api/points", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: userInfo.id, increment }), //get userInfo from the context if its available
+      });
 
-    if (!response.ok) {
-      throw new Error("Failed to update points on the server");
+      if (!response.ok) {
+        throw new Error("Failed to update points on the server");
+      }
+
+      const data = await response.json();
+      console.log("Points updated successfully on the server:", data);
+    } catch (error) {
+      console.error("Error updating points:", error.message, error.stack);
+      // revert the local points update in case of an error
+      setUserPoints((prevPoints) => prevPoints - increment);
     }
-
-    const data = await response.json();
-    console.log("Points updated successfully on the server:", data);
-  } catch (error) {
-    console.error("Error updating points:", error.message, error.stack);
-    // Optionally, revert the local points update in case of an error
-    setUserPoints((prevPoints) => prevPoints - increment);
-  }
-};
-
-
-
-
-
+  };
 
   return (
     <TelegramAuthContext.Provider
       value={{ userInfo, isLoading, userPoints, updatePoints }}>
       {children}
+      <ToastContainer />
     </TelegramAuthContext.Provider>
   );
 }

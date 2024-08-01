@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS for toastify
+import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
 import DeleteModal from "./DeleteModal";
 
@@ -113,7 +113,7 @@ export default function DeleteQuest() {
         onConfirm={handleConfirmDelete}
         onClose={handleCloseModal}
       />
-      <ToastContainer /> {/* Add this to render toast notifications */}
+      <ToastContainer />
     </section>
   );
 }

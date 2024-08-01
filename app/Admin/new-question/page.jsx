@@ -1,5 +1,4 @@
 
-// Admin/page.js
 import CreateQuestQuestion from './CreateQuestQuestions';
 
 

@@ -38,16 +38,18 @@ const FetchPass = () => {
 
   if (isLoading || loading) {
     return (
-      <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950">
-        Login to view balance
+      <div className="text-xs gap-1 flex items-center">
+        <img src="../ticket.png" alt="Chain Coins" className="w-6 h-6" />
+        <span>000</span>
       </div>
     );
   }
 
   if (!userInfo) {
     return (
-      <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950 mt-4">
-        User not logged in
+      <div className="text-xs gap-1 flex items-center">
+        <img src="../ticket.png" alt="Chain Coins" className="w-6 h-6" />
+        <span>login</span>
       </div>
     );
   }
@@ -60,7 +62,12 @@ const FetchPass = () => {
     );
   }
 
-  return <div>Play Passes: {playPass}</div>;
+  return (
+    <div className="text-xs gap-1 flex items-center">
+      <img src="../ticket.png" alt="Chain Coins" className="w-6 h-6" />
+      <span>{playPass}</span>
+    </div>
+  );
 };
 
 export default FetchPass;

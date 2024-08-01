@@ -1,5 +1,4 @@
-// app/quests/[questId]/page.js
-import QuestionComponent from "./Question1";
+import QuestionComponent from "./Questions";
 
 
 export const metadata = {

@@ -57,7 +57,7 @@ const FetchQuestsFromDb = () => {
                   <span className="uppercase font-bold text-gray-100">
                     {quest.questName}
                   </span>
-                  <Button className="bg-yellow-300 px-4 py-2 text-black text-xs hover:bg-yellow-200 transition-colors duration-300">
+                  <Button className="bg-gold-500 px-4 py-2 text-black text-xs hover:bg-yellow-500 transition-colors duration-300">
                     {quest.questStatus}
                   </Button>
                 </div>

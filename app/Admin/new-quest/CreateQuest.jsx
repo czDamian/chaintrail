@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"; // Import CSS for toastify
+import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
 
 export default function CreateQuest() {
@@ -9,7 +9,7 @@ export default function CreateQuest() {
     questName: "",
     questImage: "",
     questStatus: "locked",
-    questDescription: "", // Added questDescription field
+    questDescription: "",
   });
 
   const handleChange = (e) => {
@@ -115,7 +115,7 @@ export default function CreateQuest() {
           </button>
         </form>
       </div>
-      <ToastContainer /> {/* Add this to render toast notifications */}
+      <ToastContainer />
     </section>
   );
 }

@@ -1,4 +1,3 @@
-// Admin/page.jsx
 import CreateQuest from './CreateQuest';
 
 export const metadata = {

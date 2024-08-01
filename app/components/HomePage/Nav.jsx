@@ -34,7 +34,7 @@ const Navbar = () => {
     ? !hiddenPaths.some((path) => pathname.startsWith(path))
     : true;
 
-  if (!showNavbar) return null; // Hide Navbar if the path starts with '//'
+  if (!showNavbar) return null; // Hide Navbar if the path starts with '/'
 
   return (
     <nav

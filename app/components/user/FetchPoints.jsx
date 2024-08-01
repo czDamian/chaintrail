@@ -37,22 +37,28 @@ const FetchPoints = () => {
   }, [userInfo]);
 
   if (isLoading || loading) {
-    return <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950">login to view balance</div>;
+    return (
+      <div className="text-xs gap-1 flex items-center">
+        <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
+        <span>000</span>
+      </div>
+    );
   }
 
   if (!userInfo) {
-    return (
-      <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950 mt-4">
-        User not logged in
-      </div>
-    );
+    return <div className="text-xs gap-1 flex items-center">please log in</div>;
   }
 
   if (error) {
     return <div className="text-xs text-red-500">{error}</div>;
   }
 
-  return <div>Points: {points}</div>;
+  return (
+    <div className="text-xs gap-1 flex items-center">
+      <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
+      <span>{points}</span>
+    </div>
+  );
 };
 
 export default FetchPoints;

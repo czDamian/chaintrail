@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { MdDelete } from "react-icons/md";
-import Points from "@/app/components/user/Points";
 import SideNav from "@/app/components/Reusable/SideNav";
 import Modal from "@/app/components/Reusable/Modal";
 import { Success } from "@/app/components/Reusable/Popup";
@@ -10,6 +9,8 @@ import { Wrong } from "@/app/components/Reusable/Popup";
 import { Complete } from "@/app/components/Reusable/Popup";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import Loader from "@/app/loader";
+import FetchPoints from "@/app/components/user/FetchPoints";
+import FetchPass from "@/app/components/user/FetchPass";
 
 const QuestionComponent = ({ questId }) => {
   const { updatePoints } = useTelegramAuth();
@@ -160,14 +161,12 @@ const QuestionComponent = ({ questId }) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   return (
-    <section className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="max-w-screen-xl mt-2 mx-auto px-4 sm:px-6 lg:px-8">
       <QuesUI />
-      <div className="py-4 flex justify-between items-center text-sm">
-        <div className="flex items-center gap-2">
-          <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
-          <span className="font-bold">
-            <Points />
-          </span>
+      <div className="py-2 flex justify-between items-center text-sm">
+        <div className="flex flex-col items-center">
+          <FetchPoints />
+          <FetchPass />
         </div>
         <div className="flex items-center">
           <img src="../redImg.png" alt="level" className="w-12 h-11" />

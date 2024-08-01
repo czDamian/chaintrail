@@ -36,14 +36,3 @@ const Button = ({ children, onClick, href, className = "" }) => {
 };
 
 export default Button;
-
-// To re-use the button
-// import Button from "./path/to/Button";
-
-// function MyComponent() {
-//   return (
-//     <div>
-//       <Button>Connect</Button>
-//     </div>
-//   );
-// }

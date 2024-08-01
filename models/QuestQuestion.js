@@ -1,4 +1,3 @@
-// models/QuestQuestion.js
 import mongoose from "mongoose";
 
 const QuestQuestionSchema = new mongoose.Schema(

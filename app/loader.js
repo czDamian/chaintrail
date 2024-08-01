@@ -18,7 +18,7 @@ const Loader = () => {
               alt={image.alt}
               width={100}
               height={100}
-              className="w-40 h-40 animate-rotate"
+              className="w-40 h-40"
             />
           </div>
         ))}
@@ -31,18 +31,18 @@ const Loader = () => {
               alt={image.alt}
               width={100}
               height={100}
-              className="w-40 h-40 animate-rotate"
+              className="w-40 h-40"
             />
           </div>
         ))}
       </div>
-        <Image
-          src="/loader/letterblock.png"
-          alt="loading text"
-          width={1000}
-          height={1000}
-          className="w-full max-w-[300px] pt-3"
-        />
+      <Image
+        src="/loader/letterblock.png"
+        alt="loading text"
+        width={1000}
+        height={1000}
+        className="w-full max-w-[300px] pt-3 animate-pulse"
+      />
     </div>
   );
 };

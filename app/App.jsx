@@ -1,4 +1,3 @@
-import Login from "./components/Game/Login";
 import Footer from "./components/HomePage/Footer";
 import NFTSection from "./components/HomePage/NftSection";
 import Partners from "./components/HomePage/Partners";
@@ -18,7 +17,6 @@ export default function App() {
         <NewsPage />
         <Partners />
         <Footer />
-        <Login />
       </div>
     </main>
   );
