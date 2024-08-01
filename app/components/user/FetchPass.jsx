@@ -38,15 +38,15 @@ const FetchPass = () => {
 
   if (isLoading || loading) {
     return (
-      <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">
-        Login to view pass balance...
+      <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950">
+        Login to view balance
       </div>
     );
   }
 
   if (!userInfo) {
     return (
-      <div className="text-xs border p-2 rounded bg-neutral-950 mt-4">
+      <div className="text-xs border border-gray-700 p-2 rounded bg-neutral-950 mt-4">
         User not logged in
       </div>
     );
