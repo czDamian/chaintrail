@@ -1,9 +1,9 @@
-import Header from "./Header";
+import App from "./App";
 
 export default function Home() {
   return (
     <div>
-        <Header />
+      <App />
     </div>
   );
 }

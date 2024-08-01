@@ -9,12 +9,12 @@ export default function Profile() {
   const openPopup = () => setIsPopupOpen(true);
   const closePopup = () => setIsPopupOpen(false);
 
-  if (isLoading){
+  if (isLoading) {
     return (
       <>
         <div
           onClick={openPopup}
-          className="animate-bounce-in-down focus:outline-none">
+          className="text-xs md:text-lg animate-bounce-in-down focus:outline-none">
           <Button className="bg-black hover:scale-105 text-xs">CONNECT</Button>
         </div>
         <Popup isOpen={isPopupOpen} onClose={closePopup} />

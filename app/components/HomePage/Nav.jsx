@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import Profile from "../user/Profile";
-import { cinzel } from "../Reusable/Font";
 
 const Navbar = () => {
   const [isSticky, setIsSticky] = useState(false);
@@ -39,14 +38,12 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed bg-black  px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 ${
-        cinzel.className
-      } ${
+      className={`fixed bg-black  px-0 sm:px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 font-cinzel ${
         isSticky
           ? "bg-gradient-to-b from-neutral-950 from-5% to-neutral-900 shadow-md"
           : "bg-black"
       }`}>
-      <div className="mx-auto px-4 py-3 sm:py-5 flex justify-between items-center">
+      <div className="mx-auto px-1 md:px-4 py-3 sm:py-5 flex justify-between items-center">
         <Link
           href="/"
           className="flex items-center space-x-2 animate-bounce-in-down">
@@ -57,7 +54,7 @@ const Navbar = () => {
             height={30}
             className="w-6 md:w-7 lg:w-8"
           />
-          <span className="text-xl font-extrabold hover:text-gold-500">
+          <span className="text-xs md:text-lg lg:text-xl font-extrabold hover:text-gold-500">
             CHAIN TRAIL
           </span>
         </Link>

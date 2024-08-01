@@ -57,7 +57,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block">
-                  <div className=" overflow-hidden flex items-center justify-start hover:bg-neutral-950 rounded-lg px-1">
+                  <div className=" overflow-hidden flex items-center justify-start hover:bg-neutral-800 rounded-lg px-1">
                     <Image
                       src={member.image}
                       alt={member.name}

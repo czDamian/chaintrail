@@ -10,7 +10,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-black text-white w-full max-w-[400px]  sm:max-w-[1400px] m-0 p-0;
+  @apply bg-black text-white w-full max-w-[400px]  sm:max-w-[1400px] m-0 p-0 overflow-x-hidden;
 }
 
 input[type=file]{
