@@ -11,9 +11,11 @@ import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import Loader from "@/app/loader";
 import FetchPoints from "@/app/components/user/FetchPoints";
 import FetchPass from "@/app/components/user/FetchPass";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const QuestionComponent = ({ questId }) => {
-  const { userInfo, updatePoints } = useTelegramAuth(); // Fetch userInfo from context
+  const { userInfo } = useTelegramAuth(); // Fetch userInfo from context
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -134,7 +136,14 @@ const QuestionComponent = ({ questId }) => {
             }
 
             const updateData = await updateResponse.json();
-            setUserPoints(updateData.points);
+            // Assume updateData contains updated points information
+            // setUserPoints(updateData.points);
+
+            if (updateData.playPass <= 0) {
+              toast.error(
+                "Your play pass balance is 0 or below. Please recharge."
+              );
+            }
           } else {
             throw new Error("No play passes available");
           }
@@ -301,6 +310,7 @@ const QuestionComponent = ({ questId }) => {
           </div>
         )}
       </section>
+      <ToastContainer />
     </section>
   );
 };
