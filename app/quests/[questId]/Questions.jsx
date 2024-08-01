@@ -86,100 +86,101 @@ const QuestionComponent = ({ questId }) => {
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
 
-  const handleSubmit = async (answers = selectedAnswers) => {
-    const currentQuestion = questions[currentQuestionIndex] || {};
-    const submittedAnswer = answers.join("");
-    const correct =
-      submittedAnswer.toUpperCase() ===
-      (currentQuestion.questAnswer || "").toUpperCase();
+const handleSubmit = async (answers = selectedAnswers) => {
+  const currentQuestion = questions[currentQuestionIndex] || {};
+  const submittedAnswer = answers.join("");
+  const correct =
+    submittedAnswer.toUpperCase() ===
+    (currentQuestion.questAnswer || "").toUpperCase();
 
-    setIsCorrect(correct);
-    setShowPopup(true);
+  setIsCorrect(correct);
+  setShowPopup(true);
 
-    if (correct) {
-      if (SuccessSound) {
-        SuccessSound.play().catch((error) =>
-          console.error("Error playing sound:", error)
-        );
-      }
+  if (correct) {
+    if (SuccessSound) {
+      SuccessSound.play().catch((error) =>
+        console.error("Error playing sound:", error)
+      );
+    }
 
-      if (userInfo) {
-        const { id } = userInfo;
+    if (userInfo) {
+      const { id } = userInfo;
 
-        // Fetch the user's current points and play pass balance
-        try {
-          const response = await fetch(`/api/register?userId=${id}`);
-          const data = await response.json();
+      // Fetch the user's current points and play pass balance
+      try {
+        const response = await fetch(`/api/register?userId=${id}`);
+        const data = await response.json();
 
-          if (!response.ok) {
-            throw new Error("Failed to fetch user data");
-          }
-
-          const { points, playPass } = data;
-
-          if (playPass > 0) {
-            // Update user points and play pass on the server
-            const updateResponse = await fetch("/api/register", {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                userId: id,
-                pointsDelta: 1000,
-                playPassDelta: -1,
-              }),
-            });
-
-            if (!updateResponse.ok) {
-              throw new Error("Failed to update points and play pass");
-            }
-
-            const updateData = await updateResponse.json();
-            // Assume updateData contains updated points information
-            // setUserPoints(updateData.points);
-
-            if (updateData.playPass <= 0) {
-              toast.error(
-                "Your play pass balance is 0 or below. Please recharge."
-              );
-            }
-          } else {
-            throw new Error("No play passes available");
-          }
-        } catch (error) {
-          console.error("Error updating points:", error);
-          toast.error(
-            "An error occurred while updating points. Please try again."
-          );
+        if (!response.ok) {
+          throw new Error("Failed to fetch user data");
         }
-      }
-    } else {
-      if (wrongSound) {
-        wrongSound
-          .play()
-          .catch((error) => console.error("Error playing wrong sound:", error));
-      }
-    }
 
-    if (currentQuestionIndex === questions.length - 1) {
-      setIsCompleted(true);
-      setTimeout(() => {
-        setShowComplete(true);
-        setTimeout(() => {
-          if (congratsSound) {
-            congratsSound
-              .play()
-              .catch((error) => console.error("Error playing sound:", error));
+        const { points, playPass } = data;
+
+        if (playPass > 0) {
+          // Update user points and play pass on the server
+          const updateResponse = await fetch("/api/register", {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: id,
+              pointsDelta: 1000,
+              playPassDelta: -1,
+            }),
+          });
+
+          if (!updateResponse.ok) {
+            throw new Error("Failed to update points and play pass");
           }
-        }, 1000);
-      }, 4000);
-    } else {
-      setTimeout(() => {
-        handleNext();
-      }, 1500);
+
+          const updateData = await updateResponse.json();
+          setUserPoints(updateData.points);
+
+          // Proceed with showing success modal if points update is successful
+          if (currentQuestionIndex === questions.length - 1) {
+            setIsCompleted(true);
+            setTimeout(() => {
+              setShowComplete(true);
+              setTimeout(() => {
+                if (congratsSound) {
+                  congratsSound
+                    .play()
+                    .catch((error) =>
+                      console.error("Error playing sound:", error)
+                    );
+                }
+              }, 1000);
+            }, 4000);
+          } else {
+            setTimeout(() => {
+              handleNext();
+            }, 1500);
+          }
+        } else {
+          throw new Error("No play passes available");
+        }
+      } catch (error) {
+        console.error("Error updating points:", error);
+        toast.error(
+          "An error occurred while updating points. Please try again."
+        );
+        // Prevent further action
+        setShowPopup(false);
+      }
     }
-  };
+  } else {
+    if (wrongSound) {
+      wrongSound
+        .play()
+        .catch((error) => console.error("Error playing wrong sound:", error));
+    }
+    // Prevent further action on incorrect answer
+    setShowPopup(false);
+  }
+};
+
 
   const handleNext = () => {
     if (isCompleted || showComplete) {
