@@ -5,11 +5,11 @@ import { ethers } from "ethers";
 import Button from "../components/Reusable/Button";
 import { CgClose } from "react-icons/cg";
 const ErrorMessage = ({ message, onClose }) => (
-  <div className="fixed text-xs top-14 left-0 right-0 bg-red-500 text-black p-2 md:p-4 text-center">
+  <div className="fixed mx-4 rounded text-xs top-24 left-0 right-0 bg-green-600  p-2 md:p-4 text-center">
     <p>{message}</p>
     <button
       onClick={onClose}
-      className="absolute text-black text-2xl top-1 right-2">
+      className="absolute text-2xl top-1 right-2">
       <CgClose />
     </button>
   </div>
@@ -138,7 +138,7 @@ const Web3WalletConnect = () => {
         />
       )}
       <div className="container mx-auto text-center bg-neutral-800 p-6 rounded-lg shadow-lg">
-        <h1 className="text-2xl font-bold mb-4">Connect to Web3 Wallet</h1>
+        <h1 className="text-2xl font-bold mb-4">Connect Your Core Wallet</h1>
         <p>
           Only Core Testnet is supported. You will be prompted to switch if
           necessary.

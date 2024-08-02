@@ -24,7 +24,7 @@ const images = [
 const Collection = () => {
   return (
     <div className="my-6 w-full">
-      <div className="flex justify-between items-center bg-yellow-800 gap-8 rounded mb-4">
+      <div className="flex justify-between items-center text-black bg-gold-500 gap-8 rounded mb-4">
         <h1 className="my-4 px-4">MY COLLECTIONS</h1>
         <SideNav />
       </div>
@@ -46,7 +46,7 @@ const Collection = () => {
           </div>
         ))}
       </div> */}
-      <p>Your NFTs will be displayed here</p>
+      <p className="mt-16 px-4 md:px-8">Only NFTs minted on Core will be displayed here</p>
       <Web3WalletConnect />
     </div>
   );
