@@ -2,7 +2,7 @@ import { GrClose } from "react-icons/gr";
 import Image from "next/image";
 import Link from "next/link";
 
-const Popup = ({ isOpen, onClose }) => {
+const Popup = ({ isOpen, onClose, connectWallet }) => {
   if (!isOpen) return null;
 
   return (
@@ -17,18 +17,18 @@ const Popup = ({ isOpen, onClose }) => {
             </button>
           </div>
 
-          <div className="space-y-8 py-4">
-            <Link
-              href="#connectWallet"
+          <div className="space-y-8 py-4 text-lg">
+            <button
+              onClick={connectWallet}
               className="flex items-center justify-between p-2 hover:bg-slate-900 rounded">
               <p>Connect Wallet</p>
               <Image src="metamask.svg" width={30} height={30} alt="metamask" />
-            </Link>
+            </button>
             <Link
               href="https://t.me/ChainTrailBot"
               className="flex items-center justify-between p-2 hover:bg-slate-900 rounded">
               <p>Play on Telegram</p>
-              <Image src="telegram.svg" width={30} height={30} alt="metamask" />
+              <Image src="telegram.svg" width={30} height={30} alt="telegram" />
             </Link>
           </div>
         </div>
