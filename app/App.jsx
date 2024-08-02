@@ -3,7 +3,7 @@ import NFTSection from "./components/HomePage/NftSection";
 import Partners from "./components/HomePage/Partners";
 import Hero from "./components/HomePage/Hero";
 import Daily from "./components/HomePage/Daily";
-import NewsPage from "./components/HomePage/NewsPage";
+import HowToPlay from "./components/HomePage/HowToPlay";
 import ClaimDailyReward from "./daily-reward/ClaimDailyReward";
 
 export default function App() {
@@ -14,7 +14,7 @@ export default function App() {
         <NFTSection />
         <Daily />
         <ClaimDailyReward />
-        <NewsPage />
+        <HowToPlay />
         <Partners />
         <Footer />
       </div>

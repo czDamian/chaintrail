@@ -4,7 +4,7 @@ import Image from "next/image";
 import Button from "../Reusable/Button";
 
 const NFTSection = () => {
-  const nftImages = ["/nft1.png", "/nft01.png", "/nft2.png"];
+  const nftImages = ["/nft1.png", "/nft2.png", "/nft1.png"];
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const isMobile = useMobileCheck();
 
