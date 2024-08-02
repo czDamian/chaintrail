@@ -28,14 +28,20 @@ const NFTSection = () => {
 
       <div className="flex items-center justify-center px-4 sm:px-8">
         {isMobile ? (
-          <div className="relative w-[180px] h-auto">
-            <Image
-              src={nftImages[currentImageIndex]}
-              alt={`NFT ${currentImageIndex + 1}`}
-              width={800}
-              height={1200}
-              className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
-            />
+          <div className="flex overflow-x-auto space-x-4">
+            {nftImages.map((nftImage, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-[180px] h-auto relative">
+                <Image
+                  src={nftImage}
+                  alt={`NFT ${index + 1}`}
+                  width={800}
+                  height={1200}
+                  className="object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                />
+              </div>
+            ))}
           </div>
         ) : (
           nftImages.map((nftImage, index) => (

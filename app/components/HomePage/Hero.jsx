@@ -20,7 +20,7 @@ const Hero = () => {
         height={1000}
         src="/loader/background.png"
         alt="background"
-        className="absolute top-[-60px] left-[-130px] rotate-180 w-full sm:max-w-[750px] max-h-[50vh] min-w-[100vw] object-cover scale-150"
+        className="absolute top-[-20px] xs:top-[-60px] left-[-130px] rotate-180 w-full sm:max-w-[750px] max-h-[50vh] min-w-[100vw] object-cover scale-150"
       />
 
       <div className="z-10 font-raleway pt-20 text-center">

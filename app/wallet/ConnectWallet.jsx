@@ -4,12 +4,14 @@ import { useEffect, useState, useCallback } from "react";
 import { ethers } from "ethers";
 import Button from "../components/Reusable/Button";
 import { CgClose } from "react-icons/cg";
+import { IoCopy } from "react-icons/io5";
+
 const ErrorMessage = ({ message, onClose }) => (
-  <div className="fixed mx-4 rounded text-xs top-16 left-0 right-0 bg-green-600  p-2 md:p-4 text-center">
+  <div className="fixed mx-4 rounded text-xs top-16 left-0 right-0 bg-green-600 p-2 md:p-4 text-center">
     <p>{message}</p>
     <button
       onClick={onClose}
-      className="absolute text-2xl top-1 right-2">
+      className="absolute text-2xl top-1 right-2 text-white hover:text-gray-300">
       <CgClose />
     </button>
   </div>
@@ -21,6 +23,9 @@ const Web3WalletConnect = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [walletBalance, setWalletBalance] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showInstallMetamaskPopup, setShowInstallMetamaskPopup] =
+    useState(false);
+  const [copyButtonText, setCopyButtonText] = useState("Copy Link");
 
   const CORE_TESTNET_CHAIN_ID = "0x45b";
 
@@ -109,7 +114,7 @@ const Web3WalletConnect = () => {
         setWalletAddress(address);
         console.log("Wallet Address:", address);
       } else {
-        setErrorMessage("Copy the link and open it in your metamask.");
+        setShowInstallMetamaskPopup(true);
       }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
@@ -127,6 +132,12 @@ const Web3WalletConnect = () => {
 
   const trimWalletAddress = (address) => {
     return `${address.slice(0, 5)}...${address.slice(-5)}`;
+  };
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://chaintrail.vercel.app");
+    setCopyButtonText("Copied");
+    setTimeout(() => setCopyButtonText("Copy Link"), 2000);
   };
 
   return (
@@ -165,6 +176,27 @@ const Web3WalletConnect = () => {
           </div>
         )}
       </div>
+      {showInstallMetamaskPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-slate-950 rounded-lg shadow-xl p-4 w-80 relative">
+            <button
+              onClick={() => setShowInstallMetamaskPopup(false)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+              <CgClose />
+            </button>
+            <p className="text-white text-center mb-4">
+              Copy this link and open in your MetaMask
+            </p>
+            <div className="flex justify-center">
+              <Button
+                onClick={handleCopyLink}
+                className="flex items-center gap-1 border border-white bg-black hover:border-gold-500 text-xs">
+                <IoCopy /> {copyButtonText}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       <div id="nftContainer" className="mt-4"></div>
     </div>
   );

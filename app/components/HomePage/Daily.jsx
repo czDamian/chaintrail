@@ -24,7 +24,7 @@ const Daily = () => {
             alt="Games"
             width={1000}
             height={1000}
-            className="hover:scale-105 opacity-80 w-fit max-w-[180px] min-h-[400px] md:max-w-[200px] md:min-h-[450px]"
+            className="hover:scale-105 opacity-80 w-fit max-w-[240px] min-h-[400px] md:min-h-[450px]"
           />
         ))}
       </div>
