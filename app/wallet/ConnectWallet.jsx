@@ -2,12 +2,15 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { ethers } from "ethers";
-
+import Button from "../components/Reusable/Button";
+import { CgClose } from "react-icons/cg";
 const ErrorMessage = ({ message, onClose }) => (
-  <div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 text-center">
+  <div className="fixed text-xs top-14 left-0 right-0 bg-red-500 text-black p-2 md:p-4 text-center">
     <p>{message}</p>
-    <button onClick={onClose} className="absolute top-2 right-2 text-white">
-      ✕
+    <button
+      onClick={onClose}
+      className="absolute text-black text-2xl top-1 right-2">
+      <CgClose />
     </button>
   </div>
 );
@@ -27,11 +30,8 @@ const Web3WalletConnect = () => {
       return;
     }
 
-    console.log("Fetching balance for address:", walletAddress);
-
     try {
       const balance = await provider.getBalance(walletAddress);
-      console.log("Balance fetched:", balance);
       const balanceInCore = ethers.formatEther(balance);
       setWalletBalance(`${balanceInCore} CORE`);
     } catch (error) {
@@ -93,16 +93,13 @@ const Web3WalletConnect = () => {
         await web3Provider.send("eth_requestAccounts", []);
 
         const network = await web3Provider.getNetwork();
-        console.log("Connected network:", network);
 
         if (network.chainId.toString(16) !== CORE_TESTNET_CHAIN_ID.slice(2)) {
           await switchToCoreTestnet();
           const updatedProvider = new ethers.BrowserProvider(window.ethereum);
           setProvider(updatedProvider);
-          console.log("Switched to Core Testnet");
         } else {
           setProvider(web3Provider);
-          console.log("Using existing provider");
         }
 
         const walletSigner = await web3Provider.getSigner();
@@ -111,10 +108,8 @@ const Web3WalletConnect = () => {
         const address = await walletSigner.getAddress();
         setWalletAddress(address);
         console.log("Wallet Address:", address);
-
-        console.log("Connected to wallet successfully!");
       } else {
-        setErrorMessage("Copy the link and open it in metamask.");
+        setErrorMessage("Copy the link and open it in your metamask.");
       }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
@@ -127,7 +122,7 @@ const Web3WalletConnect = () => {
     setSigner(null);
     setWalletAddress("");
     setWalletBalance("");
-    console.log("Disconnected from wallet successfully!");
+    console.log("wallet Disconnected!");
   };
 
   const trimWalletAddress = (address) => {
@@ -135,7 +130,7 @@ const Web3WalletConnect = () => {
   };
 
   return (
-    <div className="bg-neutral-900 my-6 p-5">
+    <div className="bg-neutral-900 rounded-lg my-6 p-5">
       {errorMessage && (
         <ErrorMessage
           message={errorMessage}
@@ -150,11 +145,11 @@ const Web3WalletConnect = () => {
         </p>
         {!walletAddress ? (
           <div>
-            <button
-              className="mt-4 bg-yellow-500 text-neutral-900 px-4 py-2 rounded-lg shadow hover:bg-yellow-600 mr-2"
+            <Button
+              className="mt-4 bg-gold-500 text-black text-xs hover:bg-yellow-600"
               onClick={connectWallet}>
-              Connect with MetaMask
-            </button>
+              Connect Wallet
+            </Button>
           </div>
         ) : (
           <div>
@@ -162,11 +157,11 @@ const Web3WalletConnect = () => {
               walletAddress
             )}`}</p>
             <p className="mt-2">{`Balance: ${walletBalance}`}</p>
-            <button
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow hover:bg-red-600"
+            <Button
+              className="mt-4 bg-red-500 text-black text-xs hover:bg-red-600"
               onClick={disconnectWallet}>
-              Disconnect Wallet
-            </button>
+              Disconnect
+            </Button>
           </div>
         )}
       </div>

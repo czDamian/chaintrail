@@ -1,4 +1,5 @@
 import SideNav from "../components/Reusable/SideNav";
+import Web3WalletConnect from "../wallet/ConnectWallet";
 
 export const metadata = {
   title: "My Collections",
@@ -28,7 +29,7 @@ const Collection = () => {
         <SideNav />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
         {images.map((item, index) => (
           <div key={index}>
             <div className="rounded-xl overflow-hidden">
@@ -44,7 +45,9 @@ const Collection = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
+      <p>Your NFTs will be displayed here</p>
+      <Web3WalletConnect />
     </div>
   );
 };

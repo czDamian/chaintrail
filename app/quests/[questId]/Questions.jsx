@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { MdDelete } from "react-icons/md";
 import SideNav from "@/app/components/Reusable/SideNav";
@@ -15,8 +15,8 @@ import FetchPass from "@/app/components/user/FetchPass";
 
 const QuestionComponent = ({ questId }) => {
   const { userInfo } = useTelegramAuth(); // Fetch userInfo from context
-  const router = useRouter(); // Initialize router
-  const [points, setPoints] = useState(0); // Define setPoints
+  const router = useRouter();
+  const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);

@@ -1,7 +1,4 @@
 import SideNav from "../components/Reusable/SideNav";
-import Web3WalletConnect from "../wallet/ConnectWallet";
-
-
 
 export const metadata = {
   title: "Earn More Coins",
@@ -26,7 +23,7 @@ const MoreCoins = () => {
             <button className="text-white text-3xl py-2 px-4 rounded-xl  font-bold relative top-[-100px] right-[-20px]">
               +300
             </button>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-xl text-[12px] font-bold relative top-[-100px] right-[-60px]">
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-xl text-[12px] font-bold relative top-[-100px] right-[-50px]">
               Watch Now
             </button>
           </div>
@@ -39,13 +36,12 @@ const MoreCoins = () => {
             <button className="text-white text-2xl py-2 px-4 rounded-xl relative top-[-12px] right-[-50px]">
               1/1
             </button>
-            <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-xl text-[12px] font-bold relative top-[-25px] right-[-34px]">
+            <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-2 px-4 rounded-xl text-[12px] font-bold relative top-[-22px] right-[-34px]">
               Use Daily Pass
             </button>
           </div>
         </div>
       </div>
-      <Web3WalletConnect/>
     </section>
   );
 };
