@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 import Button from "../components/Reusable/Button";
 import { CgClose } from "react-icons/cg";
 const ErrorMessage = ({ message, onClose }) => (
-  <div className="fixed mx-4 rounded text-xs top-24 left-0 right-0 bg-green-600  p-2 md:p-4 text-center">
+  <div className="fixed mx-4 rounded text-xs top-16 left-0 right-0 bg-green-600  p-2 md:p-4 text-center">
     <p>{message}</p>
     <button
       onClick={onClose}
