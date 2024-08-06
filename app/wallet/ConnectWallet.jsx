@@ -220,7 +220,7 @@ const Web3WalletConnect = () => {
   useEffect(() => {
     const initWeb3Modal = async () => {
       const modal = new Web3Modal({
-        projectId: "YOUR_PROJECT_ID", // Replace with your actual project ID
+        projectId: "24911ae43d4f2f85e9408da2d8c99868", // Replace with your actual project ID
         standaloneChains: [
           `eip155:${CORE_MAINNET_CHAIN_ID}`,
           `eip155:${CORE_TESTNET_CHAIN_ID}`,
@@ -358,7 +358,7 @@ const Web3WalletConnect = () => {
   };
 
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg leading-10">
+    <div className="bg-neutral-900 text-gold-500 p-4 rounded-lg leading-10">
       {!address ? (
         <button onClick={connectWallet}>Connect Wallet</button>
       ) : (
