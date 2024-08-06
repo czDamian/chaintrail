@@ -22,6 +22,7 @@
     "@web3-react/walletconnect-connector": "^6.2.13",
     "@web3modal/ethereum": "^2.7.1",
     "@web3modal/react": "^2.7.1",
+    "@web3modal/standalone": "^2.4.3",
     "crypto": "^1.0.1",
     "ethers": "^6.13.2",
     "mongodb": "^6.8.0",
