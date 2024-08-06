@@ -206,7 +206,6 @@
 import { useState, useEffect } from "react";
 import { Web3Modal } from "@web3modal/standalone";
 import { ethers } from "ethers";
-import Button from "../components/Reusable/Button";
 
 const Web3WalletConnect = () => {
   const [provider, setProvider] = useState(null);
@@ -214,55 +213,70 @@ const Web3WalletConnect = () => {
   const [web3Modal, setWeb3Modal] = useState(null);
   const [chainId, setChainId] = useState(null);
 
+  // Core network chain IDs
   const CORE_MAINNET_CHAIN_ID = 1116;
   const CORE_TESTNET_CHAIN_ID = 1115;
 
   useEffect(() => {
-    const modal = new Web3Modal({
-      projectId: "24911ae43d4f2f85e9408da2d8c99868",
-      standaloneChains: [
-        `eip155:${CORE_MAINNET_CHAIN_ID}`,
-        `eip155:${CORE_TESTNET_CHAIN_ID}`,
-      ],
-      defaultChain: CORE_TESTNET_CHAIN_ID,
-    });
-    setWeb3Modal(modal);
+    const initWeb3Modal = async () => {
+      const modal = new Web3Modal({
+        projectId: "YOUR_PROJECT_ID", // Replace with your actual project ID
+        standaloneChains: [
+          `eip155:${CORE_MAINNET_CHAIN_ID}`,
+          `eip155:${CORE_TESTNET_CHAIN_ID}`,
+          "eip155:1", // Ethereum Mainnet
+          "eip155:5", // Goerli Testnet
+        ],
+        defaultChain: CORE_TESTNET_CHAIN_ID,
+        themeMode: "dark",
+        themeVariables: {
+          "--w3m-font-family": "Roboto, sans-serif",
+          "--w3m-accent-color": "#F5841F",
+          // Add more theme variables as needed
+        },
+      });
+
+      setWeb3Modal(modal);
+    };
+
+    initWeb3Modal();
   }, []);
 
   const connectWallet = async () => {
     try {
-      const isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
+      if (!web3Modal) {
+        console.error("Web3Modal not initialized");
+        return;
+      }
 
-      let newProvider;
+      const newProvider = await web3Modal.openModal();
+      console.log("Modal opened, provider:", newProvider);
 
-      if (isMobile) {
-        newProvider = await web3Modal.openModal();
-        await newProvider.enable();
-      } else {
-        if (typeof window.ethereum !== "undefined") {
-          newProvider = new ethers.BrowserProvider(window.ethereum);
-          await newProvider.send("eth_requestAccounts", []);
-        } else {
-          newProvider = await web3Modal.openModal();
-          await newProvider.enable();
-        }
+      if (!newProvider) {
+        console.error("No provider selected");
+        return;
       }
 
       setProvider(newProvider);
 
-      const signer = await newProvider.getSigner();
+      const ethersProvider = new ethers.BrowserProvider(newProvider);
+      const signer = await ethersProvider.getSigner();
       const address = await signer.getAddress();
       setAddress(address);
 
-      // Get and set the current chain ID
-      const network = await newProvider.getNetwork();
+      const network = await ethersProvider.getNetwork();
       setChainId(network.chainId);
 
-      // Add event listener for chain changes
-      window.ethereum.on("chainChanged", handleChainChanged);
+      console.log(
+        "Connected to address:",
+        address,
+        "on chain:",
+        network.chainId
+      );
+
+      if (window.ethereum) {
+        window.ethereum.on("chainChanged", handleChainChanged);
+      }
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
@@ -270,34 +284,33 @@ const Web3WalletConnect = () => {
 
   const disconnectWallet = async () => {
     if (provider) {
-      if (provider.disconnect && typeof provider.disconnect === "function") {
-        await provider.disconnect();
-      }
-      setProvider(null);
-      setAddress(null);
-      setChainId(null);
+      try {
+        await web3Modal.closeModal();
+        setProvider(null);
+        setAddress(null);
+        setChainId(null);
 
-      // Remove event listener
-      window.ethereum.removeListener("chainChanged", handleChainChanged);
+        if (window.ethereum) {
+          window.ethereum.removeListener("chainChanged", handleChainChanged);
+        }
+        console.log("Wallet disconnected");
+      } catch (error) {
+        console.error("Error disconnecting wallet:", error);
+      }
     }
   };
 
   const handleChainChanged = (newChainId) => {
-    // Convert newChainId from hex to decimal
     const chainId = parseInt(newChainId, 16);
     setChainId(chainId);
-
-    // Check if the new chain is supported
-    if (
-      chainId !== CORE_MAINNET_CHAIN_ID &&
-      chainId !== CORE_TESTNET_CHAIN_ID
-    ) {
-      alert("Please switch to Core Mainnet or Core Testnet");
-    }
+    console.log("Chain changed to:", chainId);
   };
 
   const switchNetwork = async (targetChainId) => {
-    if (!provider) return;
+    if (!window.ethereum) {
+      console.error("No ethereum object found");
+      return;
+    }
 
     try {
       await window.ethereum.request({
@@ -305,59 +318,60 @@ const Web3WalletConnect = () => {
         params: [{ chainId: `0x${targetChainId.toString(16)}` }],
       });
     } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask.
+      console.log("Switch error:", switchError);
       if (switchError.code === 4902) {
         try {
           await window.ethereum.request({
             method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: `0x${targetChainId.toString(16)}`,
-                chainName:
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "Core Mainnet"
-                    : "Core Testnet",
-                nativeCurrency: {
-                  name: "CORE",
-                  symbol: "CORE",
-                  decimals: 18,
-                },
-                rpcUrls: [
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "https://rpc.coredao.org"
-                    : "https://rpc.test.btcs.network",
-                ],
-                blockExplorerUrls: [
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "https://scan.coredao.org"
-                    : "https://scan.test.btcs.network",
-                ],
-              },
-            ],
+            params: [getChainParameters(targetChainId)],
           });
         } catch (addError) {
-          console.error("Error adding Core network:", addError);
+          console.error("Error adding network:", addError);
         }
+      } else {
+        console.error("Error switching network:", switchError);
       }
-      console.error("Error switching to Core network:", switchError);
+    }
+  };
+
+  const getChainParameters = (chainId) => {
+    switch (chainId) {
+      case CORE_MAINNET_CHAIN_ID:
+        return {
+          chainId: `0x${CORE_MAINNET_CHAIN_ID.toString(16)}`,
+          chainName: "Core Mainnet",
+          nativeCurrency: { name: "CORE", symbol: "CORE", decimals: 18 },
+          rpcUrls: ["https://rpc.coredao.org"],
+          blockExplorerUrls: ["https://scan.coredao.org"],
+        };
+      case CORE_TESTNET_CHAIN_ID:
+        return {
+          chainId: `0x${CORE_TESTNET_CHAIN_ID.toString(16)}`,
+          chainName: "Core Testnet",
+          nativeCurrency: { name: "TCORE", symbol: "TCORE", decimals: 18 },
+          rpcUrls: ["https://rpc.test.btcs.network"],
+          blockExplorerUrls: ["https://scan.test.btcs.network"],
+        };
+      default:
+        throw new Error(`Unsupported chain ID: ${chainId}`);
     }
   };
 
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg my-4 leading-10">
+    <div className="bg-neutral-900 p-4 rounded-lg leading-10">
       {!address ? (
-        <Button onClick={connectWallet}>Connect Wallet</Button>
+        <button onClick={connectWallet}>Connect Wallet</button>
       ) : (
         <div>
           <p>Connected Address: {address}</p>
           <p>Current Chain ID: {chainId}</p>
-          <Button onClick={() => switchNetwork(CORE_MAINNET_CHAIN_ID)}>
+          <button onClick={() => switchNetwork(CORE_MAINNET_CHAIN_ID)}>
             Switch to Core Mainnet
-          </Button>
-          <Button onClick={() => switchNetwork(CORE_TESTNET_CHAIN_ID)}>
+          </button>
+          <button onClick={() => switchNetwork(CORE_TESTNET_CHAIN_ID)}>
             Switch to Core Testnet
-          </Button>
-          <Button onClick={disconnectWallet}>Disconnect Wallet</Button>
+          </button>
+          <button onClick={disconnectWallet}>Disconnect Wallet</button>
         </div>
       )}
     </div>
