@@ -203,150 +203,115 @@
 
 // export default Web3WalletConnect;
 
+
 import { useState, useEffect } from "react";
-import { Web3Modal } from "@web3modal/standalone";
+import Onboard from "@web3-onboard/core";
+import injectedModule from "@web3-onboard/injected-wallets";
+import walletConnectModule from "@web3-onboard/walletconnect";
 import { ethers } from "ethers";
 import Button from "../components/Reusable/Button";
 
 const Web3WalletConnect = () => {
+  const [onboard, setOnboard] = useState(null);
   const [provider, setProvider] = useState(null);
   const [address, setAddress] = useState(null);
-  const [web3Modal, setWeb3Modal] = useState(null);
   const [chainId, setChainId] = useState(null);
 
   const CORE_MAINNET_CHAIN_ID = 1116;
   const CORE_TESTNET_CHAIN_ID = 1115;
 
   useEffect(() => {
-    const modal = new Web3Modal({
-      projectId: "24911ae43d4f2f85e9408da2d8c99868",
-      standaloneChains: [
-        `eip155:${CORE_MAINNET_CHAIN_ID}`,
-        `eip155:${CORE_TESTNET_CHAIN_ID}`,
-        "eip155:1", // Ethereum Mainnet
-        "eip155:5", // Goerli Testnet
-      ],
-      defaultChain: CORE_TESTNET_CHAIN_ID,
-    });
-    setWeb3Modal(modal);
+    const initOnboard = async () => {
+      const injected = injectedModule();
+      const walletConnect = walletConnectModule({
+        projectId: "24911ae43d4f2f85e9408da2d8c99868",
+      });
+
+      const onboard = Onboard({
+        wallets: [injected, walletConnect],
+        chains: [
+          {
+            id: `0x${CORE_MAINNET_CHAIN_ID.toString(16)}`,
+            token: "CORE",
+            label: "Core Mainnet",
+            rpcUrl: "https://rpc.coredao.org",
+          },
+          {
+            id: `0x${CORE_TESTNET_CHAIN_ID.toString(16)}`,
+            token: "tCORE",
+            label: "Core Testnet",
+            rpcUrl: "https://rpc.test.btcs.network",
+          },
+        ],
+        appMetadata: {
+          name: "My Core dApp",
+          icon: "<svg>...</svg>", // Replace with your app's icon
+          description: "My dApp using Core blockchain",
+        },
+      });
+
+      setOnboard(onboard);
+    };
+
+    initOnboard();
   }, []);
 
   const connectWallet = async () => {
+    if (!onboard) return;
+
     try {
-      const isMobile =
-        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
-        );
+      const wallets = await onboard.connectWallet();
+      if (wallets[0]) {
+        const ethersProvider = new ethers.BrowserProvider(wallets[0].provider);
+        setProvider(ethersProvider);
 
-      let newProvider;
+        const signer = await ethersProvider.getSigner();
+        const address = await signer.getAddress();
+        setAddress(address);
 
-      if (isMobile) {
-        newProvider = await web3Modal.openModal();
-        await newProvider.enable();
-      } else {
-        if (typeof window.ethereum !== "undefined") {
-          newProvider = new ethers.BrowserProvider(window.ethereum);
-          await newProvider.send("eth_requestAccounts", []);
-        } else {
-          newProvider = await web3Modal.openModal();
-          await newProvider.enable();
-        }
+        const network = await ethersProvider.getNetwork();
+        setChainId(network.chainId);
+
+        // Subscribe to changes
+        ethersProvider.on("network", (newNetwork) => {
+          setChainId(newNetwork.chainId);
+        });
+        ethersProvider.on("accountsChanged", handleAccountsChanged);
       }
-
-      setProvider(newProvider);
-
-      const signer = await newProvider.getSigner();
-      const address = await signer.getAddress();
-      setAddress(address);
-
-      // Get and set the current chain ID
-      const network = await newProvider.getNetwork();
-      setChainId(network.chainId);
-
-      // Add event listener for chain changes
-      window.ethereum.on("chainChanged", handleChainChanged);
     } catch (error) {
       console.error("Error connecting wallet:", error);
     }
   };
 
   const disconnectWallet = async () => {
-    if (provider) {
-      if (provider.disconnect && typeof provider.disconnect === "function") {
-        await provider.disconnect();
-      }
+    if (onboard) {
+      await onboard.disconnectWallet({ label: provider.connection.url });
       setProvider(null);
       setAddress(null);
       setChainId(null);
-
-      // Remove event listener
-      window.ethereum.removeListener("chainChanged", handleChainChanged);
     }
   };
 
-  const handleChainChanged = (newChainId) => {
-    // Convert newChainId from hex to decimal
-    const chainId = parseInt(newChainId, 16);
-    setChainId(chainId);
-
-    // Check if the new chain is supported
-    if (
-      chainId !== CORE_MAINNET_CHAIN_ID &&
-      chainId !== CORE_TESTNET_CHAIN_ID
-    ) {
-      alert("Please switch to Core Mainnet or Core Testnet");
+  const handleAccountsChanged = (accounts) => {
+    if (accounts.length > 0) {
+      setAddress(accounts[0]);
+    } else {
+      setAddress(null);
     }
   };
 
   const switchNetwork = async (targetChainId) => {
-    if (!provider) return;
+    if (!onboard) return;
 
     try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: `0x${targetChainId.toString(16)}` }],
-      });
-    } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask.
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: `0x${targetChainId.toString(16)}`,
-                chainName:
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "Core Mainnet"
-                    : "Core Testnet",
-                nativeCurrency: {
-                  name: "CORE",
-                  symbol: "CORE",
-                  decimals: 18,
-                },
-                rpcUrls: [
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "https://rpc.coredao.org"
-                    : "https://rpc.test.btcs.network",
-                ],
-                blockExplorerUrls: [
-                  targetChainId === CORE_MAINNET_CHAIN_ID
-                    ? "https://scan.coredao.org"
-                    : "https://scan.test.btcs.network",
-                ],
-              },
-            ],
-          });
-        } catch (addError) {
-          console.error("Error adding Core network:", addError);
-        }
-      }
-      console.error("Error switching to Core network:", switchError);
+      await onboard.setChain({ chainId: `0x${targetChainId.toString(16)}` });
+    } catch (error) {
+      console.error("Error switching network:", error);
     }
   };
 
   return (
-    <div className="bg-neutral-900 p-4 rounded-lg my-4 leading-10">
+    <div className="bg-slate-950 p-4 rounded-lg my-4 leading-10">
       {!address ? (
         <Button onClick={connectWallet}>Connect Wallet</Button>
       ) : (
