@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
+import AdminNav from "@/app/components/Reusable/AdminNav";
 
 export default function CreateQuestQuestion() {
   const [quests, setQuests] = useState([]);
@@ -78,13 +79,11 @@ export default function CreateQuestQuestion() {
 
   return (
     <section>
-      <div className="flex justify-end mr-4 mt-20">
-        <SideNav />
-      </div>
-      <div className="max-w-md mx-auto mt-4 p-6 bg-neutral-700 rounded-lg shadow-xl">
-        <h2 className="text-2xl font-bold mb-6 text-yellow-600">
-          Add Quest Question
-        </h2>
+      <div className="max-w-md mx-auto mt-20 p-6 bg-neutral-700 rounded-lg shadow-xl">
+        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+          <AdminNav />
+          <h1 className="text-2xl font-bold">New Question</h1>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="questSelect" className="block   mb-2">
@@ -147,9 +146,7 @@ export default function CreateQuestQuestion() {
             />
           </div>
           <div>
-            <label
-              htmlFor="scrambledAnswer"
-              className="block   mb-2">
+            <label htmlFor="scrambledAnswer" className="block   mb-2">
               Scrambled Answer
             </label>
             <input
@@ -169,6 +166,7 @@ export default function CreateQuestQuestion() {
           </button>
         </form>
       </div>
+      <SideNav />
       <ToastContainer />
     </section>
   );

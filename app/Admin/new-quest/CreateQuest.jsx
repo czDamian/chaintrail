@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
+import AdminNav from "@/app/components/Reusable/AdminNav";
 
 export default function CreateQuest() {
   const [quest, setQuest] = useState({
@@ -44,9 +45,10 @@ export default function CreateQuest() {
   return (
     <section className="mt-20">
       <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
-        <h2 className="text-2xl font-bold mb-6 text-yellow-600">
-          Create New Quest
-        </h2>
+        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+          <AdminNav />
+          <h1 className="text-2xl font-bold">New Quest</h1>
+        </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="questName" className="block mb-2">

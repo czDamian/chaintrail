@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
+import AdminNav from "@/app/components/Reusable/AdminNav";
 
 export default function EditQuest() {
   const [quests, setQuests] = useState([]);
@@ -94,11 +95,11 @@ export default function EditQuest() {
 
   return (
     <section>
-      <div className="flex justify-end mr-4 mt-20">
-        <SideNav />
-      </div>
-      <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
-        <h2 className="text-2xl font-bold mb-6 text-yellow-600">Edit Quest</h2>
+      <div className="max-w-md min-w-64 mt-20 mx-auto p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
+        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+          <AdminNav />
+          <h1 className="text-2xl font-bold">Edit Quest</h1>
+        </div>
         <div className="mb-4">
           <label htmlFor="selectQuest" className="block mb-2">
             Select Quest to Edit
@@ -185,8 +186,11 @@ export default function EditQuest() {
             </button>
           </form>
         )}
+        <div className="flex justify-end mr-4 mt-20">
+          <SideNav />
+        </div>
       </div>
-      <ToastContainer /> {/* Add this to render toast notifications */}
+      <ToastContainer />
     </section>
   );
 }

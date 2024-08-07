@@ -4,6 +4,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
 import DeleteModal from "./DeleteModal";
+import AdminNav from "@/app/components/Reusable/AdminNav";
 
 export default function DeleteQuest() {
   const [quests, setQuests] = useState([]);
@@ -55,7 +56,7 @@ export default function DeleteQuest() {
 
       if (response.ok) {
         toast.success("Quest deleted successfully!");
-        setSelectedQuestId(""); 
+        setSelectedQuestId("");
         const updatedResponse = await fetch("/api/quests");
         if (updatedResponse.ok) {
           const updatedData = await updatedResponse.json();
@@ -77,11 +78,11 @@ export default function DeleteQuest() {
 
   return (
     <section>
-      <div className="flex justify-end mr-4 mt-20">
-        <SideNav />
-      </div>
-      <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
-        <h2 className="text-2xl font-extrabold mb-6 ">Delete Quest</h2>
+      <div className="max-w-md mx-auto mt-20 min-w-60 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
+        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+          <AdminNav />
+          <h1 className="text-2xl font-bold">Delete Quest</h1>
+        </div>
         <form onSubmit={handleDeleteClick} className="space-y-4">
           <div>
             <label htmlFor="questSelect" className="block mb-2">
@@ -113,6 +114,7 @@ export default function DeleteQuest() {
         onConfirm={handleConfirmDelete}
         onClose={handleCloseModal}
       />
+      <SideNav />
       <ToastContainer />
     </section>
   );

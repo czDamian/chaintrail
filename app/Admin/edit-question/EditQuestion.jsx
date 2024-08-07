@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
+import AdminNav from "@/app/components/Reusable/AdminNav";
 
 export default function EditQuestion() {
   const [quests, setQuests] = useState([]);
@@ -112,13 +113,11 @@ export default function EditQuestion() {
 
   return (
     <section>
-      <div className="flex justify-end mr-4 mt-24">
-        <SideNav />
-      </div>
-      <div className="max-w-6xl mx-auto mt-4 p-6 bg-neutral-700 rounded-lg shadow-xl">
-        <h2 className="text-2xl font-bold mb-6 text-yellow-600">
-          Edit Quest Question
-        </h2>
+      <div className="max-w-6xl mx-auto mt-20 p-6 bg-neutral-700 rounded-lg shadow-xl">
+        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+          <AdminNav />
+          <h1 className="text-2xl font-bold">Edit Question</h1>
+        </div>
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -222,6 +221,7 @@ export default function EditQuestion() {
           </div>
         </form>
       </div>
+      <SideNav />
       <ToastContainer />
     </section>
   );
