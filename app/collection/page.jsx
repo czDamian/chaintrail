@@ -29,24 +29,9 @@ const Collection = () => {
         <SideNav />
       </div>
 
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
-        {images.map((item, index) => (
-          <div key={index}>
-            <div className="rounded-xl overflow-hidden">
-              {Object.keys(item).map((key, idx) => (
-                <img
-                  loading="lazy"
-                  key={idx}
-                  src={item[key]}
-                  alt={key}
-                  className="w-full"
-                />
-              ))}
-            </div>
-          </div>
-        ))}
-      </div> */}
-      <p className="mt-10 px-4 md:px-8">Only NFTs minted on Core will be displayed here</p>
+      <p className="mt-10 px-4 md:px-8">
+        Only NFTs minted on Core will be displayed here
+      </p>
       <Web3WalletConnect />
     </div>
   );

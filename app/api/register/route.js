@@ -5,7 +5,7 @@ import connectDb from "@/lib/mongodb";
 await connectDb();
 
 export async function POST(request) {
-  const { userId, username, walletAddress } = await request.json();
+  const { userId, username } = await request.json();
 
   try {
     let user = await User.findOne({ userId });
@@ -13,19 +13,10 @@ export async function POST(request) {
       return NextResponse.json({ message: "Welcome Back" });
     }
 
-    user = await User.findOne({ walletAddress });
-    if (user) {
-      return NextResponse.json(
-        { message: "Wallet address already exists" },
-        { status: 400 }
-      );
-    }
-
     user = new User({
       userId,
       username,
-      walletAddress,
-      points: 950,
+      points: 1000, // Assign 1000 points on successful registration
       playPass: 0,
     });
     await user.save();

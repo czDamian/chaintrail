@@ -1,8 +1,24 @@
+"use client";
+import { useState, useEffect } from "react";
 import { GrClose } from "react-icons/gr";
 import Image from "next/image";
 import Link from "next/link";
 
 const Popup = ({ isOpen, onClose, connectWallet }) => {
+  const [isDesktop, setIsDesktop] = useState(true);
+
+  useEffect(() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+    // Check for mobile user agents
+    const isMobile = /android|ipad|iphone|ipod|opera mini|mobile/i.test(
+      userAgent
+    );
+    setIsDesktop(!isMobile);
+
+    // Additional handling for specific edge cases can be added here
+  }, []);
+
   if (!isOpen) return null;
 
   return (
@@ -18,12 +34,19 @@ const Popup = ({ isOpen, onClose, connectWallet }) => {
           </div>
 
           <div className="space-y-8 py-4 text-lg">
-            <button
-              onClick={connectWallet}
-              className="flex items-center justify-between p-2 hover:bg-slate-900 rounded">
-              <p>Connect Wallet</p>
-              <Image src="metamask.svg" width={30} height={30} alt="metamask" />
-            </button>
+            {isDesktop && (
+              <button
+                onClick={connectWallet}
+                className="flex items-center justify-between p-2 hover:bg-slate-900 rounded">
+                <p>Connect Wallet</p>
+                <Image
+                  src="metamask.svg"
+                  width={30}
+                  height={30}
+                  alt="metamask"
+                />
+              </button>
+            )}
             <Link
               href="https://t.me/ChainTrailBot"
               className="flex items-center justify-between p-2 hover:bg-slate-900 rounded">

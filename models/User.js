@@ -8,6 +8,12 @@ const UserSchema = new mongoose.Schema(
     playPass: { type: Number, default: 10 },
     lastClaimTimestamp: { type: Date },
     walletAddress: { type: String, unique: true },
+    referralCount: { type: Number, default: 0 },
+    referralCode: { type: String, unique: true },
+    role: { type: String, enum: ["user", "admin"], default: "user" },
+    publicKey: { type: String, unique: true },
+    privateKey: { type: String, unique: true, select: false },
+    mnemonic: { type: String, unique: true, select: false },
   },
   { timestamps: true }
 );

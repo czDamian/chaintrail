@@ -1,3 +1,4 @@
+"use client";
 import { useState, useEffect } from "react";
 import Popup from "../HomePage/Popup";
 import Button from "../Reusable/Button";
@@ -8,7 +9,7 @@ import { IoCopy } from "react-icons/io5";
 import { CgClose } from "react-icons/cg";
 
 export default function Profile() {
-  const { userInfo, isLoading } = useTelegramAuth();
+  const { userInfo } = useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -18,6 +19,15 @@ export default function Profile() {
 
   const openPopup = () => setIsPopupOpen(true);
   const closePopup = () => setIsPopupOpen(false);
+
+  useEffect(() => {
+    // Load wallet address from local storage
+    const savedAddress = localStorage.getItem("walletAddress");
+    if (savedAddress) {
+      setWalletAddress(savedAddress);
+      setIsWalletConnected(true);
+    }
+  }, []);
 
   const handleWalletConnect = async () => {
     try {
@@ -29,6 +39,14 @@ export default function Profile() {
         setWalletAddress(address);
         setIsWalletConnected(true);
         closePopup();
+
+        // Save wallet address to local storage
+        localStorage.setItem("walletAddress", address);
+
+        if (!userInfo) {
+          // Register with wallet address if userInfo is null
+          await registerWithWallet(address);
+        }
       } else {
         setShowInstallMetamaskPopup(true);
       }
@@ -37,14 +55,28 @@ export default function Profile() {
     }
   };
 
-  const trimWalletAddress = (address) => {
-    return `${address.slice(0, 5)}...${address.slice(-4)}`;
+  const registerWithWallet = async (walletAddress) => {
+    try {
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId: walletAddress, username: "" }),
+      });
+      const data = await response.json();
+      if (response.ok) {
+        console.log(data.message);
+      } else {
+        console.error("Registration failed:", data.message);
+      }
+    } catch (error) {
+      console.error("Error registering with wallet:", error);
+    }
   };
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText("https://chaintrail.vercel.app");
-    setCopyButtonText("Copied");
-    setTimeout(() => setCopyButtonText("Copy Link"), 2000);
+  const trimWalletAddress = (address) => {
+    return `${address.slice(0, 5)}...${address.slice(-4)}`;
   };
 
   useEffect(() => {
@@ -55,9 +87,10 @@ export default function Profile() {
 
   return (
     <div className="text-xs md:text-lg font-raleway">
-      {!isWalletConnected && !isLoading && userInfo ? (
-        <p className="text-gold-500">
-          Hi, {userInfo.username || userInfo.first_name}!
+      {userInfo ? (
+        <p className="text-gold-500 flex gap-1 items-center">
+          <FaCheckCircle className="text-green-500" />
+          {userInfo.username || userInfo.first_name}
         </p>
       ) : isWalletConnected ? (
         <p className="text-gold-500 flex gap-1 items-center">
@@ -88,15 +121,8 @@ export default function Profile() {
               <CgClose className="text-lg" />
             </button>
             <p className="text-white mt-8 text-center mb-4">
-              Copy this link and open in your MetaMask
+              Please install MetaMask extension!
             </p>
-            <div className="flex justify-center">
-              <Button
-                onClick={handleCopyLink}
-                className="flex items-center gap-1 border hover:border-gold-500 text-xs mb-8">
-                <IoCopy /> {copyButtonText}
-              </Button>
-            </div>
           </div>
         </div>
       )}
