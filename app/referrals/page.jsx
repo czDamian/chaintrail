@@ -1,7 +1,6 @@
 import { IoCopy } from "react-icons/io5";
 import SideNav from "../components/Reusable/SideNav";
 
-
 export const metadata = {
   title: "Referrals",
   description: "Earn NFTs while playing your favorite game",
@@ -9,10 +8,6 @@ export const metadata = {
 const Referrals = () => {
   return (
     <section className="px-8">
-      <div className="flex justify-end mr-4 mt-6">
-        <SideNav />
-      </div>
-
       <div className="text-center my-6 text-2xl">
         <h1 className="font-bold ">INVITE FRIENDS!</h1>
         <p className="text-sm my-2">Refer & earn 1000 points</p>
@@ -98,6 +93,7 @@ const Referrals = () => {
           </div>
         </div>
       </div>
+      <SideNav />
     </section>
   );
 };

@@ -43,9 +43,6 @@ export default function CreateQuest() {
 
   return (
     <section>
-      <div className="flex justify-end mr-4 mt-20">
-        <SideNav />
-      </div>
       <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-yellow-600">
           Create New Quest
@@ -116,6 +113,7 @@ export default function CreateQuest() {
         </form>
       </div>
       <ToastContainer />
+      <SideNav />
     </section>
   );
 }

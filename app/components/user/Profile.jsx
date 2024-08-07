@@ -1,33 +1,31 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import { ethers } from "ethers";
+import { FaCheckCircle } from "react-icons/fa";
+import { CgClose } from "react-icons/cg";
 import Popup from "../HomePage/Popup";
 import Button from "../Reusable/Button";
-import { ethers } from "ethers";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { FaCheckCircle } from "react-icons/fa";
-import { IoCopy } from "react-icons/io5";
-import { CgClose } from "react-icons/cg";
 
 export default function Profile() {
-  const { userInfo } = useTelegramAuth();
+  const { userInfo, registerOrLogin, updateUserInfo } = useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [showInstallMetamaskPopup, setShowInstallMetamaskPopup] =
     useState(false);
-  const [copyButtonText, setCopyButtonText] = useState("Copy Link");
 
   const openPopup = () => setIsPopupOpen(true);
   const closePopup = () => setIsPopupOpen(false);
 
   useEffect(() => {
-    // Load wallet address from local storage
-    const savedAddress = localStorage.getItem("walletAddress");
-    if (savedAddress) {
-      setWalletAddress(savedAddress);
+    const savedUserId = localStorage.getItem("userId");
+    if (savedUserId && !userInfo) {
+      setWalletAddress(savedUserId);
       setIsWalletConnected(true);
+      registerOrLogin(savedUserId, "");
     }
-  }, []);
+  }, [userInfo, registerOrLogin]);
 
   const handleWalletConnect = async () => {
     try {
@@ -36,16 +34,16 @@ export default function Profile() {
         await web3Provider.send("eth_requestAccounts", []);
         const walletSigner = await web3Provider.getSigner();
         const address = await walletSigner.getAddress();
+
         setWalletAddress(address);
         setIsWalletConnected(true);
+        localStorage.setItem("userId", address);
         closePopup();
 
-        // Save wallet address to local storage
-        localStorage.setItem("walletAddress", address);
-
-        if (!userInfo) {
-          // Register with wallet address if userInfo is null
-          await registerWithWallet(address);
+        if (userInfo) {
+          updateUserInfo({ ...userInfo, id: address });
+        } else {
+          registerOrLogin(address, "");
         }
       } else {
         setShowInstallMetamaskPopup(true);
@@ -55,42 +53,16 @@ export default function Profile() {
     }
   };
 
-  const registerWithWallet = async (walletAddress) => {
-    try {
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId: walletAddress, username: "" }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        console.log(data.message);
-      } else {
-        console.error("Registration failed:", data.message);
-      }
-    } catch (error) {
-      console.error("Error registering with wallet:", error);
-    }
-  };
-
   const trimWalletAddress = (address) => {
     return `${address.slice(0, 5)}...${address.slice(-4)}`;
   };
-
-  useEffect(() => {
-    if (walletAddress) {
-      setIsWalletConnected(true);
-    }
-  }, [walletAddress]);
 
   return (
     <div className="text-xs md:text-lg font-raleway">
       {userInfo ? (
         <p className="text-gold-500 flex gap-1 items-center">
           <FaCheckCircle className="text-green-500" />
-          {userInfo.username || userInfo.first_name}
+          {userInfo.username || trimWalletAddress(userInfo.id)}
         </p>
       ) : isWalletConnected ? (
         <p className="text-gold-500 flex gap-1 items-center">
