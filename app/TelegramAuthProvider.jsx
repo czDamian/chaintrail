@@ -12,25 +12,72 @@ export default function TelegramAuthProvider({ children }) {
   const router = useRouter();
 
   useEffect(() => {
-    const savedUserInfo = localStorage.getItem("userInfo");
-    console.log("Saved userInfo in local storage:", savedUserInfo);
-    if (savedUserInfo) {
-      setUserInfo(JSON.parse(savedUserInfo));
+    const savedUserId = localStorage.getItem("userId");
+    if (savedUserId) {
+      fetchUserInfo(savedUserId);
+    } else {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, []);
 
-  const updateUserInfo = (newUserInfo) => {
-    setUserInfo(newUserInfo);
-    localStorage.setItem("userInfo", JSON.stringify(newUserInfo));
-    console.log("Updated userInfo:", newUserInfo);
+  const fetchUserInfo = async (userId) => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`/api/users?userId=${userId}`);
+      if (response.ok) {
+        const userData = await response.json();
+        setUserInfo(userData);
+        localStorage.setItem("userInfo", JSON.stringify(userData));
+      } else {
+        console.error("Failed to fetch user data");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const updateUserInfo = async (newUserInfo) => {
+    try {
+      const response = await fetch(`/api/users`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newUserInfo),
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUserInfo(updatedUser);
+        localStorage.setItem("userInfo", JSON.stringify(updatedUser));
+        console.log("Updated userInfo:", updatedUser);
+      } else {
+        console.error("Failed to update user data");
+      }
+    } catch (error) {
+      console.error("Error updating user data:", error);
+    }
   };
 
   const registerOrLogin = async (userId, username) => {
     try {
-      // Simulating API call
-      const newUserInfo = { id: userId, username, role: "user" };
-      updateUserInfo(newUserInfo);
+      setIsLoading(true);
+      const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, username }),
+      });
+      if (response.ok) {
+        const userData = await response.json();
+        setUserInfo(userData);
+        localStorage.setItem("userId", userId);
+        localStorage.setItem("userInfo", JSON.stringify(userData));
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
     } catch (error) {
       console.error("Error in registerOrLogin:", error);
       toast.error("Login failed. Please try again.");
@@ -39,7 +86,13 @@ export default function TelegramAuthProvider({ children }) {
 
   return (
     <TelegramAuthContext.Provider
-      value={{ userInfo, isLoading, registerOrLogin, updateUserInfo }}>
+      value={{
+        userInfo,
+        isLoading,
+        registerOrLogin,
+        updateUserInfo,
+        fetchUserInfo,
+      }}>
       {children}
       <ToastContainer />
     </TelegramAuthContext.Provider>

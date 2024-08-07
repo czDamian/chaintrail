@@ -8,7 +8,13 @@ import Popup from "../HomePage/Popup";
 import Button from "../Reusable/Button";
 
 export default function Profile() {
-  const { userInfo, registerOrLogin, updateUserInfo } = useTelegramAuth();
+  const {
+    userInfo,
+    registerOrLogin,
+    updateUserInfo,
+    fetchUserInfo,
+    isLoading,
+  } = useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -20,12 +26,11 @@ export default function Profile() {
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
-    if (savedUserId && !userInfo) {
+    if (savedUserId) {
       setWalletAddress(savedUserId);
       setIsWalletConnected(true);
-      registerOrLogin(savedUserId, "");
     }
-  }, [userInfo, registerOrLogin]);
+  }, []);
 
   const handleWalletConnect = async () => {
     try {
@@ -35,15 +40,19 @@ export default function Profile() {
         const walletSigner = await web3Provider.getSigner();
         const address = await walletSigner.getAddress();
 
-        setWalletAddress(address);
-        setIsWalletConnected(true);
-        localStorage.setItem("userId", address);
-        closePopup();
+        if (address) {
+          setWalletAddress(address);
+          setIsWalletConnected(true);
+          localStorage.setItem("userId", address);
+          closePopup();
 
-        if (userInfo) {
-          updateUserInfo({ ...userInfo, id: address });
+          if (userInfo) {
+            await updateUserInfo({ ...userInfo, id: address });
+          } else {
+            await registerOrLogin(address, "");
+          }
         } else {
-          registerOrLogin(address, "");
+          console.error("Failed to get wallet address");
         }
       } else {
         setShowInstallMetamaskPopup(true);
@@ -54,19 +63,27 @@ export default function Profile() {
   };
 
   const trimWalletAddress = (address) => {
-    return `${address.slice(0, 5)}...${address.slice(-4)}`;
+    return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
   };
+
+  if (isLoading) {
+    return (
+      <Button className="border border-white bg-black hover:border-gold-500 text-xs">
+        CONNECT
+      </Button>
+    );
+  }
 
   return (
     <div className="text-xs md:text-lg font-raleway">
       {userInfo ? (
         <p className="text-gold-500 flex gap-1 items-center">
-          <FaCheckCircle className="text-green-500" />
-          {userInfo.username || trimWalletAddress(userInfo.id)}
+          <FaCheckCircle className="text-gold-500" />
+          {userInfo.username || trimWalletAddress(userInfo.userId)}
         </p>
       ) : isWalletConnected ? (
         <p className="text-gold-500 flex gap-1 items-center">
-          <FaCheckCircle className="text-green-500" />
+          <FaCheckCircle className="text-gold-500" />
           {trimWalletAddress(walletAddress)}
         </p>
       ) : (

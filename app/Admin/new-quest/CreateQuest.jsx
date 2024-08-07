@@ -42,7 +42,7 @@ export default function CreateQuest() {
   };
 
   return (
-    <section>
+    <section className="mt-20">
       <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
         <h2 className="text-2xl font-bold mb-6 text-yellow-600">
           Create New Quest

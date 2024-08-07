@@ -2,29 +2,30 @@
 import Link from "next/link";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { useEffect, useState } from "react";
+import { FaHome, FaTasks, FaBox, FaUser, FaLock } from "react-icons/fa";
 
 const SideNav = () => {
-  const { userInfo, isLoading } = useTelegramAuth();
+  const { userInfo } = useTelegramAuth();
   const [navLinks, setNavLinks] = useState([
-    { href: "/", title: "Home" },
-    { href: "/quests", title: "Quests" },
-    { href: "/collection", title: "Collections" },
-    { href: "/referrals", title: "Account" },
+    { href: "/", title: "Home", icon: FaHome },
+    { href: "/quests", title: "Quests", icon: FaTasks },
+    { href: "/collection", title: "Collections", icon: FaBox },
+    { href: "/referrals", title: "Account", icon: FaUser },
   ]);
 
   useEffect(() => {
-    console.log("Current userInfo:", userInfo); // Debugging: Log userInfo
-
+    console.log("SideNav userInfo:", userInfo);
     if (userInfo?.role === "admin") {
-      console.log("User is an admin"); // Debugging: Confirm admin status
       setNavLinks((prevLinks) => {
         if (!prevLinks.some((link) => link.title === "Admin")) {
-          return [...prevLinks, { href: "/Admin/new-quest", title: "Admin" }];
+          return [
+            ...prevLinks,
+            { href: "/Admin/new-quest", title: "Admin", icon: FaLock },
+          ];
         }
         return prevLinks;
       });
     } else {
-      console.log("User is not an admin"); // Debugging: Confirm non-admin status
       setNavLinks((prevLinks) =>
         prevLinks.filter((link) => link.title !== "Admin")
       );
@@ -39,7 +40,8 @@ const SideNav = () => {
             <li key={index}>
               <Link
                 href={link.href}
-                className="block p-4 hover:bg-neutral-700 rounded transition duration-200 text-sm">
+                className="px-4 py-4 sm:px-2 hover:bg-neutral-700 rounded transition duration-200 text-xs md:text-sm flex flex-col items-center">
+                <link.icon className="mb-1" />
                 {link.title}
               </Link>
             </li>
