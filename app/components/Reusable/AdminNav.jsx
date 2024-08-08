@@ -26,7 +26,7 @@ export default function AdminNav() {
         {isOpen ? <IoClose /> : <HiOutlineMenuAlt2 />}
       </button>
       <nav
-        className={`fixed top-16 right-0 h-full w-40 bg-neutral-950 text-white transform ${
+        className={`fixed top-16 right-0 h-full w-40 md:w-52 bg-neutral-950 text-white transform ${
           isOpen ? "translate-x-0" : "translate-x-full"
         } transition-transform duration-300 ease-in-out z-40`}>
         <ul className="flex flex-col mt-16">

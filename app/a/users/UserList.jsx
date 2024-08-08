@@ -6,7 +6,6 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import SideNav from "@/app/components/Reusable/SideNav";
 
-
 export default function UserList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,49 +36,35 @@ export default function UserList() {
 
   if (loading) {
     return (
-      <div className="p-4 bg-neutral-800 min-h-screen">
+      <div className="p-4 bg-gray-900 min-h-screen">
         <h1 className="text-2xl font-bold text-white mb-4">Registered Users</h1>
         <div className="overflow-x-auto">
-          <table className="w-full bg-neutral-700 border border-neutral-600 rounded-lg shadow-md">
+          <table className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
             <thead>
-              <tr className="bg-neutral-600 border-b border-neutral-500">
-                <th className="px-4 py-2 text-left text-neutral-300">ID</th>
-                <th className="px-4 py-2 text-left text-neutral-300 max-w-36">
+              <tr className="bg-gray-700 border-b border-gray-600">
+                <th className="px-4 py-2 text-left text-gray-400">ID</th>
+                <th className="px-4 py-2 text-left text-gray-400 max-w-36">
                   User ID
                 </th>
-                <th className="px-4 py-2 text-left text-neutral-300">
-                  Username
-                </th>
-                <th className="px-4 py-2 text-left text-neutral-300">Points</th>
-                <th className="px-4 py-2 text-left text-neutral-300">
+                <th className="px-4 py-2 text-left text-gray-400">Username</th>
+                <th className="px-4 py-2 text-left text-gray-400">Points</th>
+                <th className="px-4 py-2 text-left text-gray-400">
                   Registered On
                 </th>
-                <th className="px-4 py-2 text-left text-neutral-300">Role</th>
+                <th className="px-4 py-2 text-left text-gray-400">Role</th>
               </tr>
             </thead>
             <tbody>
               {[...Array(usersPerPage)].map((_, index) => (
                 <tr
                   key={index}
-                  className="border-b border-neutral-600 animate-pulse">
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
-                  <td className="px-4 py-2 text-neutral-200 bg-neutral-700">
-                    .
-                  </td>
+                  className="border-b border-gray-600 animate-pulse">
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
                 </tr>
               ))}
             </tbody>
@@ -125,20 +110,20 @@ export default function UserList() {
   };
 
   return (
-    <div className="p-4 bg-neutral-800 min-h-screen">
-      <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+    <div className="p-4 bg-gray-900 min-h-screen">
+      <div className="flex text-yellow-500 justify-start gap-2 items-center p-4">
         <AdminNav />
         <h1 className="text-2xl font-bold">Registered Users</h1>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full bg-neutral-700 border border-neutral-600 rounded-lg shadow-md">
+        <table className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
           <thead>
-            <tr className="bg-neutral-600 border-b border-neutral-500">
-              <th className="px-4 py-2 text-left text-neutral-300">ID</th>
-              <th className="px-4 py-2 text-left text-neutral-300">User ID</th>
-              <th className="px-4 py-2 text-left text-neutral-300">Username</th>
+            <tr className="bg-gray-700 border-b border-gray-600">
+              <th className="px-4 py-2 text-left text-gray-400">ID</th>
+              <th className="px-4 py-2 text-left text-gray-400">User ID</th>
+              <th className="px-4 py-2 text-left text-gray-400">Username</th>
               <th
-                className="px-4 py-2 text-left text-neutral-300 cursor-pointer"
+                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
                 onClick={() => {
                   setSortField("points");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -148,7 +133,7 @@ export default function UserList() {
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
-                className="px-4 py-2 text-left text-neutral-300 cursor-pointer"
+                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
                 onClick={() => {
                   setSortField("registeredOn");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -158,7 +143,7 @@ export default function UserList() {
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
-                className="px-4 py-2 text-left text-neutral-300 cursor-pointer"
+                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
                 onClick={() => {
                   setSortField("role");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -170,27 +155,27 @@ export default function UserList() {
           </thead>
           <tbody>
             {currentUsers.map((user, index) => (
-              <tr key={user._id} className="border-b border-neutral-600">
-                <td className="px-4 py-2 text-neutral-200">
+              <tr key={user._id} className="border-b border-gray-600">
+                <td className="px-4 py-2 text-gray-300">
                   {indexOfFirstUser + index + 1}
                 </td>
-                <td className="px-4 py-2 text-neutral-200 overflow-hidden">
+                <td className="px-4 py-2 text-gray-300 overflow-hidden">
                   <button
                     onClick={() => copyUserId(user.userId.toString())}
                     className="hover:underline max-w-36">
                     {user.userId}
                   </button>
                 </td>
-                <td className="px-4 py-2  max-w-36 text-neutral-200">
+                <td className="px-4 py-2 max-w-36 text-gray-300">
                   {user.username}
                 </td>
-                <td className="px-4 py-2  max-w-36 text-neutral-200">
+                <td className="px-4 py-2 max-w-36 text-gray-300">
                   {user.points}
                 </td>
-                <td className="px-4 py-2  max-w-36 text-neutral-200">
+                <td className="px-4 py-2 max-w-36 text-gray-300">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-2  max-w-36 text-neutral-200">
+                <td className="px-4 py-2 max-w-36 text-gray-300">
                   {user.role}
                 </td>
               </tr>
@@ -201,7 +186,7 @@ export default function UserList() {
       <div className="mt-4 flex justify-center">
         <div className="flex space-x-2">
           <button
-            className={`px-4 py-2 border rounded-lg text-white bg-neutral-600 border-neutral-500 ${
+            className={`px-4 py-2 border rounded-lg text-white bg-gray-700 border-gray-600 ${
               currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={() => handlePageChange(currentPage - 1)}
@@ -209,7 +194,7 @@ export default function UserList() {
             Prev
           </button>
           <button
-            className={`px-4 py-2 border rounded-lg text-white bg-neutral-600 border-neutral-500 ${
+            className={`px-4 py-2 border rounded-lg text-white bg-gray-700 border-gray-600 ${
               currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={() => handlePageChange(currentPage + 1)}
