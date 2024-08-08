@@ -8,13 +8,8 @@ import Popup from "../HomePage/Popup";
 import Button from "../Reusable/Button";
 
 export default function Profile() {
-  const {
-    userInfo,
-    registerOrLogin,
-    updateUserInfo,
-    fetchUserInfo,
-    isLoading,
-  } = useTelegramAuth();
+  const { userInfo, registerUser, fetchUserInfo, isLoading } =
+    useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
@@ -27,8 +22,11 @@ export default function Profile() {
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
     if (savedUserId) {
-      setWalletAddress(savedUserId);
-      setIsWalletConnected(true);
+      if (savedUserId.startsWith("0x")) {
+        setWalletAddress(savedUserId);
+        setIsWalletConnected(true);
+      }
+      fetchUserInfo(savedUserId);
     }
   }, []);
 
@@ -46,11 +44,7 @@ export default function Profile() {
           localStorage.setItem("userId", address);
           closePopup();
 
-          if (userInfo) {
-            await updateUserInfo({ ...userInfo, id: address });
-          } else {
-            await registerOrLogin(address, "");
-          }
+          await registerUser(address, "", "wallet");
         } else {
           console.error("Failed to get wallet address");
         }
@@ -78,13 +72,8 @@ export default function Profile() {
     <div className="text-xs md:text-lg font-raleway">
       {userInfo ? (
         <p className="text-gold-500 flex gap-1 items-center">
-          <FaCheckCircle className="text-gold-500" />
+          <FaCheckCircle className="text-green-500" />
           {userInfo.username || trimWalletAddress(userInfo.userId)}
-        </p>
-      ) : isWalletConnected ? (
-        <p className="text-gold-500 flex gap-1 items-center">
-          <FaCheckCircle className="text-gold-500" />
-          {trimWalletAddress(walletAddress)}
         </p>
       ) : (
         <div
