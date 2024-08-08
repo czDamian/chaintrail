@@ -15,23 +15,14 @@ export default function TelegramAuthProvider({ children }) {
     if (savedUserId) {
       fetchUserInfo(savedUserId);
     } else {
-      const script = document.createElement("script");
-      script.src = "https://telegram.org/js/telegram-web-app.js";
-      script.async = true;
-      script.onload = () => {
-        window.Telegram.WebApp.ready();
-        const user = window.Telegram.WebApp.initDataUnsafe.user;
+      if (window.Telegram?.WebApp) {
+        const user = window.Telegram.WebApp.initDataUnsafe?.user;
         if (user && user.id) {
           registerUser(user.id.toString(), user.username || "", "telegram");
         } else {
           setIsLoading(false);
         }
-      };
-      document.body.appendChild(script);
-
-      return () => {
-        document.body.removeChild(script);
-      };
+      }
     }
   }, []);
 

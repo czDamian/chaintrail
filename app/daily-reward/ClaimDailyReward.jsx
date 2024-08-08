@@ -7,15 +7,20 @@ import Button from "../components/Reusable/Button";
 import { useRouter } from "next/navigation";
 
 const ClaimDailyReward = () => {
-  const { userInfo } = useTelegramAuth();
+  const { userInfo, isLoading } = useTelegramAuth();
   const [nextClaimTime, setNextClaimTime] = useState(null);
   const [canClaim, setCanClaim] = useState(false);
   const [timeLeft, setTimeLeft] = useState({});
   const router = useRouter();
 
   useEffect(() => {
-    checkClaimStatus();
-  }, [userInfo]);
+    const userId = localStorage.getItem("userId");
+    if (userId) {
+      checkClaimStatus(userId);
+    } else {
+      console.error("User ID not found in local storage");
+    }
+  }, []);
 
   useEffect(() => {
     if (nextClaimTime) {
@@ -29,7 +34,8 @@ const ClaimDailyReward = () => {
 
   const updateTimeLeft = () => {
     const now = new Date();
-    const timeDifference = new Date(nextClaimTime) - now;
+    const nextClaimDate = new Date(nextClaimTime);
+    const timeDifference = nextClaimDate - now;
 
     if (timeDifference <= 0) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -45,21 +51,19 @@ const ClaimDailyReward = () => {
     }
   };
 
-  const checkClaimStatus = async () => {
-    if (!userInfo || !userInfo.id) return;
+  const checkClaimStatus = async (userId) => {
     try {
-      const response = await fetch(`/api/register?userId=${userInfo.id}`);
+      const response = await fetch(`/api/claim?userId=${userId}`);
       const data = await response.json();
       if (response.ok) {
-        const now = new Date();
-        const nextClaimTime = new Date(data.nextClaimTime);
-        router.refresh();
-        if (now >= nextClaimTime) {
-          setCanClaim(true);
-          setNextClaimTime(null);
-        } else {
+        console.log("API Response:", data);
+
+        if (data.message === "Daily reward and pass not available yet") {
           setCanClaim(false);
-          setNextClaimTime(nextClaimTime);
+          setNextClaimTime(data.nextClaimTime);
+        } else {
+          setCanClaim(true);
+          setNextClaimTime(null); // Claim is available immediately
         }
       } else {
         console.error("Error checking claim status:", data.message);
@@ -70,28 +74,34 @@ const ClaimDailyReward = () => {
   };
 
   const claimRewardAndPass = async () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      console.error("User ID not found in local storage");
+      return;
+    }
+
     console.log("Claim reward and pass initiated");
     try {
-      const response = await fetch("/api/register", {
+      const response = await fetch("/api/claim", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId: userInfo.id }),
+        body: JSON.stringify({ userId }),
       });
 
-      console.log("Response received from /api/register:", response);
+      console.log("Response received from /api/claim:", response);
       const data = await response.json();
       console.log("Parsed response data:", data);
 
       if (response.ok) {
         toast.success(data.message);
-        setNextClaimTime(new Date(data.nextClaimTime));
+        setNextClaimTime(data.nextClaimTime);
         setCanClaim(false);
       } else {
         if (data.nextClaimTime) {
           toast.info("Already claimed, try again later.");
-          setNextClaimTime(new Date(data.nextClaimTime));
+          setNextClaimTime(data.nextClaimTime);
         } else {
           toast.error(data.message);
         }
