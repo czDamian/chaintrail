@@ -32,7 +32,7 @@ const NFTSection = () => {
       <div className="px-4 sm:px-8">
         <Swiper
           modules={[Pagination, Autoplay]}
-          spaceBetween={30}
+          spaceBetween={0}
           slidesPerView={isMobile ? 1 : 3}
           pagination={{ clickable: true }}
           autoplay={{ delay: 2000, disableOnInteraction: false }}
