@@ -1,23 +1,15 @@
 "use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, memo } from "react";
 import Image from "next/image";
 import { MdDelete } from "react-icons/md";
 import SideNav from "@/app/components/Reusable/SideNav";
 import Modal from "@/app/components/Reusable/Modal";
-import { Success } from "@/app/components/Reusable/Popup";
-import { Wrong } from "@/app/components/Reusable/Popup";
-import { Complete } from "@/app/components/Reusable/Popup";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import { Success, Wrong, Complete } from "@/app/components/Reusable/Popup";
 import Loader from "@/app/loader";
-import FetchPoints from "@/app/components/user/FetchPoints";
-import FetchPass from "@/app/components/user/FetchPass";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const QuestionComponent = ({ questId }) => {
-  const { userInfo } = useTelegramAuth(); 
-  const router = useRouter();
   const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -50,9 +42,35 @@ const QuestionComponent = ({ questId }) => {
       const data = await res.json();
       setQuestions(data);
       setLoading(false);
+
+      // Fetch user's points and play pass
+      await fetchUserData();
     } catch (error) {
       console.error("Error fetching questions:", error);
       setLoading(false);
+    }
+  };
+
+  const fetchUserData = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in local storage");
+      }
+
+      const response = await fetch(`/api/users?userId=${userId}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to fetch user data");
+      }
+
+      setPoints(data.points);
+      setPlayPass(data.playPass);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      toast.error(
+        "An error occurred while fetching user data. Please try again."
+      );
     }
   };
 
@@ -97,6 +115,12 @@ const QuestionComponent = ({ questId }) => {
       submittedAnswer.toUpperCase() ===
       (currentQuestion.questAnswer || "").toUpperCase();
 
+    // Check if the user has enough play pass before proceeding
+    if (playPass <= 0) {
+      toast.error("Insufficient Play Pass");
+      return;
+    }
+
     setIsCorrect(correct);
     setShowPopup(true);
 
@@ -107,51 +131,36 @@ const QuestionComponent = ({ questId }) => {
         );
       }
 
-      if (userInfo) {
-        const { id } = userInfo;
-
-        // Fetch the user's current points and play pass balance
-        try {
-          const response = await fetch(`/api/register?userId=${id}`);
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error("Failed to fetch user data");
-          }
-
-          const { points: currentPoints, playPass: currentPlayPass } = data;
-
-          if (currentPlayPass > 0) {
-            // Update user points and play pass on the server
-            const updateResponse = await fetch("/api/register", {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                userId: id,
-                pointsDelta: 1000,
-                playPassDelta: -1,
-              }),
-            });
-
-            if (!updateResponse.ok) {
-              throw new Error("Failed to update points and play pass");
-            }
-
-            const updateData = await updateResponse.json();
-            setPoints(updateData.points);
-            setPlayPass(updateData.playPass);
-            router.refresh(); // Rerender the page
-          } else {
-            throw new Error("No play passes available");
-          }
-        } catch (error) {
-          console.error("Error updating points:", error);
-          toast.error(
-            "An error occurred while updating points. Please try again."
-          );
+      try {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+          throw new Error("User ID not found in local storage");
         }
+
+        const updateResponse = await fetch("/api/claim", {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: userId,
+            pointsDelta: 1000,
+            playPassDelta: -1,
+          }),
+        });
+
+        if (!updateResponse.ok) {
+          throw new Error("Failed to update points and play pass");
+        }
+
+        const updateData = await updateResponse.json();
+        setPoints(updateData.points);
+        setPlayPass(updateData.playPass);
+      } catch (error) {
+        console.error("Error updating points:", error);
+        toast.error(
+          "An error occurred while updating points. Please try again."
+        );
       }
     } else {
       if (wrongSound) {
@@ -217,9 +226,9 @@ const QuestionComponent = ({ questId }) => {
     <section className="max-w-screen-xl mt-2 mx-auto px-4 sm:px-6 lg:px-8">
       <QuesUI />
       <div className="py-2 flex justify-between items-center text-sm">
-        <div className="flex flex-col items-center">
-          <FetchPoints points={points} />
-          <FetchPass playPass={playPass} />
+        <div className="text-xs gap-1 flex items-center">
+          <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
+          <span>{points}</span>
         </div>
         <div className="flex items-center">
           <img src="../redImg.png" alt="level" className="w-12 h-11" />
@@ -227,7 +236,10 @@ const QuestionComponent = ({ questId }) => {
             {currentQuestionIndex + 1}/{questions.length}
           </span>
         </div>
-        <SideNav />
+        <div className="text-xs gap-1 flex items-center">
+          <img src="../ticket.png" alt="Chain Coins" className="w-6 h-6" />
+          <span>{playPass}</span>
+        </div>
       </div>
       <section className="max-w-[320px]">
         <div className="grid grid-cols-2 gap-4">
@@ -309,11 +321,13 @@ const QuestionComponent = ({ questId }) => {
           </div>
         )}
       </section>
+      <SideNav />
+      <ToastContainer />
     </section>
   );
 };
 
-export default QuestionComponent;
+export default memo(QuestionComponent);
 
 export const QuesUI = () => {
   return (

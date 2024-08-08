@@ -1,9 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
 const FetchPoints = () => {
-  const { userInfo, isLoading } = useTelegramAuth();
   const [points, setPoints] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -11,7 +9,7 @@ const FetchPoints = () => {
   useEffect(() => {
     const fetchUserPoints = async (userId) => {
       try {
-        const response = await fetch(`/api/register?userId=${userId}`, {
+        const response = await fetch(`/api/users?userId=${userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -31,22 +29,24 @@ const FetchPoints = () => {
       }
     };
 
-    if (userInfo && userInfo.id) {
-      fetchUserPoints(userInfo.id);
-    }
-  }, [userInfo]);
+    // Retrieve userId from local storage
+    const userId = localStorage.getItem("userId");
 
-  if (isLoading || loading) {
+    if (userId) {
+      fetchUserPoints(userId);
+    } else {
+      setError("User ID not found in local storage");
+      setLoading(false);
+    }
+  }, []);
+
+  if (loading) {
     return (
       <div className="text-xs gap-1 flex items-center">
         <img src="../chaincoins.svg" alt="Chain Coins" className="w-6 h-6" />
         <span>000</span>
       </div>
     );
-  }
-
-  if (!userInfo) {
-    return <div className="text-xs gap-1 flex items-center">please log in</div>;
   }
 
   if (error) {
