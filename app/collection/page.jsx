@@ -6,20 +6,6 @@ export const metadata = {
   description: "Earn NFTs while playing your favorite game",
 };
 
-const images = [
-  {
-    img1: "mainNft1.svg",
-    scan: "scanNft.svg",
-  },
-  {
-    img2: "mainNft2.svg",
-    scan: "scanNft.svg",
-  },
-  {
-    img3: "mainNft3.svg",
-    scan: "scanNft.svg",
-  },
-];
 
 const Collection = () => {
   return (
