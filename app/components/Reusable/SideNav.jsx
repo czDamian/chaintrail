@@ -20,7 +20,7 @@ const SideNav = () => {
         if (!prevLinks.some((link) => link.title === "Admin")) {
           return [
             ...prevLinks,
-            { href: "/Admin/new-quest", title: "Admin", icon: FaLock },
+            { href: "/admin/new-quest", title: "Admin", icon: FaLock },
           ];
         }
         return prevLinks;
