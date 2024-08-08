@@ -12,9 +12,11 @@ import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import Loader from "@/app/loader";
 import FetchPoints from "@/app/components/user/FetchPoints";
 import FetchPass from "@/app/components/user/FetchPass";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const QuestionComponent = ({ questId }) => {
-  const { userInfo } = useTelegramAuth(); // Fetch userInfo from context
+  const { userInfo } = useTelegramAuth(); 
   const router = useRouter();
   const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);

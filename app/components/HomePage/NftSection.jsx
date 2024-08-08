@@ -32,13 +32,20 @@ const NFTSection = () => {
       <div className="px-4 sm:px-8">
         <Swiper
           modules={[Pagination, Autoplay]}
-          spaceBetween={0}
+          spaceBetween={20}
           slidesPerView={isMobile ? 1 : 3}
-          pagination={{ clickable: true }}
+          pagination={{
+            clickable: true,
+            el: ".swiper-pagination",
+            bulletElement: "div",
+            bulletClass:
+              "swiper-pagination-bullet rounded-full w-3 h-3 bg-gray-400 mr-2",
+            bulletActiveClass: "bg-yellow-500",
+          }}
           autoplay={{ delay: 2000, disableOnInteraction: false }}
           className="mySwiper">
           {nftImages.map((nftImage, index) => (
-            <SwiperSlide key={index} className="flex justify-center ">
+            <SwiperSlide key={index} className="flex justify-center">
               <div className="relative">
                 <Image
                   src={nftImage}
@@ -51,6 +58,7 @@ const NFTSection = () => {
             </SwiperSlide>
           ))}
         </Swiper>
+        <div className="swiper-pagination mt-6 flex justify-center"></div>
       </div>
 
       <div className="text-center mt-10">
