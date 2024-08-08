@@ -47,10 +47,13 @@ export default function FetchNFT() {
           })
         );
 
+        // Hide the first two NFTs
+        const displayedNFTs = allNFTs.slice(3);
+
         setContractAddress(contractAddress);
         setContractName(name);
         setContractSymbol(symbol);
-        setAllNFTs(allNFTs);
+        setAllNFTs(displayedNFTs);
       } catch (error) {
         console.error("Error fetching contract data:", error);
       } finally {
@@ -63,7 +66,7 @@ export default function FetchNFT() {
 
   // Function to trim addresses
   const trimAddress = (address) =>
-    `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
+    `${address.substring(0, 7)}...${address.substring(address.length - 5)}`;
 
   return (
     <div className="p-6 bg-gray-900 text-white min-h-screen">
@@ -72,14 +75,14 @@ export default function FetchNFT() {
       ) : (
         <div>
           <h2 className="text-2xl font-bold mb-4">NFT Information</h2>
-          <p> Only NFTs minted on Core will be displayed here</p>
+          <p>Only NFTs minted on CORE testnet will be displayed here</p>
           <p className="mb-2">
             Contract Address: {trimAddress(contractAddress)}
           </p>
           <p className="mb-2">Contract Name: {contractName}</p>
           <p className="mb-4">Contract Symbol: {contractSymbol}</p>
 
-          <h2 className="text-2xl font-bold mb-4">All NFTs</h2>
+          <h2 className="text-2xl font-bold mb-4">Available NFTs</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {allNFTs.length > 0 ? (
               allNFTs.map((nft, index) => (
@@ -98,7 +101,7 @@ export default function FetchNFT() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-xl">No NFTs found.</p>
+              <p className="text-center text-xl">You are not eligible to mint NFTs!</p>
             )}
           </div>
         </div>
