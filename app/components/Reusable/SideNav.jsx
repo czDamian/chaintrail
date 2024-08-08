@@ -10,7 +10,7 @@ const SideNav = () => {
     { href: "/", title: "Home", icon: FaHome },
     { href: "/quests", title: "Quests", icon: FaTasks },
     { href: "/collection", title: "Collections", icon: FaBox },
-    { href: "/referrals", title: "Account", icon: FaUser },
+    { href: "/wallet", title: "Wallet", icon: FaUser },
   ]);
 
   useEffect(() => {
@@ -20,7 +20,7 @@ const SideNav = () => {
         if (!prevLinks.some((link) => link.title === "Admin")) {
           return [
             ...prevLinks,
-            { href: "/admin/users", title: "Admin", icon: FaLock },
+            { href: "/a/users", title: "Admin", icon: FaLock },
           ];
         }
         return prevLinks;

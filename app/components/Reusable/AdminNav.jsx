@@ -1,18 +1,18 @@
 import Link from "next/link";
-import { RiMenu3Fill } from "react-icons/ri";
 import { IoClose } from "react-icons/io5";
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
 import { IoMdCreate } from "react-icons/io";
 import { FaRegEdit, FaHouseUser } from "react-icons/fa";
+import { HiOutlineMenuAlt2 } from "react-icons/hi";
 
 const navItems = [
-  { name: "Users", path: "/admin/users", icon: <FaHouseUser /> },
-  { name: "New Quest", path: "/admin/new-quest", icon: <IoMdCreate /> },
-  { name: "Edit Quest", path: "/admin/edit-quest", icon: <FaRegEdit /> },
-  { name: "New Question", path: "/admin/new-question", icon: <IoMdCreate /> },
-  { name: "Edit Question", path: "/admin/edit-question", icon: <FaRegEdit /> },
-  { name: "Delete Quest", path: "/admin/delete-quest", icon: <MdDelete /> },
+  { name: "Users", path: "/a/users", icon: <FaHouseUser /> },
+  { name: "New Quest", path: "/a/new-quest", icon: <IoMdCreate /> },
+  { name: "Edit Quest", path: "/a/edit-quest", icon: <FaRegEdit /> },
+  { name: "New Question", path: "/a/new-question", icon: <IoMdCreate /> },
+  { name: "Edit Question", path: "/a/edit-question", icon: <FaRegEdit /> },
+  { name: "Delete Quest", path: "/a/delete-quest", icon: <MdDelete /> },
 ];
 
 export default function AdminNav() {
@@ -22,10 +22,8 @@ export default function AdminNav() {
 
   return (
     <aside className="text-sm md:text-base">
-      <button
-        onClick={toggleNav}
-        className="text-lg md:text-2xl">
-        {isOpen ? <IoClose /> : <RiMenu3Fill />}
+      <button onClick={toggleNav} className="text-2xl md:text-3xl">
+        {isOpen ? <IoClose /> : <HiOutlineMenuAlt2 />}
       </button>
       <nav
         className={`fixed top-16 right-0 h-full w-40 bg-neutral-950 text-white transform ${
