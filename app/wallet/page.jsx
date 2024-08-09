@@ -1,3 +1,5 @@
+import SideNav from "../components/Reusable/SideNav";
+import Referrals from "./Referrals";
 import UserProfile from "./UserProfile";
 
 export const metadata = {
@@ -6,8 +8,12 @@ export const metadata = {
 };
 
 const Wallet = () => {
-  return <div>
-    <UserProfile/>
-  </div>;
+  return (
+    <div>
+      <UserProfile />
+      <Referrals />
+      <SideNav />
+    </div>
+  );
 };
 export default Wallet;

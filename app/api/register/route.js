@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import User from "@/models/User";
+import Counter from "@/models/Counter"; // Import the Counter model
 import connectDb from "@/lib/mongodb";
 import { ethers } from "ethers";
 
@@ -12,7 +13,7 @@ export async function POST(request) {
     let user = await User.findOne({ userId });
 
     if (user) {
-      // Check if wallet details are missing, invalid, or without mnemonic and update if needed
+      // Check if wallet details or referral code are missing, invalid, or without mnemonic and update if needed
       if (
         !user.walletAddress ||
         !ethers.isAddress(user.walletAddress) ||
@@ -20,18 +21,23 @@ export async function POST(request) {
       ) {
         const walletDetails = createWalletWithMnemonic();
         Object.assign(user, walletDetails);
-        await user.save();
-        console.log("Updated existing user with new wallet details:", user);
       }
+      if (!user.referralCode) {
+        user.referralCode = await generateAutoIncrementalReferralCode();
+      }
+      await user.save();
+      console.log("Updated existing user with new details:", user);
 
       return NextResponse.json({
         message: "Welcome Back",
         walletAddress: user.walletAddress,
+        referralCode: user.referralCode,
       });
     }
 
-    // User does not exist, create a new user with a wallet
+    // User does not exist, create a new user with a wallet and referral code
     const walletDetails = createWalletWithMnemonic();
+    const referralCode = await generateAutoIncrementalReferralCode();
     user = new User({
       userId,
       username,
@@ -41,6 +47,7 @@ export async function POST(request) {
       publicKey: walletDetails.publicKey,
       privateKey: walletDetails.privateKey,
       mnemonic: walletDetails.mnemonic,
+      referralCode,
     });
 
     console.log("New user before save:", user);
@@ -52,6 +59,7 @@ export async function POST(request) {
     return NextResponse.json({
       message: "Registration successful",
       walletAddress: user.walletAddress,
+      referralCode: user.referralCode,
     });
   } catch (err) {
     console.error("Error in POST route:", err);
@@ -71,4 +79,15 @@ function createWalletWithMnemonic() {
   };
   console.log("Created wallet details:", walletDetails);
   return walletDetails;
+}
+
+async function generateAutoIncrementalReferralCode() {
+  const counter = await Counter.findOneAndUpdate(
+    { name: "referralCode" },
+    { $inc: { sequenceValue: 1 } },
+    { new: true, upsert: true }
+  );
+
+  const referralCode = counter.sequenceValue.toString().padStart(4, "0");
+  return referralCode;
 }

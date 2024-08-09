@@ -1,11 +1,38 @@
-import { IoCopy } from "react-icons/io5";
-import SideNav from "../components/Reusable/SideNav";
+"use client";
 
-export const metadata = {
-  title: "Referrals",
-  description: "Earn NFTs while playing your favorite game",
-};
+import { useEffect, useState } from "react";
+import { IoCopy } from "react-icons/io5";
+
 const Referrals = () => {
+  const [referralLink, setReferralLink] = useState("");
+  const [referralCount, setReferralCount] = useState(0);
+
+  useEffect(() => {
+    const fetchReferralData = async () => {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        try {
+          const response = await fetch(`/api/users?userId=${userId}`);
+          const data = await response.json();
+
+          if (response.ok) {
+            const referralCode = data.referralCode || "0000"; // Default to "0000" if referralCode is missing
+            setReferralLink(`https://t.me/ChainTrailBot?start${referralCode}`);
+            setReferralCount(data.referralCount || 0); // Set referral count if available
+          } else {
+            console.error("Failed to fetch referral code:", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching referral code:", error);
+        }
+      } else {
+        console.error("No userId found in localStorage");
+      }
+    };
+
+    fetchReferralData();
+  }, []);
+
   return (
     <section className="px-8">
       <div className="text-center my-6 text-2xl">
@@ -13,16 +40,21 @@ const Referrals = () => {
         <p className="text-sm my-2">Refer & earn 1000 points</p>
         <div className="bg-neutral-700 p-4 rounded-lg text-sm flex justify-center gap-2 items-center mx-auto w-[300px] my-4">
           <input
-            className="bg-neutral-700 text-neutral-200"
+            className="bg-inherit border-none overflow-x-scroll text-neutral-200"
             type="text"
             name="referral"
             id="referral"
-            value="https://t.me/chaintrailBotStart1234567890...."
+            value={referralLink || "Fetching ref link..."}
             readOnly
           />
           <span className="opacity-50">|</span>
-          <span className="flex items-center gap-2 justify-between">
-            copy <IoCopy className="cursor-pointer" />
+          <span
+            className="flex items-center gap-2 justify-between cursor-pointer"
+            onClick={() => {
+              navigator.clipboard.writeText(referralLink);
+              alert("Referral link copied to clipboard!");
+            }}>
+            copy <IoCopy />
           </span>
         </div>
         <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-3 px-16 rounded-xl text-sm font-bold my-8">
@@ -31,7 +63,7 @@ const Referrals = () => {
         <div className="flex items-center justify-center gap-2">
           <span>My referrals:</span>
           <span id="referrals" className="font-bold text-yellow-500">
-            0
+            {referralCount}
           </span>
         </div>
       </div>
@@ -93,8 +125,8 @@ const Referrals = () => {
           </div>
         </div>
       </div>
-      <SideNav />
     </section>
   );
 };
+
 export default Referrals;
