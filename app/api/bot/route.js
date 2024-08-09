@@ -11,7 +11,7 @@ if (!token) {
 const bot = new Telegraf(token);
 
 bot.start((ctx) => {
-  const query = `Welcome to ChainTrail Bot. Type /launch to start the game or /points to view your points or /pass to view your number of play pass left. Have Fun`;
+  const query = `Welcome to ChainTrail Bot. Type /launch to start the game or /points to view your points or /pass to view your number of play pass left. You can also type /referrals to view the number of referrals that you have or /reflink to get your unique referral link. Have Fun`;
   ctx.reply(query);
 });
 
@@ -60,6 +60,48 @@ bot.command("pass", async (ctx) => {
     ctx.reply(`You have ${pass} Play Pass left.`);
   } catch (error) {
     ctx.reply("Sorry, there was an error fetching your points.");
+    console.error(error);
+  }
+});
+
+bot.command("referrals", async (ctx) => {
+  const userId = ctx.from.id;
+  const apiUrl = `https://chaintrail.vercel.app/api/users?userId=${userId}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error("Failed to fetch user points");
+    }
+
+    const data = await response.json();
+    const refs = data.referralCount;
+
+    ctx.reply(`You have ${refs} referrals.`);
+  } catch (error) {
+    ctx.reply("Sorry, there was an error fetching your referrals.");
+    console.error(error);
+  }
+});
+
+bot.command("reflink", async (ctx) => {
+  const userId = ctx.from.id;
+  const apiUrl = `https://chaintrail.vercel.app/api/users?userId=${userId}`;
+
+  try {
+    const response = await fetch(apiUrl);
+    if (!response.ok) {
+      throw new Error("Failed to fetch user points");
+    }
+
+    const data = await response.json();
+    const refcode = data.referralCode;
+
+    const reffLink = `https://t.me/ChainTrailBot?start${refcode}`;
+
+    ctx.reply(`Your referral link is ${reffLink}`);
+  } catch (error) {
+    ctx.reply("Sorry, there was an error fetching your referral link.");
     console.error(error);
   }
 });
