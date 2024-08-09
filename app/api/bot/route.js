@@ -64,10 +64,23 @@ bot.command("pass", async (ctx) => {
   }
 });
 
-async function handler(req, res) {
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res) {
   if (req.method === "POST") {
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const rawBody = Buffer.concat(chunks).toString("utf8");
+    const data = JSON.parse(rawBody);
+
     try {
-      await bot.handleUpdate(req.body);
+      await bot.handleUpdate(data);
       res.status(200).json({ ok: true });
     } catch (error) {
       console.error("Error processing update:", error);
@@ -79,5 +92,3 @@ async function handler(req, res) {
     res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 }
-
-module.exports = handler;
