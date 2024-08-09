@@ -1,6 +1,7 @@
 //api/bot/route.js
 const { Telegraf, Markup } = require("telegraf");
 const fetch = require("node-fetch");
+require('dotenv').config(); // Load environment variables from .env file
 
 const token = process.env.BOT_TOKEN;
 
