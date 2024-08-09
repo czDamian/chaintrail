@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import nftContractABI from "../earn/abi.json";
+import nftContractABI from "./abi.json";
 
 export default function FetchNFT() {
   const [contractAddress, setContractAddress] = useState("");
