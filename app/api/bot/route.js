@@ -1,6 +1,6 @@
+import { NextResponse } from "next/server";
 const { Telegraf, Markup } = require("telegraf");
 const fetch = require("node-fetch");
-require("dotenv").config();
 
 const token = process.env.BOT_TOKEN;
 
@@ -64,31 +64,26 @@ bot.command("pass", async (ctx) => {
   }
 });
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+export async function GET() {
+  return NextResponse.json({ ok: true, message: "Bot webhook is active" });
+}
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(chunk);
-    }
-    const rawBody = Buffer.concat(chunks).toString("utf8");
-    const data = JSON.parse(rawBody);
+export async function POST(request) {
+  const chunks = [];
+  for await (const chunk of request) {
+    chunks.push(chunk);
+  }
+  const rawBody = Buffer.concat(chunks).toString("utf8");
+  const data = JSON.parse(rawBody);
 
-    try {
-      await bot.handleUpdate(data);
-      res.status(200).json({ ok: true });
-    } catch (error) {
-      console.error("Error processing update:", error);
-      res.status(500).json({ ok: false, error: error.message });
-    }
-  } else if (req.method === "GET") {
-    res.status(200).json({ ok: true, message: "Bot webhook is active" });
-  } else {
-    res.status(405).json({ ok: false, error: "Method not allowed" });
+  try {
+    await bot.handleUpdate(data);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error("Error processing update:", error);
+    return NextResponse.json(
+      { ok: false, error: error.message },
+      { status: 500 }
+    );
   }
 }
