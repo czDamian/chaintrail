@@ -2,7 +2,14 @@
 import Link from "next/link";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { useEffect, useState } from "react";
-import { FaHome, FaTasks, FaBox, FaUser, FaLock } from "react-icons/fa";
+import {
+  FaHome,
+  FaTasks,
+  FaBox,
+  FaUser,
+  FaLock,
+  FaWallet,
+} from "react-icons/fa";
 
 const SideNav = () => {
   const { userInfo } = useTelegramAuth();
@@ -11,7 +18,7 @@ const SideNav = () => {
     { href: "/quests", title: "Quests", icon: FaTasks },
     { href: "/collection", title: "Collections", icon: FaBox },
     { href: "/earn", title: "Earn", icon: FaUser },
-    { href: "/wallet", title: "Wallet", icon: FaUser },
+    { href: "/wallet", title: "Wallet", icon: FaWallet },
   ]);
 
   useEffect(() => {
@@ -34,22 +41,22 @@ const SideNav = () => {
   }, [userInfo]);
 
   return (
-    <div className="mt-20">
-      <div className="fixed bottom-0 left-0 w-full bg-neutral-950 text-white z-50">
-        <ul className="flex justify-between">
-          {navLinks.map((link, index) => (
-            <li key={index}>
-              <Link
-                href={link.href}
-                className="px-4 py-4 sm:px-2 hover:bg-neutral-700 rounded transition duration-200 text-xs md:text-sm flex flex-col items-center">
-                <link.icon className="mb-1" />
+    <nav className="fixed bottom-0 left-0 w-full bg-neutral-950 text-white z-50 px-2 sm:px-4 md:px-6 py-2">
+      <ul className="flex justify-between items-center">
+        {navLinks.map((link, index) => (
+          <li key={index} className="flex-1">
+            <Link
+              href={link.href}
+              className="flex flex-col items-center justify-center hover:bg-neutral-700 rounded transition duration-200 py-2 px-1 sm:px-2">
+              <link.icon className="text-lg sm:text-xl mb-1" />
+              <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap">
                 {link.title}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 };
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import User from "@/models/User";
-import Counter from "@/models/Counter"; // Import the Counter model
+import Counter from "@/models/Counter";
 import connectDb from "@/lib/mongodb";
 import { ethers } from "ethers";
 
