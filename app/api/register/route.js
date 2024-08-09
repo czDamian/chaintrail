@@ -12,47 +12,63 @@ export async function POST(request) {
     let user = await User.findOne({ userId });
 
     if (user) {
-      // Check if wallet details are missing and update if needed
-      if (!user.walletAddress) {
-        // Generate a new wallet
-        const wallet = ethers.Wallet.createRandom();
-        const { address, privateKey } = wallet;
-        const mnemonic = wallet.mnemonic.phrase;
-        const publicKey = wallet.publicKey;
-
-        // Update user with new wallet details
-        user.walletAddress = address;
-        user.publicKey = publicKey;
-        user.privateKey = privateKey;
-        user.mnemonic = mnemonic;
+      // Check if wallet details are missing, invalid, or without mnemonic and update if needed
+      if (
+        !user.walletAddress ||
+        !ethers.isAddress(user.walletAddress) ||
+        !user.mnemonic
+      ) {
+        const walletDetails = createWalletWithMnemonic();
+        Object.assign(user, walletDetails);
         await user.save();
+        console.log("Updated existing user with new wallet details:", user);
       }
 
-      return NextResponse.json({ message: "Welcome Back" });
+      return NextResponse.json({
+        message: "Welcome Back",
+        walletAddress: user.walletAddress,
+      });
     }
 
-    // User does not exist, create a new user
-    const wallet = ethers.Wallet.createRandom();
-    const { address, privateKey } = wallet;
-    const mnemonic = wallet.mnemonic.phrase;
-    const publicKey = wallet.publicKey;
-
+    // User does not exist, create a new user with a wallet
+    const walletDetails = createWalletWithMnemonic();
     user = new User({
       userId,
       username,
-      points: 1000, // Assign 1000 points on successful registration
-      playPass: 0,
-      walletAddress: address,
-      publicKey,
-      privateKey,
-      mnemonic,
+      points: 1000,
+      playPass: 10,
+      walletAddress: walletDetails.walletAddress,
+      publicKey: walletDetails.publicKey,
+      privateKey: walletDetails.privateKey,
+      mnemonic: walletDetails.mnemonic,
     });
 
+    console.log("New user before save:", user);
     await user.save();
-    return NextResponse.json({ message: "Registration successful" });
+    // Verify the saved user
+    const savedUser = await User.findOne({ userId }).lean();
+    console.log("Saved user from database:", savedUser);
+
+    return NextResponse.json({
+      message: "Registration successful",
+      walletAddress: user.walletAddress,
+    });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    console.error("Error in POST route:", err);
+    return NextResponse.json(
+      { message: "Server error", error: err.message },
+      { status: 500 }
+    );
   }
 }
 
+function createWalletWithMnemonic() {
+  const wallet = ethers.Wallet.createRandom();
+  const walletDetails = {
+    walletAddress: wallet.address,
+    privateKey: wallet.privateKey,
+    mnemonic: wallet.mnemonic.phrase,
+  };
+  console.log("Created wallet details:", walletDetails);
+  return walletDetails;
+}

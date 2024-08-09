@@ -13,15 +13,11 @@ export default function FetchNFT() {
   useEffect(() => {
     const fetchContractData = async () => {
       try {
-        let provider;
-        if (window.ethereum == null) {
-          console.log("MetaMask not installed; using read-only defaults");
-          provider = ethers.getDefaultProvider();
-        } else {
-          provider = new ethers.BrowserProvider(window.ethereum);
-        }
+        const provider = new ethers.JsonRpcProvider(
+          "https://rpc.test.btcs.network"
+        );
 
-        const contractAddress = "0x98e3f452b16e19b950e14faa59dc1a343b5d3ff8"; // Replace with the actual contract address
+        const contractAddress = "0x98e3f452b16e19b950e14faa59dc1a343b5d3ff8";
         const contract = new ethers.Contract(
           contractAddress,
           nftContractABI,
@@ -33,12 +29,14 @@ export default function FetchNFT() {
         const symbol = await contract.symbol();
 
         // Query the Transfer event to get all token IDs
-        const filter = contract.filters.Transfer(null, null); // Get all Transfer events
+        const filter = contract.filters.Transfer(null, null);
         const events = await contract.queryFilter(filter);
 
         const uniqueTokenIds = new Set(
           events.map((event) => event.args.tokenId.toString())
         );
+
+        // Fetch all NFTs on CORE
         const allNFTs = await Promise.all(
           Array.from(uniqueTokenIds).map(async (tokenId) => {
             const owner = await contract.ownerOf(tokenId);
@@ -47,7 +45,7 @@ export default function FetchNFT() {
           })
         );
 
-        // Hide the first two NFTs
+        // Hide the first 3 NFTS
         const displayedNFTs = allNFTs.slice(3);
 
         setContractAddress(contractAddress);
@@ -74,7 +72,9 @@ export default function FetchNFT() {
         <div className="text-center text-xl">Loading...</div>
       ) : (
         <div>
-          <h2 className="text-2xl font-bold mb-4">NFT Information</h2>
+          <h2 className="text-2xl font-bold mb-4">
+            NFT Information (CORE Testnet)
+          </h2>
           <p>Only NFTs minted on CORE testnet will be displayed here</p>
           <p className="mb-2">
             Contract Address: {trimAddress(contractAddress)}
@@ -101,7 +101,9 @@ export default function FetchNFT() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-xl">You are not eligible to mint NFTs!</p>
+              <p className="text-center text-xl">
+                No NFTs found for this contract on CORE testnet.
+              </p>
             )}
           </div>
         </div>

@@ -12,12 +12,12 @@ const UserSchema = new mongoose.Schema(
     referralCode: { type: String, unique: true },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     publicKey: { type: String, unique: true },
-    privateKey: { type: String, unique: true, select: false },
-    mnemonic: { type: String, unique: true, select: false },
+    privateKey: { type: String, unique: true },
+    mnemonic: { type: String, unique: true },
   },
   { timestamps: true }
 );
-
+delete mongoose.models.User;
 const User = mongoose.models.User || mongoose.model("User", UserSchema);
 
 export default User;

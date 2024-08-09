@@ -21,13 +21,10 @@ export default function FetchUserNFTs() {
 
         setUserAddress(walletAddress);
 
-        let provider;
-        if (window.ethereum == null) {
-          console.log("MetaMask not installed; using read-only defaults");
-          provider = ethers.getDefaultProvider();
-        } else {
-          provider = new ethers.BrowserProvider(window.ethereum);
-        }
+        // Use the CORE Testnet RPC provider
+        const provider = new ethers.JsonRpcProvider(
+          "https://rpc.test.btcs.network"
+        );
 
         const contractAddress = "0x98e3f452b16e19b950e14faa59dc1a343b5d3ff8"; // Replace with the actual contract address
         const contract = new ethers.Contract(
