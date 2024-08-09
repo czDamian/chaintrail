@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-const { Telegraf, Markup } = require("telegraf");
-const fetch = require("node-fetch");
+import { Telegraf, Markup } from "telegraf";
+import fetch from "node-fetch";
 
 const token = process.env.BOT_TOKEN;
 
@@ -69,14 +69,9 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const chunks = [];
-  for await (const chunk of request) {
-    chunks.push(chunk);
-  }
-  const rawBody = Buffer.concat(chunks).toString("utf8");
-  const data = JSON.parse(rawBody);
-
   try {
+    const data = await request.json(); // Correctly parse JSON from the request body
+
     await bot.handleUpdate(data);
     return NextResponse.json({ ok: true });
   } catch (error) {
