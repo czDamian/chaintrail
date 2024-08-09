@@ -57,9 +57,6 @@ const Referrals = () => {
             copy <IoCopy />
           </span>
         </div>
-        <button className="bg-yellow-500 hover:bg-yellow-600 text-black py-3 px-16 rounded-xl text-sm font-bold my-8">
-          SHARE
-        </button>
         <div className="flex items-center justify-center gap-2">
           <span>My referrals:</span>
           <span id="referrals" className="font-bold text-yellow-500">
@@ -69,21 +66,18 @@ const Referrals = () => {
       </div>
 
       <div className="my-12 flex flex-col gap-4 mx-4">
-        <h1>YOUR REWARDS!</h1>
+        <h1>YOUR ACHIEVEMENTS!</h1>
         <div className="bg-neutral-700 flex gap-4 rounded-xl p-2">
           <img src="frameIq.svg" alt="iq" className="rounded-full " />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>
-            <div className="flex items-center justify-between text-sm">
-              <span>74</span>
-              <span>340</span>
-            </div>
+            <span>Get 1 referral</span>
             <input
               className="accent-yellow-400"
               type="range"
               name="iqCount"
-              value={74}
-              max={340}
+              value={0}
+              max={1}
               id=""
             />
           </div>
@@ -96,16 +90,13 @@ const Referrals = () => {
           />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>
-            <div className="flex items-center justify-between text-sm">
-              <span>1050</span>
-              <span>3000</span>
-            </div>
+            <span>Get 10 referrals</span>
             <input
               className="accent-yellow-400"
               type="range"
               name="iqCount"
-              value={1050}
-              max={3000}
+              value={0}
+              max={10}
               id=""
             />
           </div>
@@ -118,10 +109,15 @@ const Referrals = () => {
           />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>
-            <div className="flex items-center gap-1">
-              <img src="star.svg" alt="coins" />
-              <p>450</p>
-            </div>
+            <p>Get 100 referrals</p>
+            <input
+              className="accent-yellow-400"
+              type="range"
+              name="iqCount"
+              value={10}
+              max={100}
+              id=""
+            />
           </div>
         </div>
       </div>

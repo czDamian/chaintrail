@@ -4,7 +4,7 @@ import Partners from "./components/HomePage/Partners";
 import Hero from "./components/HomePage/Hero";
 import Daily from "./components/HomePage/Daily";
 import HowToPlay from "./components/HomePage/HowToPlay";
-import ClaimDailyReward from "./daily-reward/ClaimDailyReward";
+import ClaimDailyReward from "./earn/ClaimDailyReward";
 
 export default function App() {
   return (

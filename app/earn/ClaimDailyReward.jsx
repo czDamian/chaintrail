@@ -119,7 +119,7 @@ const ClaimDailyReward = () => {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">DAILY BONUS</h1>
           <p className="text-sm mb-6">
-            Free Coins for logging into the game daily without skipping
+            Get Free Coins and Play Pass for logging into the game daily 
           </p>
         </div>
         <div className="grid grid-cols-2 gap-6 mb-6">

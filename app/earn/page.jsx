@@ -1,15 +1,19 @@
 import SideNav from "../components/Reusable/SideNav";
-import UserProfile from "./UserProfile";
+import DailyRewardComponent from "./DailyRewardComponent";
+import Referrals from "./Referrals";
 
 export const metadata = {
-  title: "Wallet",
+  title: "Earn",
   description: "Earn NFTs while playing your favorite game",
 };
 
 const Wallet = () => {
   return (
     <div>
-      <UserProfile />
+      <div className="flex flex-col gap-20">
+        <DailyRewardComponent />
+        <Referrals />
+      </div>
       <SideNav />
     </div>
   );

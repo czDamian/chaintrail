@@ -23,17 +23,11 @@ export default function UserProfile() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <p>
-            <span className="font-bold">Username:</span> {userInfo.username}
-          </p>
-          <p>
-            <span className="font-bold">My ID:</span>
-            {userInfo.userId.slice(0, 10)}...
+            <span className="font-bold">Username:</span>
+            {userInfo.username || "Username not set"}
           </p>
           <p>
             <span className="font-bold">Points:</span> {userInfo.points}
-          </p>
-          <p>
-            <span className="font-bold">Role:</span> {userInfo.role}
           </p>
           <p>
             <span className="font-bold">Play Pass left:</span>{" "}

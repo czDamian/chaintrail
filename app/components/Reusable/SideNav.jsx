@@ -10,6 +10,7 @@ const SideNav = () => {
     { href: "/", title: "Home", icon: FaHome },
     { href: "/quests", title: "Quests", icon: FaTasks },
     { href: "/collection", title: "Collections", icon: FaBox },
+    { href: "/earn", title: "Earn", icon: FaUser },
     { href: "/wallet", title: "Wallet", icon: FaUser },
   ]);
 
