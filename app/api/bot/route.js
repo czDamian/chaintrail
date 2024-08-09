@@ -1,7 +1,6 @@
-//api/bot/route.js
 const { Telegraf, Markup } = require("telegraf");
 const fetch = require("node-fetch");
-require('dotenv').config(); // Load environment variables from .env file
+require("dotenv").config();
 
 const token = process.env.BOT_TOKEN;
 
@@ -12,13 +11,10 @@ if (!token) {
 const bot = new Telegraf(token);
 
 bot.start((ctx) => {
-  //   console.log("Bot started by:", ctx.from.username);
-  //   console.log(ctx.update);
-  const query = ` Welcome to ChainTrail Bot. Type /launch to start the game or /points to view your points or /pass to view your number of play pass left. Have Fun`;
+  const query = `Welcome to ChainTrail Bot. Type /launch to start the game or /points to view your points or /pass to view your number of play pass left. Have Fun`;
   ctx.reply(query);
-
-  //   ctx.telegram.sendMessage(ctx.chat.id, "Launch the game");
 });
+
 bot.command("launch", async (ctx) => {
   const startGameText = "Click the link below to start playing the game";
   const webAppUrl = "https://chaintrail.vercel.app/";
@@ -28,9 +24,8 @@ bot.command("launch", async (ctx) => {
   );
 });
 
-// Command to get and reply with the user's points
 bot.command("points", async (ctx) => {
-  const userId = ctx.from.id; // Get the Telegram user ID of the sender
+  const userId = ctx.from.id;
   const apiUrl = `https://chaintrail.vercel.app/api/users?userId=${userId}`;
 
   try {
@@ -48,9 +43,9 @@ bot.command("points", async (ctx) => {
     console.error(error);
   }
 });
-// Command to get and reply with the user's points
+
 bot.command("pass", async (ctx) => {
-  const userId = ctx.from.id; // Get the Telegram user ID of the sender
+  const userId = ctx.from.id;
   const apiUrl = `https://chaintrail.vercel.app/api/users?userId=${userId}`;
 
   try {
@@ -68,4 +63,21 @@ bot.command("pass", async (ctx) => {
     console.error(error);
   }
 });
-bot.launch();
+
+async function handler(req, res) {
+  if (req.method === "POST") {
+    try {
+      await bot.handleUpdate(req.body);
+      res.status(200).json({ ok: true });
+    } catch (error) {
+      console.error("Error processing update:", error);
+      res.status(500).json({ ok: false, error: error.message });
+    }
+  } else if (req.method === "GET") {
+    res.status(200).json({ ok: true, message: "Bot webhook is active" });
+  } else {
+    res.status(405).json({ ok: false, error: "Method not allowed" });
+  }
+}
+
+module.exports = handler;
