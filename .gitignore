@@ -38,3 +38,4 @@ next-env.d.ts
 #dangerous scripts
 updateAllUsers.js
 helperFunctions.js
+setWebhook.js

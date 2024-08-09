@@ -22,7 +22,6 @@ const SideNav = () => {
   ]);
 
   useEffect(() => {
-    console.log("SideNav userInfo:", userInfo);
     if (userInfo?.role === "admin") {
       setNavLinks((prevLinks) => {
         if (!prevLinks.some((link) => link.title === "Admin")) {
