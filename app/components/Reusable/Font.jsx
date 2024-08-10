@@ -2,6 +2,7 @@ import { Krona_One } from "next/font/google";
 import { Cinzel } from "next/font/google";
 import { Lato } from "next/font/google";
 import { Raleway } from "next/font/google";
+import { Montserrat } from "next/font/google";
 
 export const kronaOne = Krona_One({
   weight: ["400"],
@@ -15,6 +16,11 @@ export const raleway = Raleway({
 });
 
 export const cinzel = Cinzel({
+  weight: ["400", "700"],
+  subsets: ["latin"],
+  display: "swap",
+});
+export const montserrat = Montserrat({
   weight: ["400", "700"],
   subsets: ["latin"],
   display: "swap",

@@ -40,13 +40,13 @@ const SideNav = () => {
   }, [userInfo]);
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full bg-neutral-950 text-white z-50 px-2 sm:px-4 md:px-6 py-2">
+    <nav className="fixed bottom-0 left-0 w-full bg-gradient-to-b from-blue-950 to-gray-950 text-white z-50">
       <ul className="flex justify-between items-center">
         {navLinks.map((link, index) => (
           <li key={index} className="flex-1">
             <Link
               href={link.href}
-              className="flex flex-col items-center justify-center hover:bg-neutral-700 rounded transition duration-200 py-2 px-1 sm:px-2">
+              className="flex flex-col items-center justify-center hover:bg-blue-900 rounded transition duration-300 py-3 px-1 sm:px-2 md:py-5 ">
               <link.icon className="text-lg sm:text-xl mb-1" />
               <span className="text-[10px] sm:text-xs md:text-sm whitespace-nowrap">
                 {link.title}

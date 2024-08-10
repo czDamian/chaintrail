@@ -9,7 +9,9 @@ export const metadata = {
 const Wallet = () => {
   return (
     <div>
-      <UserProfile />
+      <div className="mb-20">
+        <UserProfile />
+      </div>
       <SideNav />
     </div>
   );

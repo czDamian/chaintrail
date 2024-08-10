@@ -16,10 +16,9 @@ export default function TelegramAuthProvider({ children }) {
       const queryString = window.Telegram.WebApp.initData || "";
       const urlParams = new URLSearchParams(queryString);
       const referralCode = urlParams.get("start"); // Extract referral code from URL
-      console.log(referralCode);
 
       if (referralCode) {
-        localStorage.setItem("referralCode", referralCode); // Store referral code
+        localStorage.setItem("referralCode", referralCode);
       }
 
       if (user && user.id) {
@@ -47,7 +46,7 @@ export default function TelegramAuthProvider({ children }) {
   };
 
   const registerUser = async (userId, username, method) => {
-    const referralCode = localStorage.getItem("referralCode"); // Retrieve referral code from local storage
+    const referralCode = localStorage.getItem("referralCode");
 
     try {
       setIsLoading(true);
@@ -63,7 +62,7 @@ export default function TelegramAuthProvider({ children }) {
         setUserInfo(data);
         setUserPoints(data.points || 0);
         localStorage.setItem("userId", userId);
-        localStorage.removeItem("referralCode"); // Clean up referral code after registration
+        localStorage.removeItem("referralCode");
       } else {
         toast.error("Registration failed. Please try again.");
       }

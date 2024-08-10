@@ -115,7 +115,7 @@ const ClaimDailyReward = () => {
   return (
     <div className="flex flex-col items-center justify-center my-10">
       <ToastContainer />
-      <div className="bg-neutral-800 p-6 rounded-lg shadow-lg">
+      <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">DAILY BONUS</h1>
           <p className="text-sm mb-6">
@@ -123,7 +123,7 @@ const ClaimDailyReward = () => {
           </p>
         </div>
         <div className="grid grid-cols-2 gap-6 mb-6">
-          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
+          <div className="flex bg-gray-800 py-6 flex-col border border-gray-700 rounded-lg items-center">
             <img
               src="/coins.png"
               alt="Chain Points"
@@ -132,7 +132,7 @@ const ClaimDailyReward = () => {
             <span className="text-xl mb-2 font-bold">+1200</span>
             <span className="text-sm">Chain Points</span>
           </div>
-          <div className="flex bg-neutral-900 py-6 flex-col border border-neutral-500 rounded-lg items-center">
+          <div className="flex bg-gray-800 py-6 flex-col border border-gray-700 rounded-lg items-center">
             <img
               src="/ticketIcon.svg"
               alt="Play Passes"

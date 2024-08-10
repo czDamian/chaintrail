@@ -10,7 +10,7 @@ export const metadata = {
 const Wallet = () => {
   return (
     <div>
-      <div className="flex flex-col gap-20">
+      <div className="flex flex-col gap-20 mb-20">
         <DailyRewardComponent />
         <Referrals />
       </div>

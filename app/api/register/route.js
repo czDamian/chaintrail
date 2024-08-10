@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 await connectDb();
 
 export async function POST(request) {
-  const { userId, username, referralCode } = await request.json(); // Extract referralCode
+  const { userId, username, referralCode } = await request.json();
 
   try {
     let user = await User.findOne({ userId });
@@ -26,7 +26,6 @@ export async function POST(request) {
         user.referralCode = await generateAutoIncrementalReferralCode();
       }
       await user.save();
-      console.log("Updated existing user with new details:", user);
 
       return NextResponse.json({
         message: "Welcome Back",
@@ -56,13 +55,11 @@ export async function POST(request) {
       if (referringUser) {
         referringUser.referralCount = (referringUser.referralCount || 0) + 1;
         await referringUser.save();
-        console.log("Updated referring user's referral count:", referringUser);
       } else {
         console.warn("Referral code not found:", referralCode);
       }
     }
 
-    console.log("New user before save:", user);
     await user.save();
     // Verify the saved user
     const savedUser = await User.findOne({ userId }).lean();

@@ -27,6 +27,10 @@ module.exports = {
             transform: "translateY(0)",
           },
         },
+        background: {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
         rotate: {
           "0%": { transform: "rotate(0deg)" },
           "100%": { transform: "rotate(40deg)" },
@@ -51,11 +55,13 @@ module.exports = {
         cinzel: ["Cinzel", "serif"],
         kronaOne: ["Krona One", "sans-serif"],
         raleway: ["Raleway", "sans-serif"],
+        montserrat: ["Montserrat", "sans-serif"],
       },
       animation: {
         "bounce-in-down": "bounce-in-down 1s ease-out",
         rotate: "rotate 10s linear infinite",
         glow: "glow 1.5s infinite alternate",
+        border: "background ease infinite",
       },
       colors: {
         "gold-500": "#E4AD00",
@@ -66,5 +72,5 @@ module.exports = {
       },
     },
   },
-  plugins: [ ],
+  plugins: [],
 };
