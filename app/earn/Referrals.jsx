@@ -36,27 +36,34 @@ const Referrals = () => {
   return (
     <section className="px-8">
       <div className="text-center my-6 text-2xl">
-        <h1 className="font-bold ">INVITE FRIENDS!</h1>
+        <h1 className="font-bold ">
+          INVITE <span className="text-gold-500">FRIENDS!</span>
+        </h1>
         <p className="text-sm my-2">Refer & earn 1000 points</p>
-        <div className="bg-neutral-700 p-4 rounded-lg text-sm flex justify-center gap-2 items-center mx-auto w-[300px] my-4">
-          <input
-            className="bg-inherit border-none overflow-x-scroll text-neutral-200"
-            type="text"
-            name="referral"
-            id="referral"
-            value={referralLink || "Fetching ref link..."}
-            readOnly
-          />
-          <span className="opacity-50">|</span>
-          <span
-            className="flex items-center gap-2 justify-between cursor-pointer"
-            onClick={() => {
-              navigator.clipboard.writeText(referralLink);
-              alert("Referral link copied to clipboard!");
-            }}>
-            copy <IoCopy />
-          </span>
+
+        <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 text-xs md:text-sm my-8">
+          <div className="flex items-center justify-between gap-2 rounded-[10px] p-4 bg-gray-900">
+            <input
+              className="bg-inherit border-none overflow-x-scroll text-neutral-200"
+              type="text"
+              name="referral"
+              id="referral"
+              value={referralLink || "Fetching link..."}
+              readOnly
+            />
+            <span className="opacity-50">|</span>
+            <span
+              className="flex items-center gap-2 justify-between cursor-pointer"
+              onClick={() => {
+                navigator.clipboard.writeText(referralLink);
+                alert("Referral link copied to clipboard!");
+              }}>
+              <div>copy</div>
+              <IoCopy />
+            </span>
+          </div>
         </div>
+
         <div className="flex items-center justify-center gap-2">
           <span>My referrals:</span>
           <span id="referrals" className="font-bold text-yellow-500">
@@ -67,7 +74,7 @@ const Referrals = () => {
 
       <div className="my-12 flex flex-col gap-4 mx-4">
         <h1>YOUR ACHIEVEMENTS!</h1>
-        <div className="bg-neutral-700 flex gap-4 rounded-xl p-2">
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
           <img src="frameIq.svg" alt="iq" className="rounded-full " />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>
@@ -82,11 +89,11 @@ const Referrals = () => {
             />
           </div>
         </div>
-        <div className="bg-neutral-700 flex gap-4 rounded-xl p-2">
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
           <img
             src="star.svg"
             alt="iq"
-            className="my-2 p-1 rounded-full bg-neutral-800"
+            className="my-2 p-1 rounded-full bg-gray-800"
           />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>
@@ -101,11 +108,11 @@ const Referrals = () => {
             />
           </div>
         </div>
-        <div className="bg-neutral-700 flex gap-4 rounded-xl p-2">
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
           <img
             src="frameIq1.svg"
             alt="iq"
-            className=" p-2 my-1 rounded-full bg-neutral-800 "
+            className=" p-2 my-1 rounded-full bg-gray-800 "
           />
           <div className=" flex flex-col w-full text-sm gap-1">
             <p>IQ Count: Snail Lord</p>

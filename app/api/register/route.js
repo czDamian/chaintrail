@@ -53,7 +53,8 @@ export async function POST(request) {
     if (referralCode) {
       const referringUser = await User.findOne({ referralCode });
       if (referringUser) {
-        referringUser.referralCount = (referringUser.referralCount || 0) + 1;
+        referringUser.referralCount = (referringUser.referralCount || 0) + 1; 
+        referringUser.points = (referringUser.points || 0) + 1000;
         await referringUser.save();
       } else {
         console.warn("Referral code not found:", referralCode);

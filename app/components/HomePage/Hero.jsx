@@ -5,7 +5,6 @@ import { FaTelegram } from "react-icons/fa";
 import Button from "../Reusable/Button";
 import Loader from "@/app/loader";
 import { raleway } from "../Reusable/Font";
-import { cinzel } from "../Reusable/Font";
 const Hero = () => {
   const { userInfo, isLoading } = useTelegramAuth();
 
@@ -14,19 +13,19 @@ const Hero = () => {
   }
 
   return (
-    <div className="relative mt-[-20px] md:mt-0 w-screen h-screen  flex flex-col items-center justify-center bg-black">
+    <div className="relative mt-[-20px] md:mt-0 w-screen h-screen  flex flex-col items-center justify-center">
       <Image
         width={1000}
         height={1000}
         src="/loader/background.png"
         alt="background"
-        className="absolute top-[-20px] xs:top-[-60px] left-[-130px] rotate-180 w-full sm:max-w-[750px] max-h-[50vh] min-w-[100vw] object-cover scale-150"
+        className="absolute top-[-20px] xs:top-[-60px] left-[-130px] md:left-[-300px] rotate-180 w-full sm:max-w-[350px] max-h-[50vh] min-w-[100vw] object-cover scale-150 md:scale-100"
       />
 
       <div className="z-10 font-raleway pt-20 text-center">
         <h1
-          className={`${cinzel.className} text-5xl font-cinzel md:text-7xl  mb-4`}>
-          CHAIN TRAIL <span className="mt-4 block">STUDIO</span>
+          className={`text-5xl font-cinzel md:text-7xl  mb-4 bg-gradient-to-r from-green-500 from-20% to-gold-500 bg-clip-text font-extrabold text-transparent sm:text-5xl`}>
+          CHAIN TRAIL <span className="block pt-2"> STUDIO</span>
         </h1>
 
         <p
@@ -36,15 +35,15 @@ const Hero = () => {
         </p>
         <Button
           href="/quests"
-          className="flex px-8 mb-4 mx-auto text-xs gap-2 text-black bg-gold-500 hover:bg-gold-400 transition-colors duration-300 py-3 hover:scale-105">
+          className="flex px-8 mb-4 mx-auto text-xs gap-2 text-black bg-gold-500 hover:bg-gold-400 transition-colors font-bold duration-300 py-3 hover:scale-105">
           play now
         </Button>
 
         {userInfo ? (
           <Button
             href="/quests"
-            className="flex mx-auto text-xs gap-2 md:text-2xl hover:scale-105">
-            play now
+            className="flex mx-auto text-xs gap-2 hover:scale-105 border">
+            play on
             <span className="animate-pulse text-xl">
               <FaTelegram />
             </span>

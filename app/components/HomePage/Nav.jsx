@@ -38,12 +38,12 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed bg-black  px-0 sm:px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 font-cinzel ${
+      className={`fixed bg-gray-950  px-0 sm:px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 font-cinzel ${
         isSticky
-          ? "bg-gradient-to-b from-neutral-950 from-5% to-neutral-900 shadow-md"
-          : "bg-black"
+          ? "bg-gradient-to-b from-gray-950 from-5% to-gray-900 shadow-md"
+          : "bg-gray-950"
       }`}>
-      <div className="mx-auto px-1 md:px-4 py-3 sm:py-5 flex justify-between items-center">
+      <div className="mx-auto px-1 md:px-4 py-3 sm:py-4 flex justify-between items-center">
         <Link
           href="/"
           className="flex items-center space-x-2 animate-bounce-in-down">
