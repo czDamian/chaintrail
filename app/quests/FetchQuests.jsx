@@ -61,7 +61,7 @@ const FetchQuestsFromDb = () => {
                     {quest.questStatus}
                   </Button>
                 </div>
-                <div className="mx-3 pb-2 text-xs text-center">
+                <div className="mx-3 pb-2 text-xs text-justify">
                   {quest.questDescription ||
                     "Embark on Word Trails, learn about blockchain - Think, Tap, Win. Earn Tokens and NFTs"}
                 </div>

@@ -31,16 +31,8 @@ export default function UserProfile() {
               <span className="font-bold">Points:</span> {userInfo.points}
             </p>
             <p>
-              <span className="font-bold">Play Pass left:</span>{" "}
+              <span className="font-bold">Play Pass:</span>
               {userInfo.playPass}
-            </p>
-            <p>
-              <span className="font-bold">Referrals:</span>
-              {userInfo.referralCount}
-            </p>
-            <p>
-              <span className="font-bold">Referral Link:</span>
-              https://t.me/ChainTrailBot?start{userInfo.referralCode}
             </p>
             <p>
               <span className="font-bold">User since:</span> {formattedDate}

@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { IoCopy } from "react-icons/io5";
+import Toast from "../components/Reusable/Toast";
 
 const Referrals = () => {
   const [referralLink, setReferralLink] = useState("");
   const [referralCount, setReferralCount] = useState(0);
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const fetchReferralData = async () => {
@@ -33,6 +35,12 @@ const Referrals = () => {
     fetchReferralData();
   }, []);
 
+  const copyReferralLink = () => {
+    navigator.clipboard.writeText(referralLink);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+  };
+
   return (
     <section className="px-8">
       <div className="text-center my-6 text-2xl">
@@ -54,10 +62,7 @@ const Referrals = () => {
             <span className="opacity-50">|</span>
             <span
               className="flex items-center gap-2 justify-between cursor-pointer"
-              onClick={() => {
-                navigator.clipboard.writeText(referralLink);
-                alert("Referral link copied to clipboard!");
-              }}>
+              onClick={copyReferralLink}>
               <div>copy</div>
               <IoCopy />
             </span>
@@ -71,7 +76,6 @@ const Referrals = () => {
           </span>
         </div>
       </div>
-
       <div className="my-12 flex flex-col gap-4 mx-4">
         <h1>YOUR ACHIEVEMENTS!</h1>
         <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
@@ -128,6 +132,13 @@ const Referrals = () => {
           </div>
         </div>
       </div>
+      {showToast && (
+        <Toast
+          message="Referral link copied to clipboard!"
+          borderLeftColor="border-blue-500"
+          className="animate-slide-in-right"
+        />
+      )}
     </section>
   );
 };
