@@ -149,7 +149,7 @@ const ClaimDailyReward = () => {
             className={`px-20 py-2 bg-yellow-500 hover:bg-yellow-400 active:scale-105 text-black font-bold rounded-md ${
               !canClaim ? "opacity-50 cursor-not-allowed text-xs" : ""
             }`}>
-            {canClaim ? "CLAIM" : "Already Claimed"}
+            {canClaim ? "CLAIM" : "Claimed"}
           </Button>
         </div>
         {nextClaimTime && (

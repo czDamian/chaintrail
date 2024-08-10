@@ -22,7 +22,7 @@ const Button = ({ children, onClick, href, className = "" }) => {
       onClick={handleClick}
       className={`
         ${kronaOne.className}
-         inline-block px-8 py-2 bg-gradient-to-b font-bold rounded text-sm text-center  uppercase tracking-wider ${className}
+         inline-block px-8 py-2 bg-gradient-to-b font-bold rounded text-sm text-center uppercase tracking-wider ${className}
       `}
       style={{
         clipPath: "polygon(12% 0, 100% 0%, 100% 60%, 90% 100%, 0 100%, 0 40%)",

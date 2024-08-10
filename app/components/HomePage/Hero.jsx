@@ -1,7 +1,6 @@
 "use client";
 import Image from "next/image";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { FaTelegram } from "react-icons/fa";
 import Button from "../Reusable/Button";
 import Loader from "@/app/loader";
 import { raleway } from "../Reusable/Font";
@@ -42,19 +41,31 @@ const Hero = () => {
         {userInfo ? (
           <Button
             href="/quests"
-            className="flex mx-auto text-xs gap-2 hover:scale-105 border">
-            play on
-            <span className="animate-pulse text-xl">
-              <FaTelegram />
+            className="flex mx-auto text-xs gap-0.5 hover:scale-105 border items-center">
+            <span>Play on</span>
+            <span className="animate-pulse">
+              <Image
+                src="telegram.svg"
+                height={100}
+                width={100}
+                alt="telegram"
+                className="w-6 "
+              />
             </span>
           </Button>
         ) : (
           <Button
             href="https://t.me/ChainTrailBot"
-            className="flex mx-auto text-xs gap-2 bg-black hover:bg-neutral-950 text-white border border-white transition-colors duration-300 hover:scale-105">
-            Play on
-            <span className="animate-pulse text-xl">
-              <FaTelegram />
+            className="flex mx-auto text-xs gap-0.5 hover:scale-105 border items-center">
+            <span>Play on</span>
+            <span className="animate-pulse">
+              <Image
+                src="telegram.svg"
+                height={100}
+                width={100}
+                alt="telegram"
+                className="w-6 "
+              />
             </span>
           </Button>
         )}

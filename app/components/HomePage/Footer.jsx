@@ -22,10 +22,10 @@ const Footer = () => {
       github: "https://github.com/chiscookeke11",
     },
     {
-      name: "Agbasieje Peace Chioma",
+      name: "Osatuyi Flora",
       role: "UI/UX Designer",
-      image: "/team/photo_2024-07-25_02-29-06.jpg",
-      twitter: "https://x.com/oluwa_chioma/status/1786824275749486960?s=46",
+      image: "/team/Flora.jpg",
+      github: "https://x.com/oluwa_chioma",
     },
     {
       name: "Princewill Emeka",
@@ -34,10 +34,10 @@ const Footer = () => {
       github: "https://github.com/Prnzwil",
     },
     {
-      name: "Osatuyi Flora",
+      name: "Agbasieje Peace Chioma",
       role: "UI/UX Designer",
-      image: "/team/Flora.jpg",
-      github: "https://x.com/oluwa_chioma",
+      image: "/team/photo_2024-07-25_02-29-06.jpg",
+      twitter: "https://x.com/oluwa_chioma/status/1786824275749486960?s=46",
     },
   ];
 

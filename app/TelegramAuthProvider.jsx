@@ -2,6 +2,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { usePathname, useRouter } from "next/navigation";
 
 const TelegramAuthContext = createContext();
 
@@ -9,17 +10,45 @@ export default function TelegramAuthProvider({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
+  const [navigationHistory, setNavigationHistory] = useState([]);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     if (window.Telegram?.WebApp) {
       const user = window.Telegram.WebApp.initDataUnsafe?.user;
       const queryString = window.Telegram.WebApp.initData || "";
       const urlParams = new URLSearchParams(queryString);
-      const referralCode = urlParams.get("start"); // Extract referral code from URL
+      const referralCode = urlParams.get("start");
       const app = window.Telegram.WebApp;
       app.ready();
       app.expand();
       app.enableClosingConfirmation();
+
+      // Update navigation history
+      setNavigationHistory((prevHistory) => {
+        if (prevHistory[prevHistory.length - 1] !== pathname) {
+          return [...prevHistory, pathname];
+        }
+        return prevHistory;
+      });
+
+      // Manage back button
+      if (pathname !== "/") {
+        app.BackButton.show();
+        app.BackButton.onClick(() => {
+          const newHistory = [...navigationHistory];
+          newHistory.pop(); // Remove current page
+          const previousPage = newHistory.pop(); // Get previous page
+          if (previousPage) {
+            router.push(previousPage);
+          } else {
+            app.close(); // If no previous page, close the WebApp
+          }
+        });
+      } else {
+        app.BackButton.hide();
+      }
 
       if (referralCode) {
         localStorage.setItem("referralCode", referralCode);
@@ -29,7 +58,7 @@ export default function TelegramAuthProvider({ children }) {
         registerUser(user.id.toString(), user.username || "", "telegram");
       }
     }
-  }, []);
+  }, [pathname, navigationHistory, router]);
 
   const fetchUserInfo = async (userId) => {
     try {
@@ -95,7 +124,6 @@ export default function TelegramAuthProvider({ children }) {
       }
 
       const data = await response.json();
-      console.log("Points updated successfully on the server:", data);
     } catch (error) {
       console.error("Error updating points:", error.message, error.stack);
       setUserPoints((prevPoints) => prevPoints - increment);

@@ -42,7 +42,7 @@ const Daily = () => {
                   alt={`Game ${index + 1}`}
                   width={1000}
                   height={1000}
-                  className="hover:scale-105 opacity-80 w-fit max-w-[240px] min-h-[400px] md:min-h-[450px]"
+                  className="hover:scale-105 opacity-80 w-fit max-w-60 min-h-[400px] md:min-h-[450px]"
                 />
               </div>
             </SwiperSlide>
@@ -53,7 +53,7 @@ const Daily = () => {
 
       <div className="text-center mt-10">
         <Button
-          className="bg-gold-500 text-xs md:text-lg hover:scale-105 text-black py-3"
+          className="bg-yellow-500 text-black py-3 px-6 rounded hover:scale-105 transition-transform duration-300"
           href="/quests">
           Play Now
         </Button>
