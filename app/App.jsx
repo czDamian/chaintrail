@@ -10,14 +10,12 @@ export default function App() {
   return (
     <main className="mt-20">
       <Hero />
-      <div className="bg-dark-700">
-        <NFTSection />
-        <Daily />
-        <ClaimDailyReward />
-        <HowToPlay />
-        <Partners />
-        <Footer />
-      </div>
+      <NFTSection />
+      <Daily />
+      <ClaimDailyReward />
+      <HowToPlay />
+      <Partners />
+      <Footer />
     </main>
   );
 }

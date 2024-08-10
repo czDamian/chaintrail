@@ -1,7 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
 import Image from "next/image";
-import Button from "../Reusable/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css/bundle"; // Import Swiper styles
 import { Pagination, Autoplay } from "swiper/modules";
@@ -44,9 +42,11 @@ const steps = [
 
 const HowToPlay = () => {
   return (
-    <div className="p-6 max-w-xs mx-auto text-center">
-      <h1 className="text-3xl md:text-4xl font-bold mb-4">HOW TO PLAY</h1>
-      <div className="p-3 bg-dark-900 rounded-xl">
+    <div className="p-6 max-w-xs mx-auto text-center py-12">
+      <h1 className="text-3xl md:text-4xl font-bold mb-4">
+        HOW TO <span className="text-gold-500">PLAY</span>
+      </h1>
+      <div className="p-3 bg-gray-900 rounded-xl">
         <Swiper
           modules={[Pagination, Autoplay]}
           spaceBetween={20}

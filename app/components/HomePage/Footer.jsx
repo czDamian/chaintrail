@@ -42,7 +42,7 @@ const Footer = () => {
   ];
 
   return (
-    <footer className=" w-full bg-[#4a4a4a] py-12">
+    <footer className=" w-full bg-slate-700 py-12">
       <div className=" px-4">
         <div className="">
           <div className="p-2 my-4">
@@ -57,7 +57,7 @@ const Footer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block">
-                  <div className=" overflow-hidden flex items-center justify-start hover:bg-neutral-800 rounded-lg px-1">
+                  <div className=" overflow-hidden flex items-center justify-start hover:bg-slate-800 rounded-lg px-2">
                     <Image
                       src={member.image}
                       alt={member.name}

@@ -43,8 +43,8 @@ export default function CreateQuest() {
   };
 
   return (
-    <section className="mt-20">
-      <div className="max-w-md mx-auto mt-10 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
+    <section className="my-20">
+      <div className="max-w-md mx-auto mt-10 p-6 bg-gray-800 text-white rounded-lg shadow-xl">
         <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">New Quest</h1>
@@ -90,7 +90,7 @@ export default function CreateQuest() {
               onChange={handleChange}
               className="w-full px-3 py-2 rounded-md">
               <option value="locked">Locked</option>
-              <option value="open">Open</option>
+              <option value="open " className="">Open</option>
               <option value="completed">Completed</option>
             </select>
           </div>

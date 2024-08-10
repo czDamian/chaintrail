@@ -113,7 +113,7 @@ export default function EditQuestion() {
 
   return (
     <section>
-      <div className="max-w-6xl mx-auto mt-20 p-6 bg-neutral-700 rounded-lg shadow-xl">
+      <div className="max-w-6xl mx-auto my-20 p-6 bg-slate-700 rounded-lg shadow-xl">
         <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">Edit Question</h1>
@@ -221,8 +221,8 @@ export default function EditQuestion() {
           </div>
         </form>
       </div>
-      <SideNav />
       <ToastContainer />
+      <SideNav />
     </section>
   );
 }

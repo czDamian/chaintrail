@@ -37,34 +37,54 @@ export default function UserList() {
   if (loading) {
     return (
       <div className="p-4 bg-gray-900 min-h-screen">
-        <h1 className="text-2xl font-bold text-white mb-4">Registered Users</h1>
+        <h1 className="text-2xl font-bold text-white mb-4">All Users</h1>
         <div className="overflow-x-auto">
-          <table className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+          <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-900">
             <thead>
               <tr className="bg-gray-700 border-b border-gray-600">
-                <th className="px-4 py-2 text-left text-gray-400">ID</th>
-                <th className="px-4 py-2 text-left text-gray-400 max-w-36">
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                  ID
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
                   User ID
                 </th>
-                <th className="px-4 py-2 text-left text-gray-400">Username</th>
-                <th className="px-4 py-2 text-left text-gray-400">Points</th>
-                <th className="px-4 py-2 text-left text-gray-400">
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                  Username
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                  Points
+                </th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
                   Registered On
                 </th>
-                <th className="px-4 py-2 text-left text-gray-400">Role</th>
+                <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                  Role
+                </th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {[...Array(usersPerPage)].map((_, index) => (
                 <tr
                   key={index}
                   className="border-b border-gray-600 animate-pulse">
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
-                  <td className="px-4 py-2 text-gray-300 bg-gray-800">.</td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200">
+                    .
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -116,24 +136,30 @@ export default function UserList() {
         <h1 className="text-2xl font-bold">Registered Users</h1>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full bg-gray-800 border border-gray-700 rounded-lg shadow-md">
+        <table className="min-w-full divide-y-2 divide-gray-200 bg-white text-sm dark:divide-gray-700 dark:bg-gray-900">
           <thead>
             <tr className="bg-gray-700 border-b border-gray-600">
-              <th className="px-4 py-2 text-left text-gray-400">ID</th>
-              <th className="px-4 py-2 text-left text-gray-400">User ID</th>
-              <th className="px-4 py-2 text-left text-gray-400">Username</th>
+              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                ID
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                User ID
+              </th>
+              <th className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
+                Username
+              </th>
               <th
-                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
+                className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white cursor-pointer"
                 onClick={() => {
                   setSortField("points");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
                 }}>
-                Points
+                Points{" "}
                 {sortField === "points" &&
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
-                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
+                className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white cursor-pointer"
                 onClick={() => {
                   setSortField("registeredOn");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -143,7 +169,7 @@ export default function UserList() {
                   (sortDirection === "asc" ? "↑" : "↓")}
               </th>
               <th
-                className="px-4 py-2 text-left text-gray-400 cursor-pointer"
+                className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white cursor-pointer"
                 onClick={() => {
                   setSortField("role");
                   setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -153,29 +179,29 @@ export default function UserList() {
               </th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
             {currentUsers.map((user, index) => (
               <tr key={user._id} className="border-b border-gray-600">
-                <td className="px-4 py-2 text-gray-300">
+                <td className="whitespace-nowrap px-4 py-2 font-medium text-gray-900 dark:text-white">
                   {indexOfFirstUser + index + 1}
                 </td>
-                <td className="px-4 py-2 text-gray-300 overflow-hidden">
+                <td className="whitespace-nowrap px-4 py-2 text-gray-700 dark:text-gray-200 overflow-hidden">
                   <button
                     onClick={() => copyUserId(user.userId.toString())}
                     className="hover:underline max-w-36">
                     {user.userId}
                   </button>
                 </td>
-                <td className="px-4 py-2 max-w-36 text-gray-300">
+                <td className="whitespace-nowrap px-4 py-2 max-w-36 text-gray-700 dark:text-gray-200">
                   {user.username}
                 </td>
-                <td className="px-4 py-2 max-w-36 text-gray-300">
+                <td className="whitespace-nowrap px-4 py-2 max-w-36 text-gray-700 dark:text-gray-200">
                   {user.points}
                 </td>
-                <td className="px-4 py-2 max-w-36 text-gray-300">
+                <td className="whitespace-nowrap px-4 py-2 max-w-36 text-gray-700 dark:text-gray-200">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
-                <td className="px-4 py-2 max-w-36 text-gray-300">
+                <td className="whitespace-nowrap px-4 py-2 max-w-36 text-gray-700 dark:text-gray-200">
                   {user.role}
                 </td>
               </tr>
@@ -193,6 +219,18 @@ export default function UserList() {
             disabled={currentPage === 1}>
             Prev
           </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              className={`px-4 py-2 border rounded-lg ${
+                currentPage === i + 1
+                  ? "text-yellow-500 bg-gray-700 border-gray-600"
+                  : "text-white bg-gray-800 border-gray-700"
+              }`}
+              onClick={() => handlePageChange(i + 1)}>
+              {i + 1}
+            </button>
+          ))}
           <button
             className={`px-4 py-2 border rounded-lg text-white bg-gray-700 border-gray-600 ${
               currentPage === totalPages ? "opacity-50 cursor-not-allowed" : ""
@@ -203,6 +241,7 @@ export default function UserList() {
           </button>
         </div>
       </div>
+      <ToastContainer />
       <SideNav />
     </div>
   );

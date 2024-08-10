@@ -78,7 +78,7 @@ export default function DeleteQuest() {
 
   return (
     <section>
-      <div className="max-w-md mx-auto mt-20 min-w-60 p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
+      <div className="max-w-md min-w-72 mx-auto my-20 p-6 bg-gray-800 text-white rounded-lg shadow-xl">
         <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">Delete Quest</h1>

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import Button from "../Reusable/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/bundle"; // Import Swiper styles
+import "swiper/css/bundle";
 import { Pagination, Autoplay } from "swiper/modules";
 
 const Daily = () => {
@@ -13,7 +13,7 @@ const Daily = () => {
   ];
 
   return (
-    <div className="bg-[#151515] py-12">
+    <div className="my-20 py-20">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4 animate__animated">GAMES</h1>
         <p className="text-lg text-gray-300">Think. Tap. Win. Points</p>

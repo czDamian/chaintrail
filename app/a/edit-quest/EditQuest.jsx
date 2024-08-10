@@ -83,7 +83,7 @@ export default function EditQuest() {
       });
       if (response.ok) {
         toast.success("Quest updated successfully!");
-        router.push("/quests"); // Redirect to quests list or another page after update
+        router.push("/quests"); 
       } else {
         throw new Error("Failed to update quest");
       }
@@ -95,7 +95,7 @@ export default function EditQuest() {
 
   return (
     <section>
-      <div className="max-w-md min-w-64 mt-20 mx-auto p-6 bg-neutral-700 text-white rounded-lg shadow-xl">
+      <div className="max-w-md min-w-64 my-20 mx-auto p-6 bg-slate-800 text-white rounded-lg shadow-xl">
         <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">Edit Quest</h1>
