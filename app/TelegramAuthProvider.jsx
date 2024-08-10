@@ -16,6 +16,10 @@ export default function TelegramAuthProvider({ children }) {
       const queryString = window.Telegram.WebApp.initData || "";
       const urlParams = new URLSearchParams(queryString);
       const referralCode = urlParams.get("start"); // Extract referral code from URL
+      const app = window.Telegram.WebApp;
+      app.ready();
+      app.expand();
+      app.enableClosingConfirmation();
 
       if (referralCode) {
         localStorage.setItem("referralCode", referralCode);
