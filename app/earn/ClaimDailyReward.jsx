@@ -1,24 +1,21 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import Toast from "../components/Reusable/Toast";
 import Button from "../components/Reusable/Button";
-import { useRouter } from "next/navigation";
 
 const ClaimDailyReward = () => {
-  const { userInfo, isLoading } = useTelegramAuth();
   const [nextClaimTime, setNextClaimTime] = useState(null);
   const [canClaim, setCanClaim] = useState(false);
   const [timeLeft, setTimeLeft] = useState({});
-  const router = useRouter();
+  const [toastMessage, setToastMessage] = useState(null);
+  const [toastBorderColor, setToastBorderColor] = useState("");
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (userId) {
       checkClaimStatus(userId);
     } else {
-      console.error("User ID not found in local storage");
+      console.warn("User ID not found in local storage");
     }
   }, []);
 
@@ -31,6 +28,16 @@ const ClaimDailyReward = () => {
       return () => clearInterval(interval); // Clean up interval on component unmount
     }
   }, [nextClaimTime]);
+
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 1500); // Hide the toast after 1.5 seconds
+
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
 
   const updateTimeLeft = () => {
     const now = new Date();
@@ -56,8 +63,6 @@ const ClaimDailyReward = () => {
       const response = await fetch(`/api/claim?userId=${userId}`);
       const data = await response.json();
       if (response.ok) {
-        console.log("API Response:", data);
-
         if (data.message === "Daily reward and pass not available yet") {
           setCanClaim(false);
           setNextClaimTime(data.nextClaimTime);
@@ -76,11 +81,10 @@ const ClaimDailyReward = () => {
   const claimRewardAndPass = async () => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      console.error("User ID not found in local storage");
+      console.warn("User ID not found in local storage");
       return;
     }
 
-    console.log("Claim reward and pass initiated");
     try {
       const response = await fetch("/api/claim", {
         method: "PUT",
@@ -90,36 +94,40 @@ const ClaimDailyReward = () => {
         body: JSON.stringify({ userId }),
       });
 
-      console.log("Response received from /api/claim:", response);
       const data = await response.json();
-      console.log("Parsed response data:", data);
 
       if (response.ok) {
-        toast.success(data.message);
+        setToastMessage(data.message);
+        setToastBorderColor("border-green-600");
         setNextClaimTime(data.nextClaimTime);
         setCanClaim(false);
       } else {
         if (data.nextClaimTime) {
-          toast.info("Already claimed, try again later.");
+          setToastMessage("Already claimed, try again later.");
+          setToastBorderColor("border-blue-600");
           setNextClaimTime(data.nextClaimTime);
         } else {
-          toast.error(data.message);
+          setToastMessage(data.message);
+          setToastBorderColor("border-red-600");
         }
       }
     } catch (error) {
       console.error("Error claiming reward and pass:", error);
-      toast.error("Error claiming reward and pass");
+      setToastMessage("Error claiming reward and pass");
+      setToastBorderColor("border-red-600");
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center my-10">
-      <ToastContainer />
+      {toastMessage && (
+        <Toast message={toastMessage} borderLeftColor={toastBorderColor} />
+      )}
       <div className="bg-gray-900 p-6 rounded-xl shadow-lg">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">DAILY BONUS</h1>
           <p className="text-sm mb-6">
-            Get Free Coins and Play Pass for logging into the game daily 
+            Get Free Coins and Play Pass for logging into the game daily
           </p>
         </div>
         <div className="grid grid-cols-2 gap-6 mb-6">
@@ -155,8 +163,7 @@ const ClaimDailyReward = () => {
         {nextClaimTime && (
           <div className="text-center mt-4">
             <p>
-              Next claim time: {timeLeft.days}d {timeLeft.hours}h
-              {timeLeft.minutes}m {timeLeft.seconds}s
+              Next claim time: {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
             </p>
           </div>
         )}

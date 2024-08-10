@@ -4,17 +4,19 @@ import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { ethers } from "ethers";
 import { FaCheckCircle } from "react-icons/fa";
 import { CgClose } from "react-icons/cg";
-import Popup from "../HomePage/Popup";
 import Button from "../Reusable/Button";
+import Image from "next/image";
+import Link from "next/link";
+import Toast from "../Reusable/Toast";
 
 export default function Profile() {
-  const { userInfo, registerUser, fetchUserInfo, isLoading } =
-    useTelegramAuth();
+  const { userInfo, registerUser, fetchUserInfo } = useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [walletAddress, setWalletAddress] = useState("");
   const [isWalletConnected, setIsWalletConnected] = useState(false);
-  const [showInstallMetamaskPopup, setShowInstallMetamaskPopup] =
+  const [showInstallMetamaskToast, setShowInstallMetamaskToast] =
     useState(false);
+  const [isDesktop, setIsDesktop] = useState(true);
 
   const openPopup = () => setIsPopupOpen(true);
   const closePopup = () => setIsPopupOpen(false);
@@ -28,6 +30,12 @@ export default function Profile() {
       }
       fetchUserInfo(savedUserId);
     }
+
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isMobile = /android|ipad|iphone|ipod|opera mini|mobile/i.test(
+      userAgent
+    );
+    setIsDesktop(!isMobile);
   }, []);
 
   const handleWalletConnect = async () => {
@@ -49,7 +57,8 @@ export default function Profile() {
           console.error("Failed to get wallet address");
         }
       } else {
-        setShowInstallMetamaskPopup(true);
+        setShowInstallMetamaskToast(true);
+        setTimeout(() => setShowInstallMetamaskToast(false), 2000); // Hide after 2 seconds
       }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
@@ -60,14 +69,6 @@ export default function Profile() {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
   };
 
-  if (isLoading) {
-    return (
-      <Button className="border border-white bg-black hover:border-gold-500 text-xs">
-        CONNECT
-      </Button>
-    );
-  }
-
   return (
     <div className="text-xs md:text-lg font-raleway">
       {userInfo ? (
@@ -76,33 +77,62 @@ export default function Profile() {
           {userInfo.username || trimWalletAddress(userInfo.userId)}
         </p>
       ) : (
-        <div
+        <Button
           onClick={openPopup}
-          className="animate-bounce-in-down focus:outline-none">
-          <Button className="border border-white bg-black hover:border-gold-500 text-xs">
-            CONNECT
-          </Button>
-        </div>
+          className="border border-white bg-black hover:border-gold-500 text-xs animate-bounce-in-down focus:outline-none">
+          CONNECT
+        </Button>
       )}
-      <Popup
-        isOpen={isPopupOpen}
-        onClose={closePopup}
-        connectWallet={handleWalletConnect}
-      />
 
-      {showInstallMetamaskPopup && (
+      {isPopupOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-slate-950 rounded-lg shadow-xl p-4 w-80 relative">
-            <button
-              onClick={() => setShowInstallMetamaskPopup(false)}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
-              <CgClose className="text-lg" />
-            </button>
-            <p className="text-white mt-8 text-center mb-4">
-              Please install MetaMask extension!
-            </p>
+          <div className="bg-slate-950 rounded-lg shadow-xl w-80">
+            <div className="p-4">
+              <div className="flex justify-end">
+                <button
+                  onClick={closePopup}
+                  className="text-gray-500 my-2 p-1 hover:text-gray-700 text-lg">
+                  <CgClose />
+                </button>
+              </div>
+
+              <div className="space-y-4 py-2 text-lg">
+                {isDesktop && (
+                  <div
+                    onClick={handleWalletConnect}
+                    className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded">
+                    <p>Connect Wallet</p>
+                    <Image
+                      src="metamask.svg"
+                      width={30}
+                      height={30}
+                      alt="metamask"
+                    />
+                  </div>
+                )}
+                <Link
+                  href="https://t.me/ChainTrailBot"
+                  className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded">
+                  <p>Play on Telegram</p>
+                  <Image
+                    src="telegram.svg"
+                    width={30}
+                    height={30}
+                    alt="telegram"
+                  />
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
+      )}
+
+      {showInstallMetamaskToast && (
+        <Toast
+          message="Please install MetaMask extension!"
+          borderLeftColor="border-l-red-500"
+          className=""
+        />
       )}
     </div>
   );
