@@ -7,7 +7,7 @@ import { ethers } from "ethers";
 await connectDb();
 
 export async function POST(request) {
-  const { userId, username } = await request.json();
+  const { userId, username, referralCode } = await request.json(); // Extract referralCode
 
   try {
     let user = await User.findOne({ userId });
@@ -37,7 +37,7 @@ export async function POST(request) {
 
     // User does not exist, create a new user with a wallet and referral code
     const walletDetails = createWalletWithMnemonic();
-    const referralCode = await generateAutoIncrementalReferralCode();
+    const newReferralCode = await generateAutoIncrementalReferralCode();
     user = new User({
       userId,
       username,
@@ -47,8 +47,20 @@ export async function POST(request) {
       publicKey: walletDetails.publicKey,
       privateKey: walletDetails.privateKey,
       mnemonic: walletDetails.mnemonic,
-      referralCode,
+      referralCode: newReferralCode,
     });
+
+    // Handle the referral code logic
+    if (referralCode) {
+      const referringUser = await User.findOne({ referralCode });
+      if (referringUser) {
+        referringUser.referralCount = (referringUser.referralCount || 0) + 1;
+        await referringUser.save();
+        console.log("Updated referring user's referral count:", referringUser);
+      } else {
+        console.warn("Referral code not found:", referralCode);
+      }
+    }
 
     console.log("New user before save:", user);
     await user.save();

@@ -11,17 +11,19 @@ export default function TelegramAuthProvider({ children }) {
   const [userPoints, setUserPoints] = useState(0);
 
   useEffect(() => {
-    const savedUserId = localStorage.getItem("userId");
-    if (savedUserId) {
-      fetchUserInfo(savedUserId);
-    } else {
-      if (window.Telegram?.WebApp) {
-        const user = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (user && user.id) {
-          registerUser(user.id.toString(), user.username || "", "telegram");
-        } else {
-          setIsLoading(false);
-        }
+    if (window.Telegram?.WebApp) {
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      const queryString = window.Telegram.WebApp.initData || "";
+      const urlParams = new URLSearchParams(queryString);
+      const referralCode = urlParams.get("start"); // Extract referral code from URL
+      console.log(referralCode);
+
+      if (referralCode) {
+        localStorage.setItem("referralCode", referralCode); // Store referral code
+      }
+
+      if (user && user.id) {
+        registerUser(user.id.toString(), user.username || "", "telegram");
       }
     }
   }, []);
@@ -45,6 +47,8 @@ export default function TelegramAuthProvider({ children }) {
   };
 
   const registerUser = async (userId, username, method) => {
+    const referralCode = localStorage.getItem("referralCode"); // Retrieve referral code from local storage
+
     try {
       setIsLoading(true);
       const response = await fetch("/api/register", {
@@ -52,13 +56,14 @@ export default function TelegramAuthProvider({ children }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userId, username, method }),
+        body: JSON.stringify({ userId, username, method, referralCode }),
       });
       const data = await response.json();
       if (response.ok) {
         setUserInfo(data);
         setUserPoints(data.points || 0);
         localStorage.setItem("userId", userId);
+        localStorage.removeItem("referralCode"); // Clean up referral code after registration
       } else {
         toast.error("Registration failed. Please try again.");
       }
