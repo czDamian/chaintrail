@@ -26,9 +26,10 @@ export default function Profile() {
     if (savedUserId) {
       setWalletAddress(savedUserId);
       setIsWalletConnected(true);
-      console.log("Your id is", savedUserId);
       fetchUserInfo(savedUserId);
     }
+      console.log("Your saved id is", savedUserId);
+
 
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isMobile = /android|ipad|iphone|ipod|opera mini|mobile/i.test(
@@ -67,6 +68,9 @@ export default function Profile() {
   const trimWalletAddress = (address) => {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
   };
+  console.log("Your id is", userInfo?.userId);
+  console.log("Your trimmed id is", trimWalletAddress(userInfo?.userId));
+  console.log("Your username is", userInfo?.username);
 
   return (
     <div className="text-xs md:text-lg font-raleway">
