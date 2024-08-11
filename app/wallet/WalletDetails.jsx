@@ -11,6 +11,11 @@ const trimAddress = (address) => {
   if (!address) return "";
   return `${address.slice(0, 6)}...${address.slice(-4)}`;
 };
+const trimBalance = (balance) => {
+  if (!balance) return "";
+  const formattedBalance = parseFloat(balance).toFixed(3);
+  return formattedBalance;
+};
 
 const WalletDetails = ({ walletAddress, chainName, balance }) => {
   // Determine the currency based on the chain name
@@ -26,7 +31,7 @@ const WalletDetails = ({ walletAddress, chainName, balance }) => {
         <p className="text-gray-600 uppercase">{chainName}</p>
         <p className="text-lg font-semibold">Balance:</p>
         <p className="text-gray-600">
-          {balance} {baseCurrency}
+          {trimBalance(balance)} {baseCurrency}
         </p>
       </div>
     </div>
