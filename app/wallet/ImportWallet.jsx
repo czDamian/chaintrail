@@ -1,14 +1,41 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ethers } from "ethers";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { FaCheckCircle } from "react-icons/fa";
+import WalletOptions from "./WalletOptions";
+import WalletDetails from "./WalletDetails";
+import DisconnectButton from "./DisconnectButton";
+import NetworkSwitcher from "./NetworkSwitcher ";
 
 const ImportWallet = () => {
-  const [importOption, setImportOption] = useState(null);
-  const [privateKey, setPrivateKey] = useState("");
-  const [seedPhrase, setSeedPhrase] = useState(Array(24).fill(""));
+  const [importOption, setImportOption] = useState("12words");
+  const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
+  const [wallet, setWallet] = useState(null);
+  const [chainName, setChainName] = useState("");
+  const [balance, setBalance] = useState(null);
+  const [selectedNetwork, setSelectedNetwork] = useState(
+    "https://rpc.sepolia.org"
+  );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const fetchWalletDetails = async () => {
+      if (wallet) {
+        try {
+          const provider = new ethers.JsonRpcProvider(selectedNetwork);
+          const balance = await provider.getBalance(wallet.address);
+          const network = await provider.getNetwork();
+          setChainName(network.name);
+          setBalance(ethers.formatEther(balance));
+        } catch (err) {
+          console.error("Error fetching wallet details:", err);
+        }
+      }
+    };
+
+    fetchWalletDetails();
+  }, [wallet, selectedNetwork]);
 
   const handleSeedPhraseChange = (index, value) => {
     const updatedSeedPhrase = [...seedPhrase];
@@ -17,7 +44,7 @@ const ImportWallet = () => {
 
     if (index === 0) {
       const words = value.trim().split(/\s+/);
-      if (words.length === 12 || words.length === 24) {
+      if (words.length === 12) {
         for (let i = 0; i < words.length; i++) {
           if (i < seedPhrase.length) {
             updatedSeedPhrase[i] = words[i];
@@ -30,123 +57,67 @@ const ImportWallet = () => {
 
   const connectWallet = async () => {
     try {
-      let wallet;
-      if (importOption === "privateKey" && privateKey) {
-        wallet = new ethers.Wallet(privateKey);
-      } else if (
-        (importOption === "12words" &&
-          seedPhrase.slice(0, 12).every(Boolean)) ||
-        (importOption === "24words" && seedPhrase.every(Boolean))
-      ) {
+      if (importOption === "12words" && seedPhrase.every(Boolean)) {
         const mnemonic = seedPhrase.join(" ");
-        wallet = ethers.Wallet.fromPhrase(mnemonic);
-      }
-
-      if (wallet) {
-        const provider = new ethers.JsonRpcProvider(
-          "https://mainnet.eth.aragon.network"
-        ); // Public node
-        const balance = await provider.getBalance(wallet.address);
-        console.log("Wallet Address:", wallet.address);
-        console.log("Balance:", ethers.formatEther(balance));
-
-        if (balance.gt(0)) {
-          setSuccess(true);
-          setError("");
-        } else {
-          setError("The wallet does not have any ETH.");
-          setSuccess(false);
-        }
+        const walletInstance = ethers.Wallet.fromPhrase(mnemonic); // Correct method for ethers v6
+        setWallet(walletInstance);
+        setSuccess(true);
+        setError("");
       } else {
-        setError("Invalid input. Please check your data.");
+        setError("FIelds cannot be empty");
         setSuccess(false);
       }
     } catch (err) {
       console.error("Error connecting wallet:", err);
-      setError("Failed to connect to the wallet. Please check your input.");
+      setError("Failed to import wallet");
       setSuccess(false);
     }
   };
 
+  const handleDisconnect = () => {
+    setWallet(null);
+    setChainName("");
+    setBalance(null);
+  };
+
   return (
-    <div className="flex flex-col  items-center space-y-4 mt-10">
-      <h2 className="text-2xl font-bold mb-4">Import Wallet</h2>
-      <div className=" mb-6 flex justify-between flex-wrap gap-2 items-center">
-        <button
-          onClick={() => setImportOption("privateKey")}
-          className={`px-4 py-2 rounded-md ${
-            importOption === "privateKey"
-              ? "bg-blue-800 text-white"
-              : "bg-gray-900"
-          }`}>
-          Import with Private Key
-        </button>
-        <button
-          onClick={() => setImportOption("12words")}
-          className={`px-4 py-2 rounded-md ${
-            importOption === "12words"
-              ? "bg-blue-800 text-white"
-              : "bg-gray-900"
-          }`}>
-          Import 12 Words Seed Phrase
-        </button>
-        <button
-          onClick={() => setImportOption("24words")}
-          className={`px-4 py-2 rounded-md ${
-            importOption === "24words"
-              ? "bg-blue-800 text-white"
-              : "bg-gray-900"
-          }`}>
-          Import 24 Words Seed Phrase
-        </button>
-      </div>
-
-      {importOption === "privateKey" && (
-        <textarea
-          className="border p-2 rounded-md w-full max-w-lg mb-4"
-          rows="4"
-          value={privateKey}
-          onChange={(e) => setPrivateKey(e.target.value)}
-          placeholder="Paste your private key here"
-        />
+    <div className="flex flex-col items-center space-y-4 mt-10">
+      {wallet ? (
+        <>
+          <WalletDetails
+            walletAddress={wallet.address}
+            chainName={chainName}
+            balance={balance}
+          />
+          <NetworkSwitcher
+            selectedNetwork={selectedNetwork}
+            setSelectedNetwork={setSelectedNetwork}
+          />
+          <DisconnectButton onDisconnect={handleDisconnect} />
+        </>
+      ) : (
+        <>
+          <h2 className="text-2xl font-bold mb-4">Import Wallet</h2>
+          <WalletOptions
+            importOption={importOption}
+            setImportOption={setImportOption}
+            seedPhrase={seedPhrase}
+            handleSeedPhraseChange={handleSeedPhraseChange}
+            connectWallet={connectWallet}
+          />
+          {success && (
+            <div className="flex items-center w-64 space-x-2 text-green-600">
+              <FaCheckCircle />
+              <p>Wallet connected successfully!</p>
+            </div>
+          )}
+          {error && (
+            <div className="text-sm text-red-600">
+              <p>{error}</p>
+            </div>
+          )}
+        </>
       )}
-
-      {(importOption === "12words" || importOption === "24words") && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-          {seedPhrase
-            .slice(0, importOption === "12words" ? 12 : 24)
-            .map((word, index) => (
-              <input
-                key={index}
-                type="text"
-                className="border p-2 rounded-md w-32"
-                value={word}
-                onChange={(e) => handleSeedPhraseChange(index, e.target.value)}
-                placeholder={`Word ${index + 1}`}
-              />
-            ))}
-        </div>
-      )}
-
-      {success && (
-        <div className="flex items-center w-64 space-x-2 text-green-600">
-          <FaCheckCircle />
-          <p>Wallet connected successfully!</p>
-        </div>
-      )}
-
-      {error && (
-        <div className="flex items-center w-64 space-x-2 text-red-600">
-          <FaTimesCircle />
-          <p>{error}</p>
-        </div>
-      )}
-
-      <button
-        onClick={connectWallet}
-        className="bg-green-500 w-72 text-white px-4 py-2 rounded-md mt-4">
-        Import Wallet
-      </button>
     </div>
   );
 };
