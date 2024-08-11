@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { format } from "date-fns";
@@ -8,6 +8,13 @@ export default function UserProfile() {
   const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
+
+  useEffect(() => {
+    const savedUserId = localStorage.getItem("userId");
+    if (savedUserId && (!userInfo || userInfo.userId !== savedUserId)) {
+      fetchUserInfo(savedUserId);
+    }
+  }, [fetchUserInfo, userInfo]);
 
   if (isLoading || !userInfo || !userInfo.userId) {
     return <div>Loading...</div>;
