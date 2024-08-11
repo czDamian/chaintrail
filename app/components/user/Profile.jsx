@@ -26,6 +26,7 @@ export default function Profile() {
     if (savedUserId) {
       setWalletAddress(savedUserId);
       setIsWalletConnected(true);
+      console.log("Your id is", savedUserId);
       fetchUserInfo(savedUserId);
     }
 
