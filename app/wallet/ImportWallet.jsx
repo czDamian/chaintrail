@@ -69,9 +69,9 @@ const ImportWallet = () => {
   };
 
   return (
-    <div className="flex flex-col items-center space-y-4 mt-10">
+    <div className="flex flex-col  items-center space-y-4 mt-10">
       <h2 className="text-2xl font-bold mb-4">Import Wallet</h2>
-      <div className=" mb-6 flex flex-wrap gap-2">
+      <div className=" mb-6 flex justify-between flex-wrap gap-2 items-center">
         <button
           onClick={() => setImportOption("privateKey")}
           className={`px-4 py-2 rounded-md ${
