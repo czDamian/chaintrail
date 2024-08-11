@@ -13,7 +13,7 @@ const WalletOptions = ({
       className={`px-4 py-2 rounded-md ${
         importOption === "12words" ? "bg-blue-800 text-white" : "bg-gray-900"
       }`}>
-      Import 12 Words Seed Phrase
+      Import Seed Phrase
     </button>
     {importOption === "12words" && (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">

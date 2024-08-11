@@ -24,10 +24,8 @@ export default function Profile() {
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
     if (savedUserId) {
-      if (savedUserId.startsWith("0x")) {
-        setWalletAddress(savedUserId);
-        setIsWalletConnected(true);
-      }
+      setWalletAddress(savedUserId);
+      setIsWalletConnected(true);
       fetchUserInfo(savedUserId);
     }
 
