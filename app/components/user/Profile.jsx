@@ -23,20 +23,19 @@ export default function Profile() {
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
-    if (savedUserId) {
+    if (savedUserId && !userInfo) {
       setWalletAddress(savedUserId);
       setIsWalletConnected(true);
       fetchUserInfo(savedUserId);
     }
-      console.log("Your saved id is", savedUserId);
-
+    console.log("Your saved id is", savedUserId);
 
     const userAgent = navigator.userAgent || navigator.vendor || window.opera;
     const isMobile = /android|ipad|iphone|ipod|opera mini|mobile/i.test(
       userAgent
     );
     setIsDesktop(!isMobile);
-  }, []);
+  }, [userInfo, fetchUserInfo]);
 
   const handleWalletConnect = async () => {
     try {
@@ -58,7 +57,7 @@ export default function Profile() {
         }
       } else {
         setShowInstallMetamaskToast(true);
-        setTimeout(() => setShowInstallMetamaskToast(false), 2000); // Hide after 2 seconds
+        setTimeout(() => setShowInstallMetamaskToast(false), 2000);
       }
     } catch (error) {
       console.error("Error connecting to wallet:", error);
@@ -68,6 +67,7 @@ export default function Profile() {
   const trimWalletAddress = (address) => {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
   };
+
   console.log("Your id is", userInfo?.userId);
   console.log("Your trimmed id is", trimWalletAddress(userInfo?.userId));
   console.log("Your username is", userInfo?.username);

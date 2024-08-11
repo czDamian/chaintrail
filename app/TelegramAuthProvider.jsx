@@ -1,5 +1,11 @@
 "use client";
-import { useState, useEffect, createContext, useContext } from "react";
+import {
+  useState,
+  useEffect,
+  createContext,
+  useContext,
+  useCallback,
+} from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,28 +16,7 @@ export default function TelegramAuthProvider({ children }) {
   const [isLoading, setIsLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
 
-  useEffect(() => {
-    if (window.Telegram?.WebApp) {
-      const user = window.Telegram.WebApp.initDataUnsafe?.user;
-      const queryString = window.Telegram.WebApp.initData || "";
-      const urlParams = new URLSearchParams(queryString);
-      const referralCode = urlParams.get("start"); // Extract referral code from URL
-      const app = window.Telegram.WebApp;
-      app.ready();
-      app.expand();
-      app.enableClosingConfirmation();
-
-      if (referralCode) {
-        localStorage.setItem("referralCode", referralCode);
-      }
-
-      if (user && user.id) {
-        registerUser(user.id.toString(), user.username || "", "telegram");
-      }
-    }
-  }, []);
-
-  const fetchUserInfo = async (userId) => {
+  const fetchUserInfo = useCallback(async (userId) => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/users?userId=${userId}`);
@@ -41,15 +26,17 @@ export default function TelegramAuthProvider({ children }) {
         setUserPoints(userData.points || 0);
       } else {
         console.error("Failed to fetch user data");
+        setUserInfo(null);
       }
     } catch (error) {
       console.error("Error fetching user data:", error);
+      setUserInfo(null);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const registerUser = async (userId, username, method) => {
+  const registerUser = useCallback(async (userId, username, method) => {
     const referralCode = localStorage.getItem("referralCode");
 
     try {
@@ -63,7 +50,12 @@ export default function TelegramAuthProvider({ children }) {
       });
       const data = await response.json();
       if (response.ok) {
-        setUserInfo(data);
+        const userData = {
+          id: userId,
+          username: username,
+          points: data.points || 0,
+        };
+        setUserInfo(userData);
         setUserPoints(data.points || 0);
         localStorage.setItem("userId", userId);
         localStorage.removeItem("referralCode");
@@ -76,7 +68,28 @@ export default function TelegramAuthProvider({ children }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (window.Telegram?.WebApp) {
+      const user = window.Telegram.WebApp.initDataUnsafe?.user;
+      const queryString = window.Telegram.WebApp.initData || "";
+      const urlParams = new URLSearchParams(queryString);
+      const referralCode = urlParams.get("start");
+      const app = window.Telegram.WebApp;
+      app.ready();
+      app.expand();
+      app.enableClosingConfirmation();
+
+      if (referralCode) {
+        localStorage.setItem("referralCode", referralCode);
+      }
+
+      if (user && user.id) {
+        registerUser(user.id.toString(), user.username || "", "telegram");
+      }
+    }
+  }, [registerUser]);
 
   const updatePoints = async (increment) => {
     setUserPoints((prevPoints) => prevPoints + increment);
