@@ -44,11 +44,18 @@ const Hero = () => {
         </p>
 
         {userInfo ? (
-          <Button
-            href="/quests"
-            className="flex px-8 mb-4 mx-auto text-xs gap-2 text-black bg-gold-500 hover:bg-gold-400 transition-colors font-bold duration-300 py-3 hover:scale-105">
-            Play now
-          </Button>
+          <>
+            <Button
+              href="/quests"
+              className="flex px-8 mb-4 mx-auto text-xs text-black bg-gold-500 hover:bg-yellow-400 transition-colors font-bold duration-300 py-3 hover:scale-105">
+              Play now
+            </Button>
+            <Button
+              href="/wallet"
+              className="flex px-8 mb-4 mx-auto text-xs bg-black border transition-colors font-normal duration-300 py-3 hover:scale-105">
+             dashboard
+            </Button>
+          </>
         ) : (
           <>
             {isMobile ? (

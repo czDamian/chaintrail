@@ -1,5 +1,7 @@
 import SideNav from "../components/Reusable/SideNav";
+// import ImportWallet from "./ImportWallet";
 import UserProfile from "./UserProfile";
+import WalletButton from "./WalletButton";
 
 export const metadata = {
   title: "Wallet",
@@ -10,7 +12,12 @@ const Wallet = () => {
   return (
     <div>
       <div className="mb-20">
+        <div className="my-20">
+
+        <WalletButton />
+        </div>
         <UserProfile />
+        {/* <ImportWallet /> */}
       </div>
       <SideNav />
     </div>

@@ -2,6 +2,8 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/HomePage/Nav";
 import TelegramAuthProvider from "./TelegramAuthProvider";
+import { Providers } from "@/Provider";
+
 
 
 export const metadata = {
@@ -20,8 +22,10 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <TelegramAuthProvider>
-          <Navbar />
-          {children}
+        <Providers>
+        <Navbar />
+        {children}
+        </Providers>
         </TelegramAuthProvider>
       </body>
     </html>
