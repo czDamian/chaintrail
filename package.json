@@ -23,6 +23,7 @@
         "@web3-onboard/core": "^2.22.2",
         "@web3-onboard/injected-wallets": "^2.11.1",
         "@web3-onboard/walletconnect": "^2.6.1",
+        "bcrypt": "^5.1.1",
         "crypto": "^1.0.1",
         "date-fns": "^3.6.0",
         "dotenv": "^16.4.5",

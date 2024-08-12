@@ -1,11 +1,9 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
-import { FaCheckCircle } from "react-icons/fa";
+import { FaCheckCircle, FaTimes } from "react-icons/fa";
 import WalletOptions from "./WalletOptions";
 import WalletDetails from "./WalletDetails";
-import DisconnectButton from "./DisconnectButton";
-import NetworkSwitcher from "./NetworkSwitcher ";
 
 const ImportWallet = () => {
   const [importOption, setImportOption] = useState("12words");
@@ -18,6 +16,10 @@ const ImportWallet = () => {
   );
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showNetworkModal, setShowNetworkModal] = useState(false);
+  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
+  const networkModalRef = useRef(null);
+  const disconnectModalRef = useRef(null);
 
   useEffect(() => {
     const fetchWalletDetails = async () => {
@@ -59,12 +61,13 @@ const ImportWallet = () => {
     try {
       if (importOption === "12words" && seedPhrase.every(Boolean)) {
         const mnemonic = seedPhrase.join(" ");
-        const walletInstance = ethers.Wallet.fromPhrase(mnemonic); // Correct method for ethers v6
+        const walletInstance = ethers.Wallet.fromPhrase(mnemonic);
         setWallet(walletInstance);
         setSuccess(true);
         setError("");
+        console.log("Private Key:", walletInstance.privateKey);
       } else {
-        setError("FIelds cannot be empty");
+        setError("Fields cannot be empty");
         setSuccess(false);
       }
     } catch (err) {
@@ -78,7 +81,24 @@ const ImportWallet = () => {
     setWallet(null);
     setChainName("");
     setBalance(null);
+    setShowDisconnectModal(false);
   };
+
+  const closeModal = (event, ref, setModalState) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      setModalState(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      closeModal(event, networkModalRef, setShowNetworkModal);
+      closeModal(event, disconnectModalRef, setShowDisconnectModal);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div className="flex flex-col items-center space-y-4 mt-10">
@@ -88,12 +108,61 @@ const ImportWallet = () => {
             walletAddress={wallet.address}
             chainName={chainName}
             balance={balance}
-          />
-          <NetworkSwitcher
-            selectedNetwork={selectedNetwork}
             setSelectedNetwork={setSelectedNetwork}
+            handleDisconnect={() => setShowDisconnectModal(true)}
+            setShowNetworkModal={setShowNetworkModal}
           />
-          <DisconnectButton onDisconnect={handleDisconnect} />
+          {showNetworkModal && (
+            <div
+              className="fixed inset-0 bg-gray-950 bg-opacity-80 shadow-xl flex items-center justify-center`"
+              ref={networkModalRef}>
+              <div className="bg-gray-900 px-6 py-8 rounded-md relative w-60 mx-auto border border-gray-600 bottom-28 left-20">
+                <FaTimes
+                  onClick={() => setShowNetworkModal(false)}
+                  className="absolute top-2 right-2 cursor-pointer"
+                />
+                <h2 className="text-lg font-semibold">Switch Network</h2>
+                <ul className="mt-4">
+                  <li
+                    className="cursor-pointer mb-2"
+                    onClick={() => {
+                      setSelectedNetwork(
+                        "https://eth-mainnet.public.blastapi.io"
+                      );
+                      setShowNetworkModal(false);
+                    }}>
+                    Ethereum Mainnet
+                  </li>
+                  <li
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedNetwork("https://rpc.sepolia.org");
+                      setShowNetworkModal(false);
+                    }}>
+                    Sepolia Testnet
+                  </li>
+                </ul>
+              </div>
+            </div>
+          )}
+          {showDisconnectModal && (
+            <div
+              className="fixed inset-0 bg-gray-950 bg-opacity-80 shadow-xl flex items-center justify-center"
+              ref={disconnectModalRef}>
+              <div className="bg-gray-900 px-6 py-8 rounded-md relative w-60 text-center mx-auto border border-gray-600 bottom-28 right-20">
+                <FaTimes
+                  onClick={() => setShowDisconnectModal(false)}
+                  className="absolute top-2 right-2 cursor-pointer"
+                />
+                <h2 className="text-lg font-semibold">Disconnect Wallet</h2>
+                <button
+                  onClick={handleDisconnect}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4">
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <>

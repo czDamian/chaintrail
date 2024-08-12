@@ -12,8 +12,8 @@ const Wallet = () => {
     <div>
       <div className="mb-20">
         <div className="my-20"></div>
-        <UserProfile />
         <ImportWallet />
+        <UserProfile />
       </div>
       <SideNav />
     </div>

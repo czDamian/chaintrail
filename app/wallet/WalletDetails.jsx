@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
+import { FaCaretDown } from "react-icons/fa";
 
-// Mapping network names to their base currencies
 const networkCurrencies = {
   sepolia: "ETH",
   mainnet: "ETH",
@@ -9,30 +9,61 @@ const networkCurrencies = {
 
 const trimAddress = (address) => {
   if (!address) return "";
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  return `${address.slice(0, 4)}...${address.slice(-4)}`;
 };
+
 const trimBalance = (balance) => {
   if (!balance) return "";
   const formattedBalance = parseFloat(balance).toFixed(3);
   return formattedBalance;
 };
 
-const WalletDetails = ({ walletAddress, chainName, balance }) => {
-  // Determine the currency based on the chain name
+const WalletDetails = ({
+  walletAddress,
+  chainName,
+  balance,
+  setSelectedNetwork,
+  handleDisconnect,
+  setShowNetworkModal,
+}) => {
   const baseCurrency = networkCurrencies[chainName.toLowerCase()] || "ETH";
 
   return (
-    <div className="flex flex-col items-center space-y-4">
-      <h2 className="text-2xl font-bold mb-4">Wallet Details</h2>
-      <div className="p-4 border rounded-md shadow-md w-full max-w-lg text-center">
-        <p className="text-lg font-semibold">Wallet Address:</p>
-        <p className="text-gray-600">{trimAddress(walletAddress)}</p>
-        <p className="text-lg font-semibold">Chain Name:</p>
-        <p className="text-gray-600 uppercase">{chainName}</p>
-        <p className="text-lg font-semibold">Balance:</p>
-        <p className="text-gray-600">
+    <div className="flex flex-row items-center justify-between gap-4">
+      <p
+        className="text-gray-600 flex gap-4 border rounded-md p-2 items-center cursor-pointer"
+        onClick={() => handleDisconnect()}>
+        <span className="text-gray-300">
           {trimBalance(balance)} {baseCurrency}
-        </p>
+        </span>
+        <span className="flex items-center">
+          <img
+            src="networks/eth.png"
+            width={30}
+            height={30}
+            alt="network"
+            className="w-6"
+          />
+          <span className="flex items-center">
+            {trimAddress(walletAddress)}
+            <FaCaretDown className="ml-2" />
+          </span>
+        </span>
+      </p>
+      <div
+        className="text-gray-600 border rounded-md p-2 flex items-center gap-2 uppercase cursor-pointer"
+        onClick={() => setShowNetworkModal(true)}>
+        <img
+          src="networks/eth.png"
+          width={30}
+          height={30}
+          alt="network"
+          className="w-6"
+        />
+        <span className="flex items-center">
+          {chainName}
+          <FaCaretDown className="ml-2" />
+        </span>
       </div>
     </div>
   );
