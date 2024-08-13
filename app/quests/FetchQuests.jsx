@@ -54,7 +54,7 @@ const FetchQuestsFromDb = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        router.push("/login"); // Handle error by redirecting
+        //router.push("/login"); // Handle error by redirecting
       } finally {
         setLoading(false);
       }
