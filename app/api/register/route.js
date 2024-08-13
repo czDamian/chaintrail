@@ -8,16 +8,17 @@ await connectDb();
 
 export async function POST(request) {
   const { userId, username, referralCode } = await request.json();
+//   db.getCollection("users").dropIndex("mnemonic_1");
+
 
   try {
     let user = await User.findOne({ userId });
 
     if (user) {
-      // Check if wallet details or referral code are missing, invalid, or without mnemonic and update if needed
+      // Check if wallet details or referral code are missing or invalid and update if needed
       if (
         !user.walletAddress ||
-        !ethers.isAddress(user.walletAddress) ||
-        !user.mnemonic
+        !ethers.isAddress(user.walletAddress)
       ) {
         const walletDetails = createWalletWithMnemonic();
         Object.assign(user, walletDetails);
@@ -41,11 +42,9 @@ export async function POST(request) {
       userId,
       username,
       points: 1000,
-      playPass: 10,
+      playPass: 2,
       walletAddress: walletDetails.walletAddress,
-      publicKey: walletDetails.publicKey,
       privateKey: walletDetails.privateKey,
-      mnemonic: walletDetails.mnemonic,
       referralCode: newReferralCode,
     });
 
@@ -85,7 +84,6 @@ function createWalletWithMnemonic() {
   const walletDetails = {
     walletAddress: wallet.address,
     privateKey: wallet.privateKey,
-    mnemonic: wallet.mnemonic.phrase,
   };
   console.log("Created wallet details:", walletDetails);
   return walletDetails;

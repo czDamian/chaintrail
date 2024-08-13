@@ -35,8 +35,22 @@ export async function GET() {
     await connectDb();
     console.log("Connected to the database");
 
-    const quests = await Quest.find({});
+    const quests = await Quest.find({}).sort("order");
     console.log("Retrieved quests from database:", quests);
+    // Calculate completion rate for each quest
+    const questsWithCompletionRate = quests.map((quest) => {
+      const answeredQuestions = quest.questQuestions.filter(
+        (q) => q.isAnswered
+      ).length;
+      const completionRate =
+        (answeredQuestions / quest.questQuestions.length) * 100;
+      return {
+        ...quest.toObject(),
+        completionRate,
+      };
+    });
+
+    return NextResponse.json(questsWithCompletionRate);
 
     return NextResponse.json(quests);
   } catch (error) {

@@ -1,3 +1,4 @@
+//model for adding question to each quest
 import mongoose from "mongoose";
 
 const QuestQuestionSchema = new mongoose.Schema(
@@ -13,6 +14,8 @@ const QuestQuestionSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+delete mongoose.models.QuestQuestion;
 
 const QuestQuestion =
   mongoose.models.QuestQuestion ||

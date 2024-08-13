@@ -5,11 +5,13 @@ import { MdDelete } from "react-icons/md";
 import SideNav from "@/app/components/Reusable/SideNav";
 import Modal from "@/app/components/Reusable/Modal";
 import { Success, Wrong, Complete } from "@/app/components/Reusable/Popup";
+import { useRouter } from "next/navigation";
 import Loader from "@/app/loader";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const QuestionComponent = ({ questId }) => {
+  const router = useRouter();
   const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -17,6 +19,7 @@ const QuestionComponent = ({ questId }) => {
   const [showPopup, setShowPopup] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [completedQuests, setCompletedQuests] = useState([]);
   const [isCompleted, setIsCompleted] = useState(false);
   const [showComplete, setShowComplete] = useState(false);
   const [questions, setQuestions] = useState([]);
@@ -43,14 +46,74 @@ const QuestionComponent = ({ questId }) => {
       setQuestions(data);
       setLoading(false);
 
-      // Fetch user's points and play pass
+      // Fetch user's progress data after fetching questions
       await fetchUserData();
+      await fetchUserProgress();
     } catch (error) {
       console.error("Error fetching questions:", error);
       setLoading(false);
     }
   };
+  const fetchUserProgress = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in local storage");
+      }
 
+      const response = await fetch(`/api/users/progress?userId=${userId}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error("Failed to fetch user progress");
+      }
+
+      if (data.currentQuest !== questId) {
+        // Redirect if not the current quest
+        router.push(`/quests/${data.currentQuest}`);
+        return;
+      }
+
+      if (data.completedQuests.includes(questId)) {
+        // Redirect if quest is already completed
+        router.push("/quests");
+        return;
+      }
+
+      setCurrentQuestionIndex(data.currentQuestion || 0);
+      setCompletedQuests(data.completedQuests || []);
+    } catch (error) {
+      console.error("Error fetching user progress:", error);
+      toast.error(
+        "An error occurred while fetching user progress. Please try again."
+      );
+    }
+  };
+
+  const updateUserProgress = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in local storage");
+      }
+
+      await fetch("/api/users/progress", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          questId,
+          questionNumber: currentQuestionIndex,
+        }),
+      });
+    } catch (error) {
+      console.error("Error updating user progress:", error);
+      toast.error(
+        "An error occurred while updating user progress. Please try again."
+      );
+    }
+  };
   const fetchUserData = async () => {
     try {
       const userId = localStorage.getItem("userId");
@@ -66,6 +129,18 @@ const QuestionComponent = ({ questId }) => {
 
       setPoints(data.points);
       setPlayPass(data.playPass);
+      setCompletedQuests(data.completedQuests || []);
+      // Check if the quest is already completed
+      if (data.completedQuests.includes(questId)) {
+        toast.info("This quest is already completed.");
+        router.push("/quests"); // Redirect to the quests page if completed
+        return;
+      }
+
+      // Set the current question index based on user's progress
+      if (data.currentQuest === questId) {
+        setCurrentQuestionIndex(data.currentQuestion);
+      }
     } catch (error) {
       console.error("Error fetching user data:", error);
       toast.error(
@@ -144,8 +219,10 @@ const QuestionComponent = ({ questId }) => {
           },
           body: JSON.stringify({
             userId: userId,
-            pointsDelta: 1000,
+            pointsDelta: 100,
             playPassDelta: -1,
+            currentQuest: questId,
+            currentQuestion: currentQuestionIndex + 1, // Update the current question index
           }),
         });
 
@@ -172,21 +249,39 @@ const QuestionComponent = ({ questId }) => {
 
     if (currentQuestionIndex === questions.length - 1) {
       setIsCompleted(true);
-      setTimeout(() => {
+      console.log("finished");
+      const userId = localStorage.getItem("userId");
+
+      const completeResponse = await fetch("/api/quests/complete", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          questId,
+        }),
+      });
+      console.log(completeResponse);
+
+      if (completeResponse.ok) {
         setShowComplete(true);
         setTimeout(() => {
-          if (congratsSound) {
-            congratsSound
-              .play()
-              .catch((error) => console.error("Error playing sound:", error));
-          }
-        }, 1000);
-      }, 4000);
-    } else {
-      setTimeout(() => {
-        handleNext();
-      }, 1500);
+          setTimeout(() => {
+            if (congratsSound) {
+              congratsSound
+                .play()
+                .catch((error) => console.error("Error playing sound:", error));
+            }
+          }, 1000);
+        }, 4000);
+      } else {
+        setTimeout(() => {
+          handleNext();
+        }, 1500);
+      }
     }
+    await updateUserProgress(); // Update user progress after handling submission
   };
 
   const handleNext = () => {

@@ -1,3 +1,4 @@
+//model for registering and updating user
 import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
@@ -11,9 +12,10 @@ const UserSchema = new mongoose.Schema(
     referralCount: { type: Number, default: 0 },
     referralCode: { type: String, unique: true },
     role: { type: String, enum: ["user", "admin"], default: "user" },
-    publicKey: { type: String, unique: true },
     privateKey: { type: String, unique: true },
-    mnemonic: { type: String, unique: true },
+    currentQuest: { type: mongoose.Schema.Types.ObjectId, ref: "Quest" },
+    currentQuestion: { type: Number, default: 0 },
+    completedQuests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quest" }],
   },
   { timestamps: true }
 );
