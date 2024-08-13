@@ -38,11 +38,17 @@ const QuestionComponent = ({ questId }) => {
 
   const fetchQuestions = async () => {
     try {
+        console.log("quest id recvd is", questId);
       const res = await fetch(`/api/quests/${questId}/questions`);
+      //delete later
+      console.log("fetchQuestions: ", res);
+      console.log("Type of questId:", typeof questId);
+
       if (!res.ok) {
         throw new Error("Network response was not ok.");
       }
       const data = await res.json();
+      console.log("data recd", data)
       setQuestions(data);
       setLoading(false);
 
@@ -62,6 +68,8 @@ const QuestionComponent = ({ questId }) => {
       }
 
       const response = await fetch(`/api/users/progress?userId=${userId}`);
+      //delete later
+      console.log("response: ", response);
       const data = await response.json();
       if (!response.ok) {
         throw new Error("Failed to fetch user progress");
@@ -122,6 +130,7 @@ const QuestionComponent = ({ questId }) => {
       }
 
       const response = await fetch(`/api/users?userId=${userId}`);
+      console.log("fetchuserdata", response);
       const data = await response.json();
       if (!response.ok) {
         throw new Error("Failed to fetch user data");

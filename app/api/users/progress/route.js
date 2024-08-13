@@ -23,7 +23,7 @@ export async function GET(request) {
     }
 
     return NextResponse.json({
-      currentQuest: user.currentQuest._id,
+      currentQuest: user.currentQuest,
       currentQuestion: user.currentQuestion,
       completedQuests: user.completedQuests,
     });

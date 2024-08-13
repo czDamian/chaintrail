@@ -1,16 +1,14 @@
-"use client"
+"use client";
 import { useState, useEffect } from "react";
 import SideNav from "../components/Reusable/SideNav";
 import Button from "../components/Reusable/Button";
 import Link from "next/link";
 import { QuestSkeleton } from "../components/HomePage/CustomLoader";
-import { useRouter } from "next/navigation";
 
 const FetchQuestsFromDb = () => {
   const [quests, setQuests] = useState([]);
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
-  const router = useRouter();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,14 +52,14 @@ const FetchQuestsFromDb = () => {
         }
       } catch (error) {
         console.error("Error fetching data:", error);
-        router.push("/login"); // Handle error by redirecting
+        alert("error fetching quests");
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [router]);
+  }, []);
 
   const getQuestLink = (quest) => {
     if (quest.status === "locked" || quest.status === "completed") {
