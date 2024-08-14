@@ -7,15 +7,38 @@ import { QuestSkeleton } from "../components/HomePage/CustomLoader";
 
 const FetchQuestsFromDb = () => {
   const [quests, setQuests] = useState([]);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const fetchQuests = async () => {
+    const fetchQuestsandProgress = async () => {
       try {
-        const response = await fetch("/api/quests");
-        if (response.ok) {
+        const response = await fetch(`/api/quests`);
+        const userData = await fetch(`/api/users?userId=${userId}`);
+        if (response.ok && userData.ok) {
           const data = await response.json();
-          setQuests(data);
+          const { currentQuest, currentQuestion, completedQuests } =
+            await userData.json();
+
+          console.log({ currentQuest, currentQuestion, completedQuests });
+
+          // Update quests with status based on user progress
+          const updatedQuests = data.map((quest) => {
+            let questStatus = "locked";
+            let isLinkDisabled = true;
+
+            if (completedQuests.includes(quest._id)) {
+              questStatus = "completed";
+              isLinkDisabled = true;
+            } else if (quest._id === currentQuest) {
+              questStatus = "open";
+              isLinkDisabled = false;
+            }
+
+            return { ...quest, questStatus, isLinkDisabled };
+          });
+
+          setQuests(updatedQuests);
         } else {
           throw new Error("Failed to fetch quests");
         }
@@ -26,7 +49,7 @@ const FetchQuestsFromDb = () => {
       }
     };
 
-    fetchQuests();
+    fetchQuestsandProgress();
   }, []);
 
   return (
@@ -45,8 +68,11 @@ const FetchQuestsFromDb = () => {
           : quests.map((quest) => (
               <Link
                 key={quest._id}
-                href={`/quests/${quest._id}`}
-                className="border border-gray-700 w-72 md:w-72 rounded-xl bg-gray-900 hover:bg-gray-800 mb-4 flex flex-col justify-between items-center shadow-md transition-all duration-300">
+                href={quest.isLinkDisabled ? "#" : `/quests/${quest._id}`}
+                className={`border border-gray-700 w-72 md:w-72 rounded-xl bg-gray-900 hover:bg-gray-800 mb-4 flex flex-col justify-between items-center shadow-md transition-all duration-300 ${
+                  quest.isLinkDisabled ? "cursor-not-allowed" : ""
+                }`}
+                onClick={(e) => quest.isLinkDisabled && e.preventDefault()}>
                 <img
                   className="rounded-xl h-36 object-cover w-full"
                   src={quest.questImage}
@@ -57,7 +83,12 @@ const FetchQuestsFromDb = () => {
                   <span className="uppercase font-bold text-gray-100">
                     {quest.questName}
                   </span>
-                  <Button className="bg-gold-500 px-4 py-2 text-black text-xs hover:bg-yellow-500 transition-colors duration-300">
+                  <Button
+                    className={`px-4 py-2 text-xs transition-colors duration-300 ${
+                      quest.isLinkDisabled
+                        ? "bg-neutral-900 text-gray-400 cursor-not-allowed"
+                        : "bg-gold-500 text-black hover:bg-yellow-500"
+                    }`}>
                     {quest.questStatus}
                   </Button>
                 </div>
@@ -65,15 +96,20 @@ const FetchQuestsFromDb = () => {
                   {quest.questDescription ||
                     "Embark on Word Trails, learn about blockchain - Think, Tap, Win. Earn Tokens and NFTs"}
                 </div>
-                <div className="flex justify-between gap-2 items-center text-xs px-3 w-full mb-2">
+                <div className="flex justify-between gap-1 items-center text-xs px-3 w-full mb-2">
                   <span className="border border-gray-700 p-2 rounded-md bg-gray-700 text-gray-300">
                     {quest.questQuestions.length} questions
                   </span>
-                  <span className="border border-gray-700 p-2 rounded-md bg-gray-700 text-gray-300">
-                    {1000 * quest.questQuestions.length} points
-                  </span>
-                  <span className="p-2 font-bold text-gray-900 border border-gray-900 rounded-md bg-yellow-400">
-                    1 NFT
+                  <div className="flex items-center border gap-1 border-gray-700 px-2 py-1.5 rounded-md bg-gray-700 text-gray-300">
+                    <span>{1000 * quest.questQuestions.length}</span>
+                    <img src="coins.png" width={20} alt="points" />
+                  </div>
+                  <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500">
+                    {Math.round(
+                      ((quest.questQuestions.length - 1) * 100) /
+                        quest.questQuestions.length
+                    )}
+                    %
                   </span>
                 </div>
               </Link>

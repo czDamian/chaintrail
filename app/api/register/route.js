@@ -3,6 +3,7 @@ import User from "@/models/User";
 import Counter from "@/models/Counter";
 import connectDb from "@/lib/mongodb";
 import { ethers } from "ethers";
+import Quest from "@/models/Quest";
 
 await connectDb();
 
@@ -14,12 +15,13 @@ export async function POST(request) {
 
     if (user) {
       // Check if wallet details or referral code are missing or invalid and update if needed
-      if (
-        !user.walletAddress ||
-        !ethers.isAddress(user.walletAddress)
-      ) {
+      if (!user.walletAddress || !ethers.isAddress(user.walletAddress)) {
         const walletDetails = createWalletWithMnemonic();
         Object.assign(user, walletDetails);
+      }
+      if (user.currentQuest == "") {
+        const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
+        Object.assign(user, firstQuest);
       }
       if (!user.referralCode) {
         user.referralCode = await generateAutoIncrementalReferralCode();
@@ -36,6 +38,10 @@ export async function POST(request) {
     // User does not exist, create a new user with a wallet and referral code
     const walletDetails = createWalletWithMnemonic();
     const newReferralCode = await generateAutoIncrementalReferralCode();
+
+    // Fetch the first quest
+    const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
+
     user = new User({
       userId,
       username,
@@ -44,13 +50,14 @@ export async function POST(request) {
       walletAddress: walletDetails.walletAddress,
       privateKey: walletDetails.privateKey,
       referralCode: newReferralCode,
+      currentQuest: firstQuest ? firstQuest._id : null,
     });
 
     // Handle the referral code logic
     if (referralCode) {
       const referringUser = await User.findOne({ referralCode });
       if (referringUser) {
-        referringUser.referralCount = (referringUser.referralCount || 0) + 1; 
+        referringUser.referralCount = (referringUser.referralCount || 0) + 1;
         referringUser.points = (referringUser.points || 0) + 1000;
         await referringUser.save();
       } else {

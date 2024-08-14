@@ -2,8 +2,17 @@
 import { NextResponse } from "next/server";
 import User from "@/models/User";
 import connectDb from "@/lib/mongodb";
+import mongoose from "mongoose";
+
+
+function clearMongooseCache() {
+  mongoose.models = {};
+  mongoose.modelSchemas = {};
+  console.log("Mongoose cache cleared.");
+}
 
 await connectDb();
+clearMongooseCache();
 
 export async function GET(request) {
   const userId = request.nextUrl.searchParams.get("userId");

@@ -17,11 +17,35 @@ export async function POST(request) {
   }
 }
 
-// GET method to retrieve all quests
-export async function GET() {
+// GET method to retrieve quests and current quest details for a specific user
+export async function GET(request) {
   try {
     await connectDb();
-    const quests = await Quest.find({}).sort("order");
+
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+
+    let quests;
+
+    if (userId) {
+      // Fetch the user's current quest
+      const userResponse = await fetch(
+        `/api/users?userId=${userId}`
+      );
+      const userData = await userResponse.json();
+
+      if (userResponse.ok && userData.currentQuest) {
+        // Fetch the current quest for the user
+        quests = await Quest.find({ _id: userData.currentQuest })
+      } else {
+        // If no current quest found or user not found, return all quests
+        quests = await Quest.find({}).sort("createdAt");
+      }
+    } else {
+      // Fetch all quests if no userId is provided
+      quests = await Quest.find({}).sort("createdAt");
+    }
+
     return NextResponse.json(quests);
   } catch (error) {
     console.error("Error fetching quests:", error);
@@ -29,7 +53,8 @@ export async function GET() {
   }
 }
 
-// DELETE method to remove a quest by ID
+
+// DELETE method to delete a quest by ID
 export async function DELETE(request) {
   try {
     await connectDb();
