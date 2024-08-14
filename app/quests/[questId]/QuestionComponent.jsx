@@ -13,9 +13,8 @@ import PopupHandler from "./PopupHandler";
 import QuestUI from "./QuestUI";
 import { useRouter } from "next/navigation";
 
-
 const QuestionComponent = ({ questId }) => {
-      const router = useRouter();
+  const router = useRouter();
   const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -38,60 +37,43 @@ const QuestionComponent = ({ questId }) => {
     typeof Audio !== "undefined" ? new Audio("/btn/fail.mp3") : null;
   const congratsSound =
     typeof Audio !== "undefined" ? new Audio("/btn/congrats.mp3") : null;
-  //functions begins
-  const fetchQuestions = async () => {
-    try {
-      const res = await fetch(`/api/quests/${questId}/questions`);
-      if (!res.ok) {
-        throw new Error("Network response was not ok.");
-      }
-      const data = await res.json();
 
-      // Fetch user's progress to verify the current quest
-      const userId = localStorage.getItem("userId");
-      const userRes = await fetch(`/api/users?userId=${userId}`);
-      const userData = await userRes.json();
-
-      if (userData.currentQuest !== questId) {
-        alert("You have not unlocked This quest.");
-        router.push("/quests");
-        return;
-      }
-
-      setQuestions(data);
-      setLoading(false);
-
-      // Fetch user's points and play pass
-      await fetchUserData();
-    } catch (error) {
-      console.error("Error fetching questions:", error);
-      setLoading(false);
+  // Fetch questions and user's current question index
+const fetchQuestions = async () => {
+  try {
+    const res = await fetch(`/api/quests/${questId}/questions`);
+    if (!res.ok) {
+      throw new Error("Network response was not ok.");
     }
-  };
+    const data = await res.json();
 
+    // Fetch user's progress
+    const userId = localStorage.getItem("userId");
+    const userRes = await fetch(`/api/users?userId=${userId}`);
+    const userData = await userRes.json();
 
-  const fetchUserData = async () => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found in local storage");
-      }
-
-      const response = await fetch(`/api/users?userId=${userId}`);
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
-
-      setPoints(data.points);
-      setPlayPass(data.playPass);
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      toast.error(
-        "An error occurred while fetching user data. Please try again."
-      );
+    if (userData.currentQuest !== questId) {
+      alert("You have not unlocked this quest.");
+      router.push("/quests");
+      return;
     }
-  };
+
+    setQuestions(data);
+
+    // Fetch user's current question index for this quest
+    const userQuestIndex = userData.currentQuestion?.[questId];
+    setCurrentQuestionIndex(userQuestIndex !== undefined ? userQuestIndex : 0);
+
+    setLoading(false);
+
+    // Fetch user's points and play pass
+    setPoints(userData.points);
+    setPlayPass(userData.playPass);
+  } catch (error) {
+    console.error("Error fetching questions:", error);
+    setLoading(false);
+  }
+};
 
   useEffect(() => {
     if (questId) {
@@ -168,26 +150,54 @@ const handleSubmit = async (answers = selectedAnswers) => {
       // Determine the next quest ID
       const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
 
-      // Update the user with new quest and completed quests
+      // Update the user's points and play pass
+      const updateData = {
+        userId: userId,
+        pointsDelta: 1000,
+        playPassDelta: -1,
+        currentQuestionIndex: correct
+          ? currentQuestionIndex + 1
+          : currentQuestionIndex,
+      };
+
+      // If the current question is the last one in the quest, update completedQuest and currentQuest
+      if (currentQuestionIndex === questions.length - 1) {
+        updateData.completedQuest = questId;
+        updateData.currentQuest = nextQuestId;
+      }
+
+      // Send the update request
       const updateResponse = await fetch("/api/claim", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          userId: userId,
-          pointsDelta: 1000,
-          playPassDelta: -1,
-          completedQuest: questId,
-          currentQuest: nextQuestId,
-        }),
+        body: JSON.stringify(updateData),
       });
 
       if (!updateResponse.ok) {
         throw new Error("Failed to update points and quest status");
       }
 
-      const updateData = await updateResponse.json();
-      setPoints(updateData.points);
-      setPlayPass(updateData.playPass);
+      const updatedUserData = await updateResponse.json();
+      setPoints(updatedUserData.points);
+      setPlayPass(updatedUserData.playPass);
+
+      if (currentQuestionIndex === questions.length - 1) {
+        setIsCompleted(true);
+        setTimeout(() => {
+          setShowComplete(true);
+          setTimeout(() => {
+            if (congratsSound) {
+              congratsSound
+                .play()
+                .catch((error) => console.error("Error playing sound:", error));
+            }
+          }, 1000);
+        }, 4000);
+      } else {
+        setTimeout(() => {
+          handleNext();
+        }, 1500);
+      }
     } catch (error) {
       console.error("Error updating points:", error);
       toast.error("An error occurred while updating points. Please try again.");
@@ -198,24 +208,6 @@ const handleSubmit = async (answers = selectedAnswers) => {
         .play()
         .catch((error) => console.error("Error playing wrong sound:", error));
     }
-  }
-
-  if (currentQuestionIndex === questions.length - 1) {
-    setIsCompleted(true);
-    setTimeout(() => {
-      setShowComplete(true);
-      setTimeout(() => {
-        if (congratsSound) {
-          congratsSound
-            .play()
-            .catch((error) => console.error("Error playing sound:", error));
-        }
-      }, 1000);
-    }, 4000);
-  } else {
-    setTimeout(() => {
-      handleNext();
-    }, 1500);
   }
 };
 

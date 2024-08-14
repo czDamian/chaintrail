@@ -75,7 +75,15 @@ export async function PUT(request) {
 
 // PATCH Route to update user points, pass, completed quests, and current quest
 export async function PATCH(request) {
-  const { userId, pointsDelta, playPassDelta, completedQuest, currentQuest } = await request.json();
+  const {
+    userId,
+    pointsDelta,
+    playPassDelta,
+    completedQuest,
+    currentQuest,
+    questId,
+    questionIndex,
+  } = await request.json();
 
   try {
     const user = await User.findOne({ userId });
@@ -102,6 +110,10 @@ export async function PATCH(request) {
     if (currentQuest !== undefined) {
       user.currentQuest = currentQuest;
     }
+    // Update the current question index for the quest
+    if (questId !== undefined && questionIndex !== undefined) {
+      user.currentQuestion.set(questId, questionIndex);
+    }
 
     await user.save();
 
@@ -111,6 +123,7 @@ export async function PATCH(request) {
       playPass: user.playPass,
       completedQuests: user.completedQuests,
       currentQuest: user.currentQuest,
+      currentQuestion: user.currentQuestion,
     });
   } catch (err) {
     console.error(err);
