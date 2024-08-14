@@ -36,7 +36,24 @@ const FetchQuestsFromDb = () => {
             return { ...quest, questStatus, isLinkDisabled };
           });
 
-          setQuests(updatedQuests);
+          // Sort quests: Completed first, then open, then locked
+          const sortedQuests = updatedQuests.sort((a, b) => {
+            if (
+              a.questStatus === "completed" &&
+              b.questStatus !== "completed"
+            ) {
+              return -1;
+            }
+            if (a.questStatus === "open" && b.questStatus !== "open") {
+              return b.questStatus === "completed" ? 1 : -1;
+            }
+            if (a.questStatus === "locked" && b.questStatus !== "locked") {
+              return 1;
+            }
+            return 0;
+          });
+
+          setQuests(sortedQuests);
         } else {
           throw new Error("Failed to fetch quests");
         }
