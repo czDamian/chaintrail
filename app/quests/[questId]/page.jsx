@@ -1,4 +1,4 @@
-import QuestionComponent from "./Questions";
+import QuestionComponent from "./QuestionComponent";
 
 
 export const metadata = {

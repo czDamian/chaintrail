@@ -14,7 +14,7 @@ export async function POST(request) {
     let user = await User.findOne({ userId });
 
     if (user) {
-      // Check if wallet details or referral code are missing or invalid and update if needed
+      // Check if wallet details or referral code or current Quest is missing or invalid and update if needed
       if (!user.walletAddress || !ethers.isAddress(user.walletAddress)) {
         const walletDetails = createWalletWithMnemonic();
         Object.assign(user, walletDetails);
