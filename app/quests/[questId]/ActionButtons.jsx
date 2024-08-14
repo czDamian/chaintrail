@@ -18,29 +18,56 @@ const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
 
   const closeModal = () => setModalState({ isOpen: false, type: null });
 
-  const confirmHint = () => {
-    setPoints(points - 200);
-    setModalState({ isOpen: true, type: "hint" });
+  const confirmHint = async () => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in local storage");
+      }
+      const response = await fetch("/api/claim", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userId,
+          pointsDelta: -200, // Deduct 200 points
+          playPassDelta: 0, // No change to play pass
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update points");
+      }
+
+      const data = await response.json();
+      setPoints(data.points); // Update points with the new value from the server
+      setModalState({ isOpen: true, type: "hint" });
+    } catch (error) {
+      console.error("Error updating points:", error);
+      alert("Failed to update points. Please try again.");
+      closeModal();
+    }
   };
 
   const getModalContent = () => {
     if (modalState.type === "confirm") {
       return (
         <>
-          <h2 className="text-xl font-bold text-gold-500 mb-4">Confirm Hint</h2>
+          <h2 className="text-xl font-bold mb-4">Confirm Hint</h2>
           <p className="mb-4">
             Are you sure you want to spend 200 coins to get a hint?
           </p>
           <div className="flex justify-end gap-2">
             <button
               onClick={closeModal}
-              className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-400">
-              No
+              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
+              Cancel
             </button>
             <button
               onClick={confirmHint}
               className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              Yes
+              Confirm
             </button>
           </div>
         </>

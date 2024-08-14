@@ -1,6 +1,7 @@
 // api/quests/route.js
 import connectDb from "@/lib/mongodb";
 import Quest from "@/models/Quest";
+import User from "@/models/User";
 import { NextResponse } from "next/server";
 
 // POST method to create a new quest
@@ -18,12 +19,51 @@ export async function POST(request) {
 }
 
 // GET method to retrieve all quests
-export async function GET() {
+export async function GET(request) {
   try {
     await connectDb();
+    const userId = request.nextUrl.searchParams.get("userId");
+
     const quests = await Quest.find({}).sort("createdAt");
 
-    return NextResponse.json(quests);
+    // Fetch user progress if userId is provided
+    let updatedQuests = quests;
+    if (userId) {
+      const user = await User.findOne({ userId });
+      const { currentQuest, completedQuests } = user;
+
+      // Update quests with status based on user progress
+      updatedQuests = quests.map((quest) => {
+        let questStatus = "locked";
+        let isLinkDisabled = true;
+
+        if (completedQuests.includes(quest._id.toString())) {
+          questStatus = "completed";
+          isLinkDisabled = true;
+        } else if (quest._id.toString() === currentQuest.toString()) {
+          questStatus = "open";
+          isLinkDisabled = false;
+        }
+
+        return { ...quest.toObject(), questStatus, isLinkDisabled };
+      });
+
+      // Sort quests: Completed first, then open, then locked
+      updatedQuests = updatedQuests.sort((a, b) => {
+        if (a.questStatus === "completed" && b.questStatus !== "completed") {
+          return -1;
+        }
+        if (a.questStatus === "open" && b.questStatus !== "open") {
+          return b.questStatus === "completed" ? 1 : -1;
+        }
+        if (a.questStatus === "locked" && b.questStatus !== "locked") {
+          return 1;
+        }
+        return 0;
+      });
+    }
+
+    return NextResponse.json(updatedQuests);
   } catch (error) {
     console.error("Error fetching quests:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -13,47 +13,12 @@ const FetchQuestsFromDb = () => {
     const fetchQuestsandProgress = async () => {
       const userId = localStorage.getItem("userId");
       try {
-        const response = await fetch(`/api/quests`);
-        const userData = await fetch(`/api/users?userId=${userId}`);
-        if (response.ok && userData.ok) {
-          const data = await response.json();
-          const { currentQuest, currentQuestion, completedQuests } =
-            await userData.json();
+        // Fetch quests with userId as a query parameter
+        const response = await fetch(`/api/quests?userId=${userId}`);
 
-          // Update quests with status based on user progress
-          const updatedQuests = data.map((quest) => {
-            let questStatus = "locked";
-            let isLinkDisabled = true;
-
-            if (completedQuests.includes(quest._id)) {
-              questStatus = "completed";
-              isLinkDisabled = true;
-            } else if (quest._id === currentQuest) {
-              questStatus = "open";
-              isLinkDisabled = false;
-            }
-
-            return { ...quest, questStatus, isLinkDisabled };
-          });
-
-          // Sort quests: Completed first, then open, then locked
-          const sortedQuests = updatedQuests.sort((a, b) => {
-            if (
-              a.questStatus === "completed" &&
-              b.questStatus !== "completed"
-            ) {
-              return -1;
-            }
-            if (a.questStatus === "open" && b.questStatus !== "open") {
-              return b.questStatus === "completed" ? 1 : -1;
-            }
-            if (a.questStatus === "locked" && b.questStatus !== "locked") {
-              return 1;
-            }
-            return 0;
-          });
-
-          setQuests(sortedQuests);
+        if (response.ok) {
+          const questsData = await response.json();
+          setQuests(questsData);
         } else {
           throw new Error("Failed to fetch quests");
         }
@@ -125,10 +90,7 @@ const FetchQuestsFromDb = () => {
                   <img src="coins.png" width={20} alt="points" />
                 </div>
                 <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500">
-                  {Math.round(
-                    ((quest.questQuestions.length + 51) * 100) /
-                      100
-                  )}
+                  {Math.round(((quest.questQuestions.length + 51) * 100) / 100)}
                   %
                 </span>
               </div>

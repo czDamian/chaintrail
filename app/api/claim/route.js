@@ -73,9 +73,9 @@ export async function PUT(request) {
   }
 }
 
-// PATCH Route to update user points and pass
+// PATCH Route to update user points, pass, completed quests, and current quest
 export async function PATCH(request) {
-  const { userId, pointsDelta, playPassDelta } = await request.json();
+  const { userId, pointsDelta, playPassDelta, completedQuest, currentQuest } = await request.json();
 
   try {
     const user = await User.findOne({ userId });
@@ -83,17 +83,38 @@ export async function PATCH(request) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    user.points += pointsDelta;
-    user.playPass += playPassDelta;
+    // Update points and play pass
+    if (pointsDelta !== undefined) {
+      user.points += pointsDelta;
+    }
+    if (playPassDelta !== undefined) {
+      user.playPass += playPassDelta;
+    }
+
+    // Update completed quests
+    if (completedQuest) {
+      if (!user.completedQuests.includes(completedQuest)) {
+        user.completedQuests.push(completedQuest);
+      }
+    }
+
+    // Update current quest
+    if (currentQuest !== undefined) {
+      user.currentQuest = currentQuest;
+    }
+
     await user.save();
 
     return NextResponse.json({
-      message: "User points and play pass updated",
+      message: "User updated successfully",
       points: user.points,
       playPass: user.playPass,
+      completedQuests: user.completedQuests,
+      currentQuest: user.currentQuest,
     });
   } catch (err) {
     console.error(err);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
