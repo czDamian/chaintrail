@@ -1,4 +1,3 @@
-// api/users/route.js
 import { NextResponse } from "next/server";
 import User from "@/models/User";
 import connectDb from "@/lib/mongodb";
@@ -112,7 +111,8 @@ export async function PATCH(request) {
     }
     // Update the current question index for the quest
     if (questId !== undefined && questionIndex !== undefined) {
-      user.currentQuestion.set(questId, questionIndex);
+      if (!user.currentQuestion) user.currentQuestion = {};
+      user.currentQuestion[questId] = questionIndex;
     }
 
     await user.save();
@@ -130,4 +130,3 @@ export async function PATCH(request) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
-

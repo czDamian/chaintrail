@@ -47,7 +47,6 @@ const fetchQuestions = async () => {
     }
     const data = await res.json();
 
-    // Fetch user's progress
     const userId = localStorage.getItem("userId");
     const userRes = await fetch(`/api/users?userId=${userId}`);
     const userData = await userRes.json();
@@ -60,13 +59,10 @@ const fetchQuestions = async () => {
 
     setQuestions(data);
 
-    // Fetch user's current question index for this quest
-    const userQuestIndex = userData.currentQuestion?.[questId];
+    const userQuestIndex = userData.currentQuestion[questId];
     setCurrentQuestionIndex(userQuestIndex !== undefined ? userQuestIndex : 0);
 
     setLoading(false);
-
-    // Fetch user's points and play pass
     setPoints(userData.points);
     setPlayPass(userData.playPass);
   } catch (error) {
@@ -74,7 +70,6 @@ const fetchQuestions = async () => {
     setLoading(false);
   }
 };
-
   useEffect(() => {
     if (questId) {
       fetchQuestions();
@@ -116,7 +111,6 @@ const handleSubmit = async (answers = selectedAnswers) => {
     submittedAnswer.toUpperCase() ===
     (currentQuestion.questAnswer || "").toUpperCase();
 
-  // Check if the user has enough play pass before proceeding
   if (playPass <= 0) {
     toast.error("Insufficient Play Pass");
     return;
@@ -125,89 +119,71 @@ const handleSubmit = async (answers = selectedAnswers) => {
   setIsCorrect(correct);
   setShowPopup(true);
 
-  if (correct) {
-    if (SuccessSound) {
-      SuccessSound.play().catch((error) =>
-        console.error("Error playing sound:", error)
-      );
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      throw new Error("User ID not found in local storage");
     }
 
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found in local storage");
-      }
+    const questsResponse = await fetch("/api/quests");
+    const allQuests = await questsResponse.json();
+    const currentQuestIndex = allQuests.findIndex(
+      (quest) => quest._id === questId
+    );
+    const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
 
-      // Fetch all quests
-      const questsResponse = await fetch("/api/quests");
-      const allQuests = await questsResponse.json();
+    const newQuestionIndex = correct
+      ? currentQuestionIndex + 1
+      : currentQuestionIndex;
 
-      // Find the index of the current quest
-      const currentQuestIndex = allQuests.findIndex(
-        (quest) => quest._id === questId
-      );
+    const updateData = {
+      userId: userId,
+      pointsDelta: correct ? 1000 : 0,
+      playPassDelta: -1,
+      questId: questId,
+      questionIndex: newQuestionIndex,
+    };
 
-      // Determine the next quest ID
-      const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
+    if (newQuestionIndex === questions.length) {
+      updateData.completedQuest = questId;
+      updateData.currentQuest = nextQuestId;
+    }
 
-      // Update the user's points and play pass
-      const updateData = {
-        userId: userId,
-        pointsDelta: 1000,
-        playPassDelta: -1,
-        currentQuestionIndex: correct
-          ? currentQuestionIndex + 1
-          : currentQuestionIndex,
-      };
+    const updateResponse = await fetch("/api/claim", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateData),
+    });
 
-      // If the current question is the last one in the quest, update completedQuest and currentQuest
-      if (currentQuestionIndex === questions.length - 1) {
-        updateData.completedQuest = questId;
-        updateData.currentQuest = nextQuestId;
-      }
+    if (!updateResponse.ok) {
+      throw new Error("Failed to update points and quest status");
+    }
 
-      // Send the update request
-      const updateResponse = await fetch("/api/claim", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
-      });
+    const updatedUserData = await updateResponse.json();
+    setPoints(updatedUserData.points);
+    setPlayPass(updatedUserData.playPass);
+    setCurrentQuestionIndex(newQuestionIndex);
 
-      if (!updateResponse.ok) {
-        throw new Error("Failed to update points and quest status");
-      }
-
-      const updatedUserData = await updateResponse.json();
-      setPoints(updatedUserData.points);
-      setPlayPass(updatedUserData.playPass);
-
-      if (currentQuestionIndex === questions.length - 1) {
-        setIsCompleted(true);
+    if (newQuestionIndex === questions.length) {
+      setIsCompleted(true);
+      setTimeout(() => {
+        setShowComplete(true);
         setTimeout(() => {
-          setShowComplete(true);
-          setTimeout(() => {
-            if (congratsSound) {
-              congratsSound
-                .play()
-                .catch((error) => console.error("Error playing sound:", error));
-            }
-          }, 1000);
-        }, 4000);
-      } else {
-        setTimeout(() => {
-          handleNext();
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("Error updating points:", error);
-      toast.error("An error occurred while updating points. Please try again.");
+          if (congratsSound) {
+            congratsSound
+              .play()
+              .catch((error) => console.error("Error playing sound:", error));
+          }
+        }, 1000);
+      }, 4000);
+    } else if (correct) {
+      setTimeout(() => {
+        handleNext();
+      }, 1500);
     }
-  } else {
-    if (wrongSound) {
-      wrongSound
-        .play()
-        .catch((error) => console.error("Error playing wrong sound:", error));
-    }
+  } catch (error) {
+    console.error("Error updating points:", error);
+    toast.error("An error occurred while updating points. Please try again.");
   }
 };
 

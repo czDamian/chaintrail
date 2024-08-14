@@ -17,7 +17,7 @@ const UserSchema = new mongoose.Schema(
       ref: "Quest",
       default: [],
     },
-    currentQuestion: { type: Number, default: 0 },
+    currentQuestion: { type: Object, default: {} },
     walletAddress: { type: String, unique: true },
     privateKey: { type: String, unique: true },
   },
