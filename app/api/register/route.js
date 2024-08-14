@@ -19,10 +19,13 @@ export async function POST(request) {
         const walletDetails = createWalletWithMnemonic();
         Object.assign(user, walletDetails);
       }
-      if (user.currentQuest == "") {
+      if (user.currentQuest === "" || user.currentQuest === null) {
         const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
-        Object.assign(user, firstQuest);
+        if (firstQuest) {
+          user.currentQuest = firstQuest._id;
+        }
       }
+
       if (!user.referralCode) {
         user.referralCode = await generateAutoIncrementalReferralCode();
       }

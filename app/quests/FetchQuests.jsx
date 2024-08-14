@@ -126,8 +126,8 @@ const FetchQuestsFromDb = () => {
                 </div>
                 <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500">
                   {Math.round(
-                    ((quest.questQuestions.length - 1) * 100) /
-                      quest.questQuestions.length
+                    ((quest.questQuestions.length + 51) * 100) /
+                      100
                   )}
                   %
                 </span>
