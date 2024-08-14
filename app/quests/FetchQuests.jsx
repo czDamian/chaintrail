@@ -8,10 +8,10 @@ import { QuestSkeleton } from "../components/HomePage/CustomLoader";
 const FetchQuestsFromDb = () => {
   const [quests, setQuests] = useState([]);
   const [loading, setLoading] = useState(true);
-  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     const fetchQuestsandProgress = async () => {
+      const userId = localStorage.getItem("userId");
       try {
         const response = await fetch(`/api/quests`);
         const userData = await fetch(`/api/users?userId=${userId}`);
@@ -19,8 +19,6 @@ const FetchQuestsFromDb = () => {
           const data = await response.json();
           const { currentQuest, currentQuestion, completedQuests } =
             await userData.json();
-
-          console.log({ currentQuest, currentQuestion, completedQuests });
 
           // Update quests with status based on user progress
           const updatedQuests = data.map((quest) => {
