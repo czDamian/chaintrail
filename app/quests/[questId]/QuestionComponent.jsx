@@ -232,7 +232,7 @@ const QuestionComponent = ({ questId }) => {
         totalQuestions={questions.length}
         playPass={playPass}
       />
-      <section className="max-w-[320px]">
+      <section className="max-w-[320px] mb-10">
         <QuestionImages currentQuestion={currentQuestion} />
         <AnswerDisplay
           currentQuestion={currentQuestion}
