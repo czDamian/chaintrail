@@ -25,7 +25,6 @@ export async function POST(request, { params }) {
     clearModelCache();
 
     await connectDb();
-    console.log("Connected to the database");
     const body = await request.json();
     console.log("Received request body:", body);
 

@@ -13,9 +13,6 @@ const UserSchema = new mongoose.Schema(
     referralCode: { type: String, unique: true },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     privateKey: { type: String, unique: true },
-    currentQuest: { type: mongoose.Schema.Types.ObjectId, ref: "Quest" },
-    currentQuestion: { type: Number, default: 0 },
-    completedQuests: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quest" }],
   },
   { timestamps: true }
 );

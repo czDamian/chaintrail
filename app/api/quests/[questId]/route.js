@@ -29,21 +29,22 @@ export async function GET(request, { params }) {
   }
 }
 
-
-
-
-
 export async function PUT(request, { params }) {
   try {
     await connectDb();
     const questId = params.questId;
 
     if (!questId) {
-      return NextResponse.json({ error: "Quest ID is required" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Quest ID is required" },
+        { status: 400 }
+      );
     }
 
     const body = await request.json();
-    const updatedQuest = await Quest.findByIdAndUpdate(questId, body, { new: true });
+    const updatedQuest = await Quest.findByIdAndUpdate(questId, body, {
+      new: true,
+    });
 
     if (!updatedQuest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });

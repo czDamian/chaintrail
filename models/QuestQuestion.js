@@ -8,7 +8,6 @@ const QuestQuestionSchema = new mongoose.Schema(
     img3: { type: String, required: true },
     img4: { type: String, required: true },
     hint: { type: String, required: true },
-    isAnswered: { type: Boolean, default: false },
     questAnswer: { type: String, required: true },
     scrambledAnswer: { type: String, required: true },
   },

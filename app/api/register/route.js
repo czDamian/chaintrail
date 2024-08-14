@@ -8,8 +8,6 @@ await connectDb();
 
 export async function POST(request) {
   const { userId, username, referralCode } = await request.json();
-//   db.getCollection("users").dropIndex("mnemonic_1");
-
 
   try {
     let user = await User.findOne({ userId });
