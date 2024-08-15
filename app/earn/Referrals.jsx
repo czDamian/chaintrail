@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IoCopy } from "react-icons/io5";
+import {
+  IoCopy,
+  IoCheckmarkCircle,
+  IoTimeOutline,
+  IoStar,
+} from "react-icons/io5";
 import Toast from "../components/Reusable/Toast";
 
 const Referrals = () => {
@@ -19,7 +24,7 @@ const Referrals = () => {
 
           if (response.ok) {
             const referralCode = data.referralCode || "0000"; // Default to "0000" if referralCode is missing
-            setReferralLink(`https://t.me/ChainTrailBot?start${referralCode}`);
+            setReferralLink(`https://t.me/ChainTrailBot?start=${referralCode}`);
             setReferralCount(data.referralCount || 0); // Set referral count if available
           } else {
             console.error("Failed to fetch referral code:", data.message);
@@ -41,10 +46,18 @@ const Referrals = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  const getAchievementIcon = (isComplete) => {
+    return isComplete ? (
+      <IoCheckmarkCircle className="text-yellow-400 text-3xl" />
+    ) : (
+      <IoTimeOutline className="text-gray-500 text-3xl" />
+    );
+  };
+
   return (
     <section className="px-8">
       <div className="text-center my-6 text-2xl">
-        <h1 className="font-bold ">
+        <h1 className="font-bold">
           INVITE <span className="text-gold-500">FRIENDS!</span>
         </h1>
         <p className="text-sm my-2">Refer & earn 1000 points</p>
@@ -76,62 +89,64 @@ const Referrals = () => {
           </span>
         </div>
       </div>
+
       <div className="my-12 flex flex-col gap-4 mx-4">
-        <h1>YOUR ACHIEVEMENTS!</h1>
-        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
-          <img src="frameIq.svg" alt="iq" className="rounded-full " />
-          <div className=" flex flex-col w-full text-sm gap-1">
-            <p>IQ Count: Snail Lord</p>
+        <h1 className="text-xl font-semibold text-gray-300">
+          YOUR ACHIEVEMENTS!
+        </h1>
+
+        {/* Achievement 1 */}
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-4 items-center">
+          {getAchievementIcon(referralCount >= 1)}
+          <div className="flex flex-col w-full text-sm gap-1">
+            <p className="font-medium">Snail Lord</p>
             <span>Get 1 referral</span>
             <input
               className="accent-yellow-400"
               type="range"
               name="iqCount"
-              value={0}
+              value={Math.min(referralCount, 1)}
               max={1}
-              id=""
+              readOnly
             />
           </div>
         </div>
-        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
-          <img
-            src="star.svg"
-            alt="iq"
-            className="my-2 p-1 rounded-full bg-gray-800"
-          />
-          <div className=" flex flex-col w-full text-sm gap-1">
-            <p>IQ Count: Snail Lord</p>
+
+        {/* Achievement 2 */}
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-4 items-center">
+          {getAchievementIcon(referralCount >= 10)}
+          <div className="flex flex-col w-full text-sm gap-1">
+            <p className="font-medium">Rising Star</p>
             <span>Get 10 referrals</span>
             <input
               className="accent-yellow-400"
               type="range"
               name="iqCount"
-              value={0}
+              value={Math.min(referralCount, 10)}
               max={10}
-              id=""
+              readOnly
             />
           </div>
         </div>
-        <div className="bg-gray-800 flex gap-4 rounded-xl p-2">
-          <img
-            src="frameIq1.svg"
-            alt="iq"
-            className=" p-2 my-1 rounded-full bg-gray-800 "
-          />
-          <div className=" flex flex-col w-full text-sm gap-1">
-            <p>IQ Count: Snail Lord</p>
-            <p>Get 100 referrals</p>
+
+        {/* Achievement 3 */}
+        <div className="bg-gray-800 flex gap-4 rounded-xl p-4 items-center">
+          {getAchievementIcon(referralCount >= 100)}
+          <div className="flex flex-col w-full text-sm gap-1">
+            <p className="font-medium">Mastermind</p>
+            <span>Get 100 referrals</span>
             <input
               className="accent-yellow-400"
               type="range"
               name="iqCount"
-              value={10}
+              value={Math.min(referralCount, 100)}
               max={100}
-              id=""
+              readOnly
             />
           </div>
         </div>
       </div>
+
       {showToast && (
         <Toast
           message="Referral link copied to clipboard!"
