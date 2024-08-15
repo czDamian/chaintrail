@@ -11,7 +11,7 @@ const BackButton = () => {
 
   return (
     <button onClick={handleBack}>
-      <MdClose className="text-white text-3xl" />
+      <MdClose className="text-white text-3xl inline" />Back
     </button>
   );
 };

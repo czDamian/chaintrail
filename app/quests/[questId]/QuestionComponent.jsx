@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect, memo } from "react";
-import SideNav from "@/app/components/Reusable/SideNav";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "@/app/loader";
@@ -12,6 +11,7 @@ import ActionButtons from "./ActionButtons";
 import PopupHandler from "./PopupHandler";
 import QuestUI from "./QuestUI";
 import { useRouter } from "next/navigation";
+import BackButton from "@/app/components/Reusable/BackButton";
 
 const QuestionComponent = ({ questId }) => {
   const router = useRouter();
@@ -219,6 +219,7 @@ const handleSubmit = async (answers = selectedAnswers) => {
 
   return (
     <section className="max-w-screen-xl mt-2 mx-auto px-4 sm:px-6 lg:px-8">
+      <BackButton />
       <QuestUI />
       <UserInfoBar
         points={points}
@@ -249,7 +250,6 @@ const handleSubmit = async (answers = selectedAnswers) => {
           isCorrect={isCorrect}
         />
       </section>
-      <SideNav />
       <ToastContainer />
     </section>
   );
