@@ -38,7 +38,7 @@ const Referrals = () => {
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
     setShowToast(true);
-    setTimeout(() => setShowToast(false), 3000); // Hide toast after 3 seconds
+    setTimeout(() => setShowToast(false), 3000);
   };
 
   return (

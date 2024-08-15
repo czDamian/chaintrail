@@ -2,7 +2,6 @@
 import { useState, useEffect, memo } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Loader from "@/app/loader";
 import UserInfoBar from "./UserInfoBar";
 import QuestionImages from "./QuestionImages";
 import AnswerDisplay from "./AnswerDisplay";
@@ -12,6 +11,7 @@ import PopupHandler from "./PopupHandler";
 import QuestUI from "./QuestUI";
 import { useRouter } from "next/navigation";
 import BackButton from "@/app/components/Reusable/BackButton";
+import QuestionLoader from "./QuestionLoader";
 
 const QuestionComponent = ({ questId }) => {
   const router = useRouter();
@@ -39,37 +39,39 @@ const QuestionComponent = ({ questId }) => {
     typeof Audio !== "undefined" ? new Audio("/btn/congrats.mp3") : null;
 
   // Fetch questions and user's current question index
-const fetchQuestions = async () => {
-  try {
-    const res = await fetch(`/api/quests/${questId}/questions`);
-    if (!res.ok) {
-      throw new Error("Network response was not ok.");
+  const fetchQuestions = async () => {
+    try {
+      const res = await fetch(`/api/quests/${questId}/questions`);
+      if (!res.ok) {
+        throw new Error("Network response was not ok.");
+      }
+      const data = await res.json();
+
+      const userId = localStorage.getItem("userId");
+      const userRes = await fetch(`/api/users?userId=${userId}`);
+      const userData = await userRes.json();
+
+      if (userData.currentQuest !== questId) {
+        alert("You have not unlocked this quest.");
+        router.push("/quests");
+        return;
+      }
+
+      setQuestions(data);
+
+      const userQuestIndex = userData.currentQuestion[questId];
+      setCurrentQuestionIndex(
+        userQuestIndex !== undefined ? userQuestIndex : 0
+      );
+
+      setLoading(false);
+      setPoints(userData.points);
+      setPlayPass(userData.playPass);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      setLoading(false);
     }
-    const data = await res.json();
-
-    const userId = localStorage.getItem("userId");
-    const userRes = await fetch(`/api/users?userId=${userId}`);
-    const userData = await userRes.json();
-
-    if (userData.currentQuest !== questId) {
-      alert("You have not unlocked this quest.");
-      router.push("/quests");
-      return;
-    }
-
-    setQuestions(data);
-
-    const userQuestIndex = userData.currentQuestion[questId];
-    setCurrentQuestionIndex(userQuestIndex !== undefined ? userQuestIndex : 0);
-
-    setLoading(false);
-    setPoints(userData.points);
-    setPlayPass(userData.playPass);
-  } catch (error) {
-    console.error("Error fetching questions:", error);
-    setLoading(false);
-  }
-};
+  };
   useEffect(() => {
     if (questId) {
       fetchQuestions();
@@ -104,89 +106,92 @@ const fetchQuestions = async () => {
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
 
-const handleSubmit = async (answers = selectedAnswers) => {
-  const currentQuestion = questions[currentQuestionIndex] || {};
-  const submittedAnswer = answers.join("");
-  const correct =
-    submittedAnswer.toUpperCase() ===
-    (currentQuestion.questAnswer || "").toUpperCase();
+  const handleSubmit = async (answers = selectedAnswers) => {
+    const currentQuestion = questions[currentQuestionIndex] || {};
+    const submittedAnswer = answers.join("");
+    const correct =
+      submittedAnswer.toUpperCase() ===
+      (currentQuestion.questAnswer || "").toUpperCase();
 
-  if (playPass <= 0) {
-    toast.error("Insufficient Play Pass");
-    return;
-  }
-
-  setIsCorrect(correct);
-  setShowPopup(true);
-
-  try {
-    const userId = localStorage.getItem("userId");
-    if (!userId) {
-      throw new Error("User ID not found in local storage");
+    if (playPass <= 0) {
+      toast.error("Insufficient Play Pass");
+      return;
     }
 
-    const questsResponse = await fetch("/api/quests");
-    const allQuests = await questsResponse.json();
-    const currentQuestIndex = allQuests.findIndex(
-      (quest) => quest._id === questId
-    );
-    const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
+    setIsCorrect(correct);
+    setShowPopup(true);
 
-    const newQuestionIndex = correct
-      ? currentQuestionIndex + 1
-      : currentQuestionIndex;
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID not found in local storage");
+      }
 
-    const updateData = {
-      userId: userId,
-      pointsDelta: correct ? 1000 : 0,
-      playPassDelta: -1,
-      questId: questId,
-      questionIndex: newQuestionIndex,
-    };
+      const questsResponse = await fetch("/api/quests");
+      const allQuests = await questsResponse.json();
+      const currentQuestIndex = allQuests.findIndex(
+        (quest) => quest._id === questId
+      );
+      const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
 
-    if (newQuestionIndex === questions.length) {
-      updateData.completedQuest = questId;
-      updateData.currentQuest = nextQuestId;
-    }
+      const newQuestionIndex = correct
+        ? currentQuestionIndex + 1
+        : currentQuestionIndex;
 
-    const updateResponse = await fetch("/api/claim", {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updateData),
-    });
+      const isLastQuestion = newQuestionIndex === questions.length;
+      const updateData = {
+        userId: userId,
+        pointsDelta: correct ? 1000 : 0,
+        playPassDelta: isLastQuestion ? -1 : 0,
+        questId: questId,
+        questionIndex: newQuestionIndex,
+      };
 
-    if (!updateResponse.ok) {
-      throw new Error("Failed to update points and quest status");
-    }
+      if (newQuestionIndex === questions.length) {
+        updateData.completedQuest = questId;
+        updateData.currentQuest = nextQuestId;
+      }
+      if (isLastQuestion) {
+        updateData.completedQuest = questId;
+        updateData.currentQuest = nextQuestId;
+      }
+      const updateResponse = await fetch("/api/claim", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updateData),
+      });
 
-    const updatedUserData = await updateResponse.json();
-    setPoints(updatedUserData.points);
-    setPlayPass(updatedUserData.playPass);
-    setCurrentQuestionIndex(newQuestionIndex);
+      if (!updateResponse.ok) {
+        throw new Error("Failed to update points and quest status");
+      }
 
-    if (newQuestionIndex === questions.length) {
-      setIsCompleted(true);
-      setTimeout(() => {
-        setShowComplete(true);
+      const updatedUserData = await updateResponse.json();
+      setPoints(updatedUserData.points);
+      setPlayPass(updatedUserData.playPass);
+      setCurrentQuestionIndex(newQuestionIndex);
+
+      if (newQuestionIndex === questions.length) {
+        setIsCompleted(true);
         setTimeout(() => {
-          if (congratsSound) {
-            congratsSound
-              .play()
-              .catch((error) => console.error("Error playing sound:", error));
-          }
-        }, 1000);
-      }, 4000);
-    } else if (correct) {
-      setTimeout(() => {
-        handleNext();
-      }, 1500);
+          setShowComplete(true);
+          setTimeout(() => {
+            if (congratsSound) {
+              congratsSound
+                .play()
+                .catch((error) => console.error("Error playing sound:", error));
+            }
+          }, 1000);
+        }, 4000);
+      } else if (correct) {
+        setTimeout(() => {
+          handleNext();
+        }, 1500);
+      }
+    } catch (error) {
+      console.error("Error updating points:", error);
+      toast.error("An error occurred while updating points. Please try again.");
     }
-  } catch (error) {
-    console.error("Error updating points:", error);
-    toast.error("An error occurred while updating points. Please try again.");
-  }
-};
-
+  };
 
   const handleNext = () => {
     if (isCompleted || showComplete) {
@@ -208,7 +213,7 @@ const handleSubmit = async (answers = selectedAnswers) => {
   }, [showPopup, isCompleted]);
 
   if (loading) {
-    return <Loader />;
+    return <QuestionLoader />;
   }
 
   if (!questions.length) {
