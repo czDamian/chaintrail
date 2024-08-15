@@ -9,6 +9,7 @@ const ClaimDailyReward = () => {
   const [timeLeft, setTimeLeft] = useState({});
   const [toastMessage, setToastMessage] = useState(null);
   const [toastBorderColor, setToastBorderColor] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const userId = localStorage.getItem("userId");
@@ -16,6 +17,7 @@ const ClaimDailyReward = () => {
       checkClaimStatus(userId);
     } else {
       console.warn("User ID not found in local storage");
+      setIsLoading(false);
     }
   }, []);
 
@@ -25,7 +27,7 @@ const ClaimDailyReward = () => {
         updateTimeLeft();
       }, 1000);
 
-      return () => clearInterval(interval); // Clean up interval on component unmount
+      return () => clearInterval(interval);
     }
   }, [nextClaimTime]);
 
@@ -33,7 +35,7 @@ const ClaimDailyReward = () => {
     if (toastMessage) {
       const timer = setTimeout(() => {
         setToastMessage(null);
-      }, 1500); // Hide the toast after 1.5 seconds
+      }, 1500);
 
       return () => clearTimeout(timer);
     }
@@ -47,7 +49,7 @@ const ClaimDailyReward = () => {
     if (timeDifference <= 0) {
       setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
       setCanClaim(true);
-      setNextClaimTime(null); // Reset next claim time when it's time to claim
+      setNextClaimTime(null);
     } else {
       const seconds = Math.floor((timeDifference / 1000) % 60);
       const minutes = Math.floor((timeDifference / 1000 / 60) % 60);
@@ -59,22 +61,27 @@ const ClaimDailyReward = () => {
   };
 
   const checkClaimStatus = async (userId) => {
+    setIsLoading(true);
     try {
       const response = await fetch(`/api/claim?userId=${userId}`);
       const data = await response.json();
       if (response.ok) {
-        if (data.message === "Daily reward and pass not available yet") {
-          setCanClaim(false);
+        if (data.nextClaimTime) {
           setNextClaimTime(data.nextClaimTime);
+          setCanClaim(false);
         } else {
           setCanClaim(true);
-          setNextClaimTime(null); // Claim is available immediately
+          setNextClaimTime(null);
         }
       } else {
         console.error("Error checking claim status:", data.message);
+        setCanClaim(false);
       }
     } catch (error) {
       console.error("Error checking claim status:", error);
+      setCanClaim(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,6 +92,7 @@ const ClaimDailyReward = () => {
       return;
     }
 
+    setIsLoading(true);
     try {
       const response = await fetch("/api/claim", {
         method: "PUT",
@@ -106,6 +114,7 @@ const ClaimDailyReward = () => {
           setToastMessage("Already claimed, try again later.");
           setToastBorderColor("border-blue-600");
           setNextClaimTime(data.nextClaimTime);
+          setCanClaim(false);
         } else {
           setToastMessage(data.message);
           setToastBorderColor("border-red-600");
@@ -115,6 +124,13 @@ const ClaimDailyReward = () => {
       console.error("Error claiming reward and pass:", error);
       setToastMessage("Error claiming reward and pass");
       setToastBorderColor("border-red-600");
+    } finally {
+      setIsLoading(false);
+      // Recheck claim status after attempting to claim
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        checkClaimStatus(userId);
+      }
     }
   };
 
@@ -146,24 +162,27 @@ const ClaimDailyReward = () => {
               alt="Play Passes"
               className="w-12 h-12 mb-2"
             />
-            <span className="text-xl font-bold">4</span>
+            <span className="text-xl font-bold">2</span>
             <span className="text-sm mb-2">Play Passes</span>
           </div>
         </div>
         <div className="text-center">
           <Button
             onClick={claimRewardAndPass}
-            disabled={!canClaim}
+            disabled={!canClaim || isLoading}
             className={`px-20 py-2 bg-yellow-500 hover:bg-yellow-400 active:scale-105 text-black font-bold rounded-md ${
-              !canClaim ? "opacity-50 cursor-not-allowed text-xs" : ""
+              !canClaim || isLoading
+                ? "opacity-50 cursor-not-allowed text-xs"
+                : ""
             }`}>
-            {canClaim ? "CLAIM" : "Claimed"}
+            {isLoading ? "Loading..." : canClaim ? "CLAIM" : "Claimed"}
           </Button>
         </div>
-        {nextClaimTime && (
+        {nextClaimTime && !canClaim && (
           <div className="text-center mt-4">
             <p>
-              Next claim time: {timeLeft.hours}h {timeLeft.minutes}m {timeLeft.seconds}s
+              Next claim time: {timeLeft.hours}h {timeLeft.minutes}m
+              {timeLeft.seconds}s
             </p>
           </div>
         )}

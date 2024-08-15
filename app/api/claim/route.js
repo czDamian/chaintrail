@@ -55,7 +55,7 @@ export async function PUT(request) {
     }
 
     user.points += 1200;
-    user.playPass += 4;
+    user.playPass += 2;
     user.lastClaimTimestamp = now;
     await user.save();
 
