@@ -7,23 +7,31 @@ import { QuestSkeleton } from "../components/HomePage/CustomLoader";
 
 const FetchQuestsFromDb = () => {
   const [quests, setQuests] = useState([]);
+  const [userProgress, setUserProgress] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchQuestsandProgress = async () => {
       const userId = localStorage.getItem("userId");
       try {
-        // Fetch quests with userId as a query parameter
-        const response = await fetch(`/api/quests?userId=${userId}`);
+        // Fetch quests
+        const questsResponse = await fetch(`/api/quests?userId=${userId}`);
 
-        if (response.ok) {
-          const questsData = await response.json();
+        // Fetch user data
+        const userResponse = await fetch(`/api/users?userId=${userId}`);
+
+        if (questsResponse.ok && userResponse.ok) {
+          const questsData = await questsResponse.json();
+          const userData = await userResponse.json();
+
           setQuests(questsData);
+          setUserProgress(userData.currentQuestion || {});
+          console.log(userData.currentQuestion)
         } else {
-          throw new Error("Failed to fetch quests");
+          throw new Error("Failed to fetch data");
         }
       } catch (error) {
-        console.error("Error fetching quests:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -31,6 +39,20 @@ const FetchQuestsFromDb = () => {
 
     fetchQuestsandProgress();
   }, []);
+
+  const calculateProgress = (quest) => {
+    if (quest.questStatus == "completed") return 100;
+    if (quest.questStatus == "locked") return 0;
+
+    const currentQuestionNumber = userProgress[quest._id] || 0;
+    console.log("currentQuestionNumber", currentQuestionNumber)
+    const totalQuestions = quest.questQuestions.length;
+    console.log("totalQuestions", totalQuestions);
+
+    if (currentQuestionNumber > totalQuestions) return 100;
+
+    return Math.round(((currentQuestionNumber + 1) / totalQuestions) * 100);
+  };
 
   return (
     <section className="bg-gray-900 mb-20">
@@ -90,8 +112,7 @@ const FetchQuestsFromDb = () => {
                   <img src="coins.png" width={20} alt="points" />
                 </div>
                 <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500">
-                  {Math.round(((quest.questQuestions.length + 51) * 100) / 100)}
-                  %
+                  {calculateProgress(quest)}%
                 </span>
               </div>
             </Link>
