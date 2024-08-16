@@ -26,7 +26,7 @@ const FetchQuestsFromDb = () => {
 
           setQuests(questsData);
           setUserProgress(userData.currentQuestion || {});
-          console.log(userData.currentQuestion)
+          console.log(userData.currentQuestion);
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -45,7 +45,7 @@ const FetchQuestsFromDb = () => {
     if (quest.questStatus == "locked") return 0;
 
     const currentQuestionNumber = userProgress[quest._id] || 0;
-    console.log("currentQuestionNumber", currentQuestionNumber)
+    console.log("currentQuestionNumber", currentQuestionNumber);
     const totalQuestions = quest.questQuestions.length;
     console.log("totalQuestions", totalQuestions);
 
@@ -92,12 +92,14 @@ const FetchQuestsFromDb = () => {
                 </span>
                 <Button
                   className={`px-4 py-2 text-xs transition-colors duration-300 ${
-                    quest.isLinkDisabled
-                      ? "bg-neutral-900 text-gray-400 cursor-not-allowed"
-                      : "bg-gold-500 text-black hover:bg-yellow-500"
+                    quest.questStatus === "locked"
+                      ? "bg-neutral-900 text-gray-300 cursor-not-allowed"
+                      : quest.questStatus === "completed"
+                      ? "bg-blue-500 text-black hover:bg-blue-600 cursor-not-allowed"
+                      : "bg-gold-500 text-black hover:bg-yellow-600"
                   }`}>
                   {quest.questStatus}
-                </Button>
+                </Button>{" "}
               </div>
               <div className="mx-3 pb-2 text-xs text-justify">
                 {quest.questDescription ||
