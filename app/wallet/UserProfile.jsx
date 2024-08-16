@@ -1,13 +1,18 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
 import { format } from "date-fns";
+import { ethers } from "ethers";
 
 export default function UserProfile() {
   const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
   const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
+  const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
+  const [importError, setImportError] = useState("");
+  const [importSuccess, setImportSuccess] = useState(false);
+  const [showImportFields, setShowImportFields] = useState(false);
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
@@ -21,6 +26,85 @@ export default function UserProfile() {
   }
 
   const formattedDate = format(new Date(userInfo.createdAt), "MMMM dd, yyyy");
+
+  const handleDisconnect = async () => {
+    try {
+      const response = await fetch(`/api/users?userId=${userInfo.userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: null,
+          privateKey: null,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to disconnect wallet');
+      }
+
+      // Refresh the page to show updated wallet info
+      window.location.reload();
+    } catch (err) {
+      console.error("Error disconnecting wallet:", err);
+      setImportError("Failed to disconnect wallet");
+    }
+  };
+
+  const handleSeedPhraseChange = (index, value) => {
+    const updatedSeedPhrase = [...seedPhrase];
+    updatedSeedPhrase[index] = value;
+    setSeedPhrase(updatedSeedPhrase);
+
+    if (index === 0) {
+      const words = value.trim().split(/\s+/);
+      if (words.length === 12) {
+        for (let i = 0; i < words.length; i++) {
+          if (i < seedPhrase.length) {
+            updatedSeedPhrase[i] = words[i];
+          }
+        }
+        setSeedPhrase(updatedSeedPhrase);
+      }
+    }
+  };
+
+  const handleImportWallet = async () => {
+    if (!seedPhrase.every(Boolean)) {
+      setImportError("All seed phrase fields must be filled");
+      return;
+    }
+
+    try {
+      const mnemonic = seedPhrase.join(" ");
+      const walletInstance = ethers.Wallet.fromPhrase(mnemonic);
+
+      const response = await fetch(`/api/users?userId=${userInfo.userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          walletAddress: walletInstance.address,
+          privateKey: walletInstance.privateKey,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user wallet info');
+      }
+
+      setImportSuccess(true);
+      setImportError("");
+      // Refresh user info to show updated wallet info
+      fetchUserInfo(userInfo.userId);
+    } catch (err) {
+      console.error("Error importing wallet:", err);
+      setImportError("Failed to import wallet");
+      setImportSuccess(false);
+    }
+  };
 
   return (
     <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 mt-20 md:mt-40">
@@ -38,50 +122,101 @@ export default function UserProfile() {
               <span className="font-bold">Points:</span> {userInfo.points}
             </p>
             <p>
-              <span className="font-bold">Play Pass:</span>
+              <span className="font-bold">Play Pass: </span>
               {userInfo.playPass}
             </p>
             <p>
               <span className="font-bold">User since:</span> {formattedDate}
             </p>
 
-            <div className="flex items-center">
-              <label className="block font-bold mb-2 w-32">Private Key</label>
-              <div className="flex flex-1 items-center relative">
-                <input
-                  type={showPrivateKey ? "text" : "password"}
-                  value={userInfo.privateKey}
-                  readOnly
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPrivateKey(!showPrivateKey)}
-                  className="px-3 flex items-center text-gray-500">
-                  {showPrivateKey ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
+            {userInfo.walletAddress && userInfo.privateKey ? (
+              <>
+                <div className="flex items-center">
+                  <label className="block font-bold mb-2 w-32">Private Key</label>
+                  <div className="flex flex-1 items-center relative">
+                    <input
+                      type={showPrivateKey ? "text" : "password"}
+                      value={userInfo.privateKey}
+                      readOnly
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPrivateKey(!showPrivateKey)}
+                      className="px-3 flex items-center text-gray-500">
+                      {showPrivateKey ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
 
-            <div className="flex items-center mt-4">
-              <label className="block font-bold mb-2 w-32">
-                Wallet Address
-              </label>
-              <div className="flex flex-1 items-center relative">
-                <input
-                  type={showWalletAddress ? "text" : "password"}
-                  value={userInfo.walletAddress}
-                  readOnly
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
-                />
+                <div className="flex items-center mt-4">
+                  <label className="block font-bold mb-2 w-32">
+                    Wallet Address
+                  </label>
+                  <div className="flex flex-1 items-center relative">
+                    <input
+                      type={showWalletAddress ? "text" : "password"}
+                      value={userInfo.walletAddress}
+                      readOnly
+                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowWalletAddress(!showWalletAddress)}
+                      className="px-3 flex items-center text-gray-500">
+                      {showWalletAddress ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+                </div>
                 <button
-                  type="button"
-                  onClick={() => setShowWalletAddress(!showWalletAddress)}
-                  className="px-3 flex items-center text-gray-500">
-                  {showWalletAddress ? <FaEyeSlash /> : <FaEye />}
+                  onClick={handleDisconnect}
+                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4">
+                  Disconnect Wallet
                 </button>
+              </>
+            ) : (
+              <div className="col-span-2">
+                {!showImportFields ? (
+                  <button
+                    onClick={() => setShowImportFields(true)}
+                    className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 w-full">
+                    Connect Wallet
+                  </button>
+                ) : (
+                  <>
+                    <h3 className="text-xl font-bold mb-4">Import Wallet</h3>
+                    <div className="grid grid-cols-3 gap-2">
+                      {seedPhrase.map((word, index) => (
+                        <input
+                          key={index}
+                          type="text"
+                          value={word}
+                          onChange={(e) => handleSeedPhraseChange(index, e.target.value)}
+                          className="border rounded-md px-2 py-1 text-sm"
+                          placeholder={`Word ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                    <button
+                      onClick={handleImportWallet}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 w-full">
+                      Import Wallet
+                    </button>
+                    {importSuccess && (
+                      <div className="flex items-center mt-2 text-green-600">
+                        <FaCheckCircle className="mr-2" />
+                        <p>Wallet imported successfully!</p>
+                      </div>
+                    )}
+                    {importError && (
+                      <div className="text-sm text-red-600 mt-2">
+                        <p>{importError}</p>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

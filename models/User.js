@@ -18,8 +18,18 @@ const UserSchema = new mongoose.Schema(
       default: [],
     },
     currentQuestion: { type: Object, default: {} },
-    walletAddress: { type: String, unique: true },
-    privateKey: { type: String, unique: true },
+    walletAddress: {
+      type: String,
+      unique: true,
+      sparse: true,
+      default: null,
+    },
+    privateKey: {
+      type: String,
+      unique: true,
+      sparse: true,
+      default: null,
+    },
   },
   { timestamps: true }
 );

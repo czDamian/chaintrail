@@ -29,7 +29,7 @@ const WalletDetails = ({
   const baseCurrency = networkCurrencies[chainName.toLowerCase()] || "ETH";
 
   return (
-    <div className="flex flex-row items-center justify-between gap-4">
+    <div className="flex flex-row items-center justify-between gap-4 text-xs">
       <p
         className="text-gray-600 flex gap-4 border rounded-md p-2 items-center cursor-pointer"
         onClick={() => handleDisconnect()}>
