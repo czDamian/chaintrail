@@ -144,12 +144,19 @@ const QuestionComponent = ({ questId }) => {
         pointsDelta: correct ? 1000 : 0,
         playPassDelta: isLastQuestion ? -1 : 0,
         questId: questId,
-        questionIndex: newQuestionIndex,
+        currentQuestion: {
+          [questId]: newQuestionIndex,
+        },
       };
 
       if (newQuestionIndex === questions.length) {
         updateData.completedQuest = questId;
         updateData.currentQuest = nextQuestId;
+        if (nextQuestId) {
+          updateData.currentQuestion = {
+            [nextQuestId]: 0,
+          };
+        }
       }
       if (isLastQuestion) {
         updateData.completedQuest = questId;

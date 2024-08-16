@@ -51,7 +51,7 @@ const FetchQuestsFromDb = () => {
 
     if (currentQuestionNumber > totalQuestions) return 100;
 
-    return Math.round(((currentQuestionNumber + 1) / totalQuestions) * 100);
+    return Math.round(((currentQuestionNumber) / totalQuestions) * 100);
   };
 
   return (
@@ -99,7 +99,7 @@ const FetchQuestsFromDb = () => {
                       : "bg-gold-500 text-black hover:bg-yellow-600"
                   }`}>
                   {quest.questStatus}
-                </Button>{" "}
+                </Button>
               </div>
               <div className="mx-3 pb-2 text-xs text-justify">
                 {quest.questDescription ||

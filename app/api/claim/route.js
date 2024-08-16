@@ -80,8 +80,7 @@ export async function PATCH(request) {
     playPassDelta,
     completedQuest,
     currentQuest,
-    questId,
-    questionIndex,
+    currentQuestion,
   } = await request.json();
 
   try {
@@ -109,10 +108,9 @@ export async function PATCH(request) {
     if (currentQuest !== undefined) {
       user.currentQuest = currentQuest;
     }
-    // Update the current question index for the quest
-    if (questId !== undefined && questionIndex !== undefined) {
-      if (!user.currentQuestion) user.currentQuestion = {};
-      user.currentQuestion[questId] = questionIndex;
+    // Replace the entire currentQuestion object
+    if (currentQuestion !== undefined) {
+      user.currentQuestion = currentQuestion;
     }
 
     await user.save();
