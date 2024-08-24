@@ -41,14 +41,13 @@ const QuestionComponent = ({ questId }) => {
   // Fetch questions and user's current question index
   const fetchQuestions = async () => {
     try {
+      const userId = localStorage.getItem("userId");
       const res = await fetch(`/api/quests/${questId}/questions`);
-      if (!res.ok) {
+      const userRes = await fetch(`/api/users?userId=${userId}`);
+      if (!res.ok || !userRes.ok) {
         throw new Error("Network response was not ok.");
       }
       const data = await res.json();
-
-      const userId = localStorage.getItem("userId");
-      const userRes = await fetch(`/api/users?userId=${userId}`);
       const userData = await userRes.json();
 
       if (userData.currentQuest !== questId) {
@@ -56,17 +55,15 @@ const QuestionComponent = ({ questId }) => {
         router.push("/quests");
         return;
       }
-
       setQuestions(data);
-
-      const userQuestIndex = userData.currentQuestion[questId];
+      setPoints(userData.points);
+      setPlayPass(userData.playPass);
+      const userQuestIndex = userData.currentQuestion[questId] || 0;
       setCurrentQuestionIndex(
         userQuestIndex !== undefined ? userQuestIndex : 0
       );
 
       setLoading(false);
-      setPoints(userData.points);
-      setPlayPass(userData.playPass);
     } catch (error) {
       console.error("Error fetching questions:", error);
       setLoading(false);
