@@ -9,3 +9,10 @@ run `npx hardhat run scripts/mint.js --network coreTestnet` to mint the nft on c
 
 the nfts were minted separately so confirm the ipfshash before minting
 
+
+## About Edu Chain
+Network name: Open Campus Codex Sepolia
+New RPC URL https://open-campus-codex-sepolia.drpc.org
+Chain ID: 0xa045c
+Currency Symbol: EDU
+Block Explorer URL (Optional): https://opencampus-codex.blockscout.com

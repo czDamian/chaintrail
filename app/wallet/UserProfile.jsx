@@ -1,10 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
-import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
+import {
+  FaEye,
+  FaEyeSlash,
+  FaCheckCircle,
+  FaChevronDown,
+} from "react-icons/fa";
 import { format } from "date-fns";
 import { ethers } from "ethers";
+import Modal from "../components/Reusable/Modal";
 import Loader from "../loader";
+import { useRouter } from "next/navigation";
 
 export default function UserProfile() {
   const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
@@ -13,6 +20,12 @@ export default function UserProfile() {
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState(false);
   const [showImportFields, setShowImportFields] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const router = useRouter();
+
+  const truncateAddress = (address) => {
+    return address ? `${address.slice(0, 6)}...${address.slice(-4)}` : "";
+  };
 
   useEffect(() => {
     const savedUserId = localStorage.getItem("userId");
@@ -44,8 +57,7 @@ export default function UserProfile() {
         throw new Error("Failed to disconnect wallet");
       }
 
-      // Refresh the page to show updated wallet info
-      window.location.reload();
+      router.refresh();
     } catch (err) {
       console.error("Error disconnecting wallet:", err);
       setImportError("Failed to disconnect wallet");
@@ -97,8 +109,8 @@ export default function UserProfile() {
 
       setImportSuccess(true);
       setImportError("");
-      // Refresh user info to show updated wallet info
       fetchUserInfo(userInfo.userId);
+      router.refresh();
     } catch (err) {
       console.error("Error importing wallet:", err);
       setImportError("Failed to import wallet");
@@ -151,17 +163,48 @@ export default function UserProfile() {
                   </div>
                 </div>
 
-                <div className="flex flex-col">
+                <div className="flex flex-row justify-between">
                   <div className="font-bold">
                     Wallet Address:
+                    <button
+                      onClick={() => setShowModal(true)}
+                      className="flex items-center gap-2 ml-2 text-blue-500">
+                      {truncateAddress(userInfo.walletAddress)}
+                      <FaChevronDown />
+                    </button>
                   </div>
-                  {userInfo.walletAddress || " wallet not connected"}
+                  <div className="flex items-center gap-2 mt-2">
+                    <img
+                      src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
+                      alt="Chain Logo"
+                      className="w-6 h-6"
+                    />
+                    <span className="text-gray-400">Edu Chain</span>
+                  </div>
                 </div>
-                <button
-                  onClick={handleDisconnect}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md mt-4">
-                  Disconnect Wallet
-                </button>
+
+                {showModal && (
+                  <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+                    <h3 className="text-lg font-semibold mb-4">
+                      Disconnect Wallet
+                    </h3>
+                    <p className="text-xs md:text-lg">
+                      Are you sure you want to disconnect your wallet?
+                    </p>
+                    <div className="flex justify-end mt-4 text-xs md:text-lg">
+                      <button
+                        onClick={handleDisconnect}
+                        className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">
+                        Disconnect
+                      </button>
+                      <button
+                        onClick={() => setShowModal(false)}
+                        className="bg-gray-500 text-white px-4 py-2 rounded-md">
+                        Cancel
+                      </button>
+                    </div>
+                  </Modal>
+                )}
               </>
             ) : (
               <div className="col-span-2">
