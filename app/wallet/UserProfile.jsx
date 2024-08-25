@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import {
   FaEye,
+  FaTimes,
   FaEyeSlash,
   FaCheckCircle,
   FaChevronDown,
@@ -21,6 +22,7 @@ export default function UserProfile() {
   const [importSuccess, setImportSuccess] = useState(false);
   const [showImportFields, setShowImportFields] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showPrivateKeyModal, setShowPrivateKeyModal] = useState(false);
   const router = useRouter();
 
   const truncateAddress = (address) => {
@@ -137,9 +139,6 @@ export default function UserProfile() {
               <span className="font-bold">Play Pass: </span>
               {userInfo.playPass}
             </p>
-            <p>
-              <span className="font-bold">User since:</span> {formattedDate}
-            </p>
 
             {userInfo.walletAddress && userInfo.privateKey ? (
               <>
@@ -163,44 +162,68 @@ export default function UserProfile() {
                   </div>
                 </div>
 
-                <div className="flex flex-row justify-between">
-                  <div className="font-bold">
-                    Wallet Address:
-                    <button
-                      onClick={() => setShowModal(true)}
-                      className="flex items-center gap-2 ml-2 text-blue-500">
-                      {truncateAddress(userInfo.walletAddress)}
-                      <FaChevronDown />
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
+                <div className="flex flex-col xs:flex-row justify-between">
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="flex items-center gap-2 text-blue-500 border p-2 rounded-md border-blue-500 text-sm">
+                    {truncateAddress(userInfo.walletAddress)}
+                    <FaChevronDown />
+                  </button>
+                  <button className="flex items-center gap-2  border p-2 rounded-md border-blue-500">
                     <img
                       src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
                       alt="Chain Logo"
                       className="w-6 h-6"
                     />
-                    <span className="text-gray-400">Edu Chain</span>
-                  </div>
+                    <span className="text-gray-400 text-sm">Edu Chain</span>
+                    <FaChevronDown />
+                  </button>
                 </div>
 
                 {showModal && (
                   <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                    <h3 className="text-lg font-semibold mb-4">
-                      Disconnect Wallet
-                    </h3>
-                    <p className="text-xs md:text-lg">
-                      Are you sure you want to disconnect your wallet?
-                    </p>
-                    <div className="flex justify-end mt-4 text-xs md:text-lg">
-                      <button
-                        onClick={handleDisconnect}
-                        className="bg-red-500 text-white px-4 py-2 rounded-md mr-2">
-                        Disconnect
-                      </button>
+                    <div className="relative">
                       <button
                         onClick={() => setShowModal(false)}
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700">
+                        <FaTimes />
+                      </button>
+                      <p className="text-center font-bold my-4">
+                        {truncateAddress(userInfo.walletAddress)}
+                      </p>
+                      <p className="text-center text-gray-400 my-4">0 ETH</p>
+                      <div className="flex text-sm gap-4">
+                        <button
+                          onClick={handleDisconnect}
+                          className="bg-red-500 text-white px-4 py-2 rounded-md">
+                          Disconnect Wallet
+                        </button>
+                        <button
+                          onClick={() => setShowPrivateKeyModal(true)}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                          Show Private Key
+                        </button>
+                      </div>
+                    </div>
+                  </Modal>
+                )}
+
+                {showPrivateKeyModal && (
+                  <Modal
+                    isOpen={showPrivateKeyModal}
+                    onClose={() => setShowPrivateKeyModal(false)}>
+                    <h3 className="text-lg font-semibold mb-4">Private Key</h3>
+                    <input
+                      type="text"
+                      value={userInfo.privateKey}
+                      readOnly
+                      className="w-full px-3 py-2 border rounded-md bg-gray-900"
+                    />
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={() => setShowPrivateKeyModal(false)}
                         className="bg-gray-500 text-white px-4 py-2 rounded-md">
-                        Cancel
+                        Close
                       </button>
                     </div>
                   </Modal>
