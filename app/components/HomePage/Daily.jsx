@@ -19,8 +19,8 @@ const Daily = () => {
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
-      setIsMobile(width < 450);
-      setIsTablet(width >= 450 && width < 800);
+      setIsMobile(width < 500);
+      setIsTablet(width >= 500 && width < 800);
     };
 
     handleResize();

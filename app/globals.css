@@ -1,26 +1,27 @@
 /* globals.css */
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Krona+One:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Montserrat&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Krona+One:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+* {
+  @apply m-0 p-0 box-border overflow-x-hidden  sm:max-w-[1400px];
+}
+
 body {
-  @apply bg-gray-950 text-white w-full max-w-[400px]  sm:max-w-[1400px] m-0 p-0 overflow-x-hidden font-montserrat;
+  @apply bg-gray-950 text-white w-full font-montserrat overflow-hidden;
+}
+input,
+select,
+textarea,
+option {
+  @apply bg-inherit outline-none border border-neutral-600;
 }
 
-input[type=file]{
-    @apply my-2 ;
+h1 {
+  @apply font-cinzel font-bold;
 }
-input, select, textarea, option{
-   @apply  bg-inherit outline-none border border-neutral-600
-}
-
-h1{
-    @apply font-cinzel font-bold;
-}
-

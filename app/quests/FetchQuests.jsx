@@ -55,7 +55,7 @@ const FetchQuestsFromDb = () => {
   };
 
   return (
-    <section className="bg-gray-900 mb-20">
+    <section className=" mb-20 w-full">
       <div className="flex justify-between items-center mx-4 my-4 py-2 text-gray-300">
         <h1 className="font-bold text-gold-500 text-4xl">QUESTS</h1>
         <div className="flex gap-2 cursor-pointer">

@@ -8,6 +8,7 @@ import {
 } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 const TelegramAuthContext = createContext();
 
@@ -15,6 +16,7 @@ export default function TelegramAuthProvider({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
+  const router= useRouter();
 
   const fetchUserInfo = useCallback(async (userId) => {
     try {
@@ -59,6 +61,7 @@ export default function TelegramAuthProvider({ children }) {
         setUserPoints(data.points || 0);
         localStorage.setItem("userId", userId);
         localStorage.removeItem("referralCode");
+        router.refresh();
       } else {
         toast.error("Registration failed. Please try again.");
       }

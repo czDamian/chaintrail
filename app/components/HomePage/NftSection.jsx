@@ -4,7 +4,7 @@ import Image from "next/image";
 import Button from "../Reusable/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css/bundle"; // Import Swiper styles
-import { Pagination, Autoplay } from "swiper/modules";
+import { Autoplay } from "swiper/modules";
 
 const NFTSection = () => {
   const nftImages = ["/nft1.png", "/nft2.png", "/nft1.png"];
@@ -21,44 +21,35 @@ const NFTSection = () => {
   }, []);
 
   return (
-    <div className="bg-slate-900 w-full py-12">
+    <div className="bg-slate-900 w-full py-12 px-2">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">UNIQUE NFTS</h1>
         <p className="text-lg text-gray-300">
-          Earn Unique NFTs on completing each game & quest
+          Earn Unique NFTs when you reach a certain points threshold
         </p>
       </div>
 
       <div className="px-4 sm:px-8">
         <Swiper
-          modules={[Pagination, Autoplay]}
-          spaceBetween={20}
+          modules={[Autoplay]}
+          spaceBetween={10}
           slidesPerView={isMobile ? 1 : 3}
-          pagination={{
-            clickable: true,
-            el: ".swiper-pagination",
-            bulletElement: "div",
-            bulletClass:
-              "swiper-pagination-bullet rounded-full w-3 h-3 bg-gray-400 mr-2",
-            bulletActiveClass: "bg-yellow-500",
-          }}
           autoplay={{ delay: 2000, disableOnInteraction: false }}
           className="mySwiper">
           {nftImages.map((nftImage, index) => (
             <SwiperSlide key={index} className="flex justify-center">
-              <div className="relative">
+              <div className="">
                 <Image
                   src={nftImage}
                   alt={`NFT ${index + 1}`}
                   width={800}
                   height={1200}
-                  className="object-cover rounded-lg hover:scale-105 transition-transform duration-300 max-w-60 mx-auto"
+                  className="object-cover rounded-lg transition-transform duration-300  max-w-56 mx-auto"
                 />
               </div>
             </SwiperSlide>
           ))}
         </Swiper>
-        <div className="swiper-pagination mt-6 flex justify-center"></div>
       </div>
 
       <div className="text-center mt-10">

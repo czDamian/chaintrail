@@ -135,7 +135,7 @@ const ClaimDailyReward = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center my-10">
+    <div className="flex flex-col items-center justify-center my-10 mx-4">
       {toastMessage && (
         <Toast message={toastMessage} borderLeftColor={toastBorderColor} />
       )}

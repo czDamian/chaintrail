@@ -4,10 +4,10 @@ import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 import { FaEye, FaEyeSlash, FaCheckCircle } from "react-icons/fa";
 import { format } from "date-fns";
 import { ethers } from "ethers";
+import Loader from "../loader";
 
 export default function UserProfile() {
   const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
-  const [showWalletAddress, setShowWalletAddress] = useState(false);
   const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
   const [importError, setImportError] = useState("");
@@ -22,7 +22,7 @@ export default function UserProfile() {
   }, [fetchUserInfo, userInfo]);
 
   if (isLoading || !userInfo || !userInfo.userId) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   const formattedDate = format(new Date(userInfo.createdAt), "MMMM dd, yyyy");
@@ -30,9 +30,9 @@ export default function UserProfile() {
   const handleDisconnect = async () => {
     try {
       const response = await fetch(`/api/users?userId=${userInfo.userId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           walletAddress: null,
@@ -41,7 +41,7 @@ export default function UserProfile() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to disconnect wallet');
+        throw new Error("Failed to disconnect wallet");
       }
 
       // Refresh the page to show updated wallet info
@@ -81,9 +81,9 @@ export default function UserProfile() {
       const walletInstance = ethers.Wallet.fromPhrase(mnemonic);
 
       const response = await fetch(`/api/users?userId=${userInfo.userId}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           walletAddress: walletInstance.address,
@@ -92,7 +92,7 @@ export default function UserProfile() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update user wallet info');
+        throw new Error("Failed to update user wallet info");
       }
 
       setImportSuccess(true);
@@ -107,7 +107,7 @@ export default function UserProfile() {
   };
 
   return (
-    <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 mt-20 md:mt-40">
+    <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 mt-20 mx-8">
       <div className="flex flex-col items-center rounded-[10px] p-4 bg-gray-900">
         <div className="w-full max-w-4xl p-6 ">
           <div className="mb-6 flex items-center gap-2 text-gold-500">
@@ -116,7 +116,7 @@ export default function UserProfile() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <p>
               <span className="font-bold">Username:</span>
-              {userInfo.username || "Username not set"}
+              {userInfo.username || " not set"}
             </p>
             <p>
               <span className="font-bold">Points:</span> {userInfo.points}
@@ -132,7 +132,9 @@ export default function UserProfile() {
             {userInfo.walletAddress && userInfo.privateKey ? (
               <>
                 <div className="flex items-center">
-                  <label className="block font-bold mb-2 w-32">Private Key</label>
+                  <label className="block font-bold mb-2 w-32">
+                    Private Key
+                  </label>
                   <div className="flex flex-1 items-center relative">
                     <input
                       type={showPrivateKey ? "text" : "password"}
@@ -149,24 +151,11 @@ export default function UserProfile() {
                   </div>
                 </div>
 
-                <div className="flex items-center mt-4">
-                  <label className="block font-bold mb-2 w-32">
-                    Wallet Address
-                  </label>
-                  <div className="flex flex-1 items-center relative">
-                    <input
-                      type={showWalletAddress ? "text" : "password"}
-                      value={userInfo.walletAddress}
-                      readOnly
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowWalletAddress(!showWalletAddress)}
-                      className="px-3 flex items-center text-gray-500">
-                      {showWalletAddress ? <FaEyeSlash /> : <FaEye />}
-                    </button>
+                <div className="flex flex-col">
+                  <div className="font-bold">
+                    Wallet Address:
                   </div>
+                  {userInfo.walletAddress || " wallet not connected"}
                 </div>
                 <button
                   onClick={handleDisconnect}
@@ -191,7 +180,9 @@ export default function UserProfile() {
                           key={index}
                           type="text"
                           value={word}
-                          onChange={(e) => handleSeedPhraseChange(index, e.target.value)}
+                          onChange={(e) =>
+                            handleSeedPhraseChange(index, e.target.value)
+                          }
                           className="border rounded-md px-2 py-1 text-sm"
                           placeholder={`Word ${index + 1}`}
                         />

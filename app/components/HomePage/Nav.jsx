@@ -38,7 +38,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed bg-gray-950  px-0 sm:px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 font-cinzel ${
+      className={`fixed bg-gray-950 sm:px-4 top-0 left-0 text-xs right-0 z-50 transition-all duration-300 font-cinzel ${
         isSticky
           ? "bg-gradient-to-b from-gray-950 from-5% to-gray-900 shadow-md"
           : "bg-gray-950"
@@ -54,7 +54,7 @@ const Navbar = () => {
             height={30}
             className="w-6 md:w-7 lg:w-8"
           />
-          <span className="text-xs md:text-lg lg:text-xl font-extrabold hover:text-gold-500">
+          <span className="text-xs xs:text-lg lg:text-xl font-bold hover:text-gold-500">
             CHAIN TRAIL
           </span>
         </Link>
