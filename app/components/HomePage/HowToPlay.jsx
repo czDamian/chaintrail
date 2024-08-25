@@ -1,8 +1,9 @@
 "use client";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/bundle"; // Import Swiper styles
+import "swiper/css/bundle";
 import { Pagination, Autoplay } from "swiper/modules";
+import { useEffect, useState } from "react";
 
 const steps = [
   {
@@ -20,7 +21,7 @@ const steps = [
     step: "STEP 3",
     image: "/loader/loader3.png",
     title:
-      "Think, Tap, Win . Earn points and NFTs for getting the correct word that represents the 4 pictures in the Quest.",
+      "Earn points for choosing the correct word that represents the 4 pictures in the Quest.",
   },
   {
     step: "STEP 4",
@@ -31,7 +32,7 @@ const steps = [
   {
     step: "STEP 5",
     image: "/coinbag.png",
-    title: "Claim FREE Points and game Passes for Logging into the game daily.",
+    title: "Claim FREE Points and play Passes for Logging into the game daily.",
   },
   {
     step: "STEP 6",
@@ -41,8 +42,28 @@ const steps = [
 ];
 
 const HowToPlay = () => {
+  const [slidesPerView, setSlidesPerView] = useState(1);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 900) {
+        setSlidesPerView(4);
+      } else if (window.innerWidth >= 700) {
+        setSlidesPerView(3);
+      } else if (window.innerWidth >= 350) {
+        setSlidesPerView(2);
+      } else {
+        setSlidesPerView(1);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   return (
-    <div className="p-6 max-w-xs mx-auto text-center py-12">
+    <div className="p-6 max-w-7xl mx-auto text-center py-12 my-12">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">
         HOW TO <span className="text-gold-500">PLAY</span>
       </h1>
@@ -50,7 +71,7 @@ const HowToPlay = () => {
         <Swiper
           modules={[Pagination, Autoplay]}
           spaceBetween={20}
-          slidesPerView={1}
+          slidesPerView={slidesPerView}
           pagination={{
             clickable: true,
             el: ".swiper-pagination",
@@ -63,19 +84,21 @@ const HowToPlay = () => {
           className="mySwiper">
           {steps.map((step, index) => (
             <SwiperSlide key={index}>
-              <h3 className="text-lg font-bold mb-2">{step.step}</h3>
-              <div className="relative w-full h-48 mb-4">
-                <Image
-                  src={step.image}
-                  alt={step.title}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg"
-                />
+              <div className="bg-gray-800 p-4 rounded-lg h-full">
+                <h3 className="text-lg font-bold mb-2">{step.step}</h3>
+                <div className="relative w-full h-32 mb-4">
+                  <Image
+                    src={step.image}
+                    alt={step.title}
+                    layout="fill"
+                    objectFit="contain"
+                    className="rounded-lg min-w-28"
+                  />
+                </div>
+                <p className="text-sm text-gray-300 leading-6 mb-6">
+                  {step.title}
+                </p>
               </div>
-              <p className="text-sm text-gray-300 leading-6 mb-6">
-                {step.title}
-              </p>
             </SwiperSlide>
           ))}
         </Swiper>

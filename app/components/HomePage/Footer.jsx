@@ -69,47 +69,11 @@ const Footer = () => {
                       <h5 className="font-bold text-[#EEEEEE]">
                         {member.name}
                       </h5>
-                      <p className="text-[#D4D0E0]">{member.role}</p>
+                      <p className="text-[#D4D0E0] text-sm pt-2">{member.role}</p>
                     </div>
                   </div>
                 </Link>
               ))}
-            </div>
-          </div>
-          <hr className="m-x-8 my-16 md:my-20" />
-
-          <div className="">
-            <h2 className="text-2xl font-bold mb-4">News & Information</h2>
-            <ul className="space-y-2">
-              <li>
-                <Link href="#" className="text-gray-400 hover:underline">
-                  News
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-gray-400 hover:underline">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-gray-400 hover:underline">
-                  Contact Us
-                </Link>
-              </li>
-              <li>
-                <Link href="#" className="text-gray-400 hover:underline">
-                  Learn About Web 3
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <hr className="m-x-8 my-16 md:my-20" />
-          <div className="my-6">
-            <h2 className="mb-6">Terms And Conditions</h2>
-            <div className="text-[#D4D0E0] my-2 flex items-center justify-between lg:justify-start lg:gap-16">
-              <Link href="#">Sitemap</Link>.
-              <Link href="#">Terms Of Service</Link>.
-              <Link href="#">Privacy</Link>
             </div>
           </div>
         </div>

@@ -1,6 +1,5 @@
 import Footer from "./components/HomePage/Footer";
 import NFTSection from "./components/HomePage/NftSection";
-import Partners from "./components/HomePage/Partners";
 import Hero from "./components/HomePage/Hero";
 import Daily from "./components/HomePage/Daily";
 import HowToPlay from "./components/HomePage/HowToPlay";
@@ -14,7 +13,6 @@ export default function App() {
       <Daily />
       <ClaimDailyReward />
       <HowToPlay />
-      <Partners />
       <Footer />
     </main>
   );
