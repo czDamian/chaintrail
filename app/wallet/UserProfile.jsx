@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 
 export default function UserProfile() {
   const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
-  const [showPrivateKey, setShowPrivateKey] = useState(false);
   const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState(false);
@@ -142,27 +141,7 @@ export default function UserProfile() {
 
             {userInfo.walletAddress && userInfo.privateKey ? (
               <>
-                <div className="flex items-center">
-                  <label className="block font-bold mb-2 w-32">
-                    Private Key
-                  </label>
-                  <div className="flex flex-1 items-center relative">
-                    <input
-                      type={showPrivateKey ? "text" : "password"}
-                      value={userInfo.privateKey}
-                      readOnly
-                      className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-gray-900"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPrivateKey(!showPrivateKey)}
-                      className="px-3 flex items-center text-gray-500">
-                      {showPrivateKey ? <FaEyeSlash /> : <FaEye />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col xs:flex-row justify-between">
+                <div className="flex flex-col xs:flex-row justify-between gap-2">
                   <button
                     onClick={() => setShowModal(true)}
                     className="flex items-center gap-2 text-blue-500 border p-2 rounded-md border-blue-500 text-sm">
@@ -192,15 +171,15 @@ export default function UserProfile() {
                         {truncateAddress(userInfo.walletAddress)}
                       </p>
                       <p className="text-center text-gray-400 my-4">0 ETH</p>
-                      <div className="flex text-sm gap-4">
+                      <div className="flex text-sm justify-between gap-4">
                         <button
                           onClick={handleDisconnect}
-                          className="bg-red-500 text-white px-4 py-2 rounded-md">
-                          Disconnect Wallet
+                          className="bg-red-500 text-white px-2 py-3 rounded-md">
+                          Disconnect
                         </button>
                         <button
                           onClick={() => setShowPrivateKeyModal(true)}
-                          className="bg-blue-500 text-white px-4 py-2 rounded-md">
+                          className="bg-blue-500 text-white px-2 py-3 rounded-md">
                           Show Private Key
                         </button>
                       </div>
