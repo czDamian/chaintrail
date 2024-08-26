@@ -103,99 +103,95 @@ const QuestionComponent = ({ questId }) => {
     setSelectedAnswers(selectedAnswers.slice(0, -1));
   };
 
-  const handleSubmit = async (answers = selectedAnswers) => {
-    const currentQuestion = questions[currentQuestionIndex] || {};
-    const submittedAnswer = answers.join("");
-    const correct =
-      submittedAnswer.toUpperCase() ===
-      (currentQuestion.questAnswer || "").toUpperCase();
+const handleSubmit = async (answers = selectedAnswers) => {
+  const currentQuestion = questions[currentQuestionIndex] || {};
+  const submittedAnswer = answers.join("");
+  const correct =
+    submittedAnswer.toUpperCase() ===
+    (currentQuestion.questAnswer || "").toUpperCase();
 
-    if (playPass <= 0) {
-      toast.error("Insufficient Play Pass");
-      return;
+  if (playPass <= 0) {
+    toast.error("Insufficient Play Pass");
+    return;
+  }
+
+  setIsCorrect(correct);
+  setShowPopup(true);
+
+  try {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      throw new Error("User ID not found in local storage");
     }
 
-    setIsCorrect(correct);
-    setShowPopup(true);
+    const questsResponse = await fetch("/api/quests");
+    const allQuests = await questsResponse.json();
+    const currentQuestIndex = allQuests.findIndex(
+      (quest) => quest._id === questId
+    );
+    const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
 
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found in local storage");
+    const newQuestionIndex = currentQuestionIndex + 1; // Move to the next question regardless of correctness
+    const isLastQuestion = newQuestionIndex >= questions.length;
+
+    const updateData = {
+      userId: userId,
+      pointsDelta: correct ? 1000 : 0,
+      playPassDelta: isLastQuestion ? -1 : 0,
+      questId: questId,
+      currentQuestion: {
+        [questId]: newQuestionIndex,
+      },
+    };
+
+    if (isLastQuestion) {
+      updateData.completedQuest = questId;
+      updateData.currentQuest = nextQuestId;
+      if (nextQuestId) {
+        updateData.currentQuestion = {
+          [nextQuestId]: 0,
+        };
       }
-
-      const questsResponse = await fetch("/api/quests");
-      const allQuests = await questsResponse.json();
-      const currentQuestIndex = allQuests.findIndex(
-        (quest) => quest._id === questId
-      );
-      const nextQuestId = allQuests[currentQuestIndex + 1]?._id || null;
-
-      const newQuestionIndex = correct
-        ? currentQuestionIndex + 1
-        : currentQuestionIndex;
-
-      const isLastQuestion = newQuestionIndex === questions.length;
-      const updateData = {
-        userId: userId,
-        pointsDelta: correct ? 1000 : 0,
-        playPassDelta: isLastQuestion ? -1 : 0,
-        questId: questId,
-        currentQuestion: {
-          [questId]: newQuestionIndex,
-        },
-      };
-
-      if (newQuestionIndex === questions.length) {
-        updateData.completedQuest = questId;
-        updateData.currentQuest = nextQuestId;
-        if (nextQuestId) {
-          updateData.currentQuestion = {
-            [nextQuestId]: 0,
-          };
-        }
-      }
-      if (isLastQuestion) {
-        updateData.completedQuest = questId;
-        updateData.currentQuest = nextQuestId;
-      }
-      const updateResponse = await fetch("/api/claim", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updateData),
-      });
-
-      if (!updateResponse.ok) {
-        throw new Error("Failed to update points and quest status");
-      }
-
-      const updatedUserData = await updateResponse.json();
-      setPoints(updatedUserData.points);
-      setPlayPass(updatedUserData.playPass);
-      setCurrentQuestionIndex(newQuestionIndex);
-
-      if (newQuestionIndex === questions.length) {
-        setIsCompleted(true);
-        setTimeout(() => {
-          setShowComplete(true);
-          setTimeout(() => {
-            if (congratsSound) {
-              congratsSound
-                .play()
-                .catch((error) => console.error("Error playing sound:", error));
-            }
-          }, 1000);
-        }, 4000);
-      } else if (correct) {
-        setTimeout(() => {
-          handleNext();
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("Error updating points:", error);
-      toast.error("An error occurred while updating points. Please try again.");
     }
-  };
+
+    const updateResponse = await fetch("/api/claim", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updateData),
+    });
+
+    if (!updateResponse.ok) {
+      throw new Error("Failed to update points and quest status");
+    }
+
+    const updatedUserData = await updateResponse.json();
+    setPoints(updatedUserData.points);
+    setPlayPass(updatedUserData.playPass);
+    setCurrentQuestionIndex(newQuestionIndex);
+
+    if (isLastQuestion) {
+      setIsCompleted(true);
+      setTimeout(() => {
+        setShowComplete(true);
+        setTimeout(() => {
+          if (congratsSound) {
+            congratsSound
+              .play()
+              .catch((error) => console.error("Error playing sound:", error));
+          }
+        }, 1000);
+      }, 4000);
+    } else {
+      setTimeout(() => {
+        handleNext();
+      }, 1500);
+    }
+  } catch (error) {
+    console.error("Error updating points:", error);
+    toast.error("An error occurred while updating points. Please try again.");
+  }
+};
+
 
   const handleNext = () => {
     if (isCompleted || showComplete) {
