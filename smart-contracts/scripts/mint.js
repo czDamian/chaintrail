@@ -24,7 +24,7 @@ async function main() {
   const eduNFT = EduNFT.attach(contractAddress);
 
   // Use the IPFS hash obtained from Pinata (change this if needed)
-  const ipfsHash = IPFSHASH4;
+  const ipfsHash = IPFSHASH3;
 
   try {
     // Mint a new NFT

@@ -85,7 +85,7 @@ export default function FetchUserNFTs() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-xl">You haven't minted any NFT yet</p>
+              <p className="text-center text-xl">You have not minted any NFT yet</p>
             )}
           </div>
         </div>
