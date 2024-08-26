@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import User from "@/models/User";
 import connectDb from "@/lib/mongodb";
 import mongoose from "mongoose";
-
+import bcrypt from "bcrypt";
 
 function clearMongooseCache() {
   mongoose.models = {};
@@ -40,9 +40,9 @@ export async function GET(request) {
   }
 }
 
-
 export async function PATCH(request) {
   const userId = request.nextUrl.searchParams.get("userId");
+  const saltRounds = 10;
 
   try {
     if (!userId) {
@@ -54,9 +54,14 @@ export async function PATCH(request) {
 
     const { walletAddress = null, privateKey = null } = await request.json();
 
+    let hashedPrivateKey = null;
+    if (privateKey) {
+      hashedPrivateKey = await bcrypt.hash(privateKey, saltRounds);
+    }
+
     const user = await User.findOneAndUpdate(
       { userId },
-      { walletAddress, privateKey },
+      { walletAddress, privateKey: hashedPrivateKey },
       { new: true }
     );
 

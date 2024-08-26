@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import User from "@/models/User";
 import Counter from "@/models/Counter";
 import connectDb from "@/lib/mongodb";
-import { ethers } from "ethers";
+import Web3 from "web3";
 import Quest from "@/models/Quest";
 
 await connectDb();
 
+const saltRounds = 10;
 export async function POST(request) {
   const { userId, username, referralCode } = await request.json();
 
@@ -15,8 +16,8 @@ export async function POST(request) {
 
     if (user) {
       // Check if wallet details or referral code or current Quest is missing or invalid and update if needed
-      if (!user.walletAddress || !ethers.isAddress(user.walletAddress)) {
-        const walletDetails = createWalletWithMnemonic();
+      if (!user.walletAddress || !Web3.utils.isAddress(user.walletAddress)) {
+        const walletDetails = createWalletWithWeb3();
         Object.assign(user, walletDetails);
       }
       if (user.currentQuest === "" || user.currentQuest === null) {
@@ -39,8 +40,12 @@ export async function POST(request) {
     }
 
     // User does not exist, create a new user with a wallet and referral code
-    const walletDetails = createWalletWithMnemonic();
-    const newReferralCode = await generateAutoIncrementalReferralCode();
+   const walletDetails = createWalletWithWeb3();
+   const hashedPrivateKey = await bcrypt.hash(
+     walletDetails.privateKey,
+     saltRounds
+   );
+   const newReferralCode = await generateAutoIncrementalReferralCode();
 
     // Fetch the first quest
     const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
@@ -51,7 +56,7 @@ export async function POST(request) {
       points: 1000,
       playPass: 2,
       walletAddress: walletDetails.walletAddress,
-      privateKey: walletDetails.privateKey,
+      privateKey: hashedPrivateKey,
       referralCode: newReferralCode,
       currentQuest: firstQuest ? firstQuest._id : null,
     });
@@ -87,11 +92,12 @@ export async function POST(request) {
   }
 }
 
-function createWalletWithMnemonic() {
-  const wallet = ethers.Wallet.createRandom();
+function createWalletWithWeb3() {
+  const web3 = new Web3();
+  const account = web3.eth.accounts.create();
   const walletDetails = {
-    walletAddress: wallet.address,
-    privateKey: wallet.privateKey,
+    walletAddress: account.address,
+    privateKey: account.privateKey,
   };
   console.log("Created wallet details:", walletDetails);
   return walletDetails;

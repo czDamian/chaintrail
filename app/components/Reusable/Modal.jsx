@@ -3,7 +3,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-950 p-6 rounded-lg max-w-sm w-full mx-16">{children}</div>
+      <div className="bg-gray-950 p-6 rounded-lg max-w-xs w-full">{children}</div>
     </div>
   );
 };
