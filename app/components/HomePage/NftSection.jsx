@@ -1,18 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Button from "../Reusable/Button";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css/bundle"; // Import Swiper styles
+import "swiper/css/bundle";
 import { Autoplay } from "swiper/modules";
 
 const NFTSection = () => {
-  const nftImages = ["/nft1.png", "/nft2.png", "/nft1.png"];
+  const nftImages = ["/nft1.png", "/nft2.png", "/nft01.png"];
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      const width = window.innerWidth;
+      setIsMobile(width < 500);
+      setIsTablet(width >= 500 && width < 800);
     };
 
     handleResize();
@@ -20,8 +22,10 @@ const NFTSection = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  const slidesPerView = isMobile ? 1 : isTablet ? 2 : 3;
+
   return (
-    <div className="bg-slate-900 w-full py-12 px-2">
+    <div className="bg-slate-900 w-full py-12 px-2 overflow-visible">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">UNIQUE NFTS</h1>
         <p className="text-lg text-gray-300">
@@ -33,7 +37,7 @@ const NFTSection = () => {
         <Swiper
           modules={[Autoplay]}
           spaceBetween={10}
-          slidesPerView={isMobile ? 1 : 3}
+          slidesPerView={slidesPerView}
           autoplay={{ delay: 2000, disableOnInteraction: false }}
           className="mySwiper">
           {nftImages.map((nftImage, index) => (
@@ -50,14 +54,6 @@ const NFTSection = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
-
-      <div className="text-center mt-10">
-        <Button
-          className="bg-yellow-500 text-black py-3 px-6 rounded hover:scale-105 transition-transform duration-300"
-          href="/quests">
-          Play Now
-        </Button>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ const steps = [
   {
     step: "STEP 1",
     image: "coinsPana.svg",
-    title: "Connect Wallet or Click Play on Telegram to get started",
+    title: "Connect any web3 Wallet or Click Play on Telegram to get started",
   },
   {
     step: "STEP 2",
@@ -21,13 +21,13 @@ const steps = [
     step: "STEP 3",
     image: "/loader/loader3.png",
     title:
-      "Earn points for choosing the correct word that represents the 4 pictures in the Quest.",
+      "Earn unlimited points for answering the correct questions in each Quest.",
   },
   {
     step: "STEP 4",
     image: "mainNft2.svg",
     title:
-      "Earn exclusive NFTs for completing a quest correctly at a go without failing!!",
+      "Earn unique and exclusive NFTs when you reach a certain point threshold",
   },
   {
     step: "STEP 5",
@@ -37,7 +37,7 @@ const steps = [
   {
     step: "STEP 6",
     image: "mainNft3.svg",
-    title: "Refer friends and earn more points.",
+    title: "Refer friends and earn more points. The more you refer, the higher you earn",
   },
 ];
 
