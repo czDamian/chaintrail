@@ -1,7 +1,14 @@
+//mint nft using hardhat
+//npx hardhat run scripts/mint.js --network opencampus
+
+const hre = require("hardhat");
+
 async function main() {
-  const [deployer] = await ethers.getSigners();
+  // Get the deployer address
+  const [deployer] = await hre.ethers.getSigners();
   console.log("Using account:", deployer.address);
 
+  // IPFS hashes
   const IPFSHASH2 =
     "https://teal-deep-unicorn-287.mypinata.cloud/ipfs/QmVN1gaD1NQ5RBaTnHyaF9r2fcz9ApVymY6u1XVAhVvd7H";
   const IPFSHASH3 =
@@ -10,19 +17,24 @@ async function main() {
     "https://teal-deep-unicorn-287.mypinata.cloud/ipfs/QmUzdF5yyFjwj1eJzFv2fJfDaS7iTLNVHwqQ7CzJ7yhLHu";
 
   // Replace with the deployed contract address
-  deployed_ca = "0x98e3f452b16e19b950e14faa59dc1a343b5d3ff8";
-  const contractAddress = deployed_ca;
-  const SimpleNFT = await ethers.getContractFactory("SimpleNFT");
-  const simpleNFT = SimpleNFT.attach(contractAddress);
+  const contractAddress = "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922";
 
-  // Use the IPFS hash obtained from Pinata
+  // Get the contract factory and attach it to the deployed contract
+  const EduNFT = await hre.ethers.getContractFactory("EDUNFT");
+  const eduNFT = EduNFT.attach(contractAddress);
+
+  // Use the IPFS hash obtained from Pinata (change this if needed)
   const ipfsHash = IPFSHASH4;
 
-  // Mint a new NFT
-  const tx = await simpleNFT.mint(deployer.address, ipfsHash);
-  await tx.wait();
-
-  console.log("Minted NFT to:", deployer.address);
+  try {
+    // Mint a new NFT
+    const tx = await eduNFT.mint(deployer.address, ipfsHash);
+    await tx.wait(); // Wait for the transaction to be mined
+    console.log("Minted NFT to:", deployer.address);
+    console.log("Transaction hash:", tx.hash);
+  } catch (error) {
+    console.error("Error minting NFT:", error);
+  }
 }
 
 main()
@@ -31,3 +43,9 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+// once its successful, you will get a message like this
+//   Using account: 0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC
+// Minted NFT to: 0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC
+// FC
+// Transaction hash: 0xdd9f532cc04d70c0ed76ee622ad9833095e7dbda2e33d8ea68fe49aaef8446f4

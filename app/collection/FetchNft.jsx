@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
-import { ethers } from "ethers";
-import nftContractABI from "./abi.json";
+import Web3 from "web3";
+import nftContractABI from "./EduNft.json";
 import Button from "../components/Reusable/Button";
 
 export default function FetchNFT() {
@@ -12,6 +12,9 @@ export default function FetchNFT() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Web3 provider for Edu Chain
+  const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
+
   // Function to calculate required points
   const calculateRequiredPoints = (index) => {
     const basePoints = 20000;
@@ -19,10 +22,10 @@ export default function FetchNFT() {
   };
 
   const getNextAvailableTokenId = async (contract) => {
-    let tokenId = 3; // Start from 3 since you're hiding the first 3 NFTs
+    let tokenId = 0;
     while (true) {
       try {
-        await contract.tokenURI(tokenId);
+        await contract.methods.tokenURI(tokenId).call();
         tokenId++;
       } catch (error) {
         // If this throws an error, it means the token doesn't exist
@@ -34,46 +37,39 @@ export default function FetchNFT() {
   useEffect(() => {
     const fetchContractData = async () => {
       try {
-        const provider = new ethers.JsonRpcProvider(
-          "https://rpc.test.btcs.network"
-        );
+        const contractAddress = "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922";
+        const contract = new web3.eth.Contract(nftContractABI, contractAddress);
 
-        const contractAddress = "0x98e3f452b16e19b950e14faa59dc1a343b5d3ff8";
-        const contract = new ethers.Contract(
-          contractAddress,
-          nftContractABI,
-          provider
-        );
         // Fetch contract information
-        const name = await contract.name();
-        const symbol = await contract.symbol();
+        const name = await contract.methods.name().call();
+        const symbol = await contract.methods.symbol().call();
+        setContractAddress(contractAddress);
+        setContractName(name);
+        setContractSymbol(symbol);
 
         // Query the Transfer event to get all token IDs
-        const filter = contract.filters.Transfer(null, null);
-        const events = await contract.queryFilter(filter);
+        const events = await contract.getPastEvents("Transfer", {
+          fromBlock: 0,
+          toBlock: "latest",
+        });
 
         const uniqueTokenIds = new Set(
-          events.map((event) => event.args.tokenId.toString())
+          events.map((event) => event.returnValues.tokenId.toString())
         );
 
-        // Fetch all NFTs on CORE
+        // Fetch all NFTs on Edu Chain
         const allNFTs = await Promise.all(
           Array.from(uniqueTokenIds).map(async (tokenId) => {
-            const owner = await contract.ownerOf(tokenId);
-            const uri = await contract.tokenURI(tokenId);
+            const owner = await contract.methods.ownerOf(tokenId).call();
+            const uri = await contract.methods.tokenURI(tokenId).call();
             return { id: tokenId, owner, uri };
           })
         );
 
-        // Hide the first 3 NFTS
-        const displayedNFTs = allNFTs.slice(3);
-
-        setContractAddress(contractAddress);
-        setContractName(name);
-        setContractSymbol(symbol);
-        setAllNFTs(displayedNFTs);
+        setAllNFTs(allNFTs);
       } catch (error) {
         console.error("Error fetching contract data:", error);
+        setError("Error fetching contract data.");
       } finally {
         setIsLoading(false);
       }
@@ -82,7 +78,6 @@ export default function FetchNFT() {
     fetchContractData();
   }, []);
 
-  // Function to trim addresses
   const trimAddress = (address) =>
     `${address.substring(0, 7)}...${address.substring(address.length - 5)}`;
 
@@ -95,7 +90,6 @@ export default function FetchNFT() {
     }
 
     try {
-      // Fetch user data
       const response = await fetch(`/api/users?userId=${userId}`);
       const userData = await response.json();
 
@@ -111,15 +105,14 @@ export default function FetchNFT() {
         return;
       }
 
-      const provider = new ethers.JsonRpcProvider(
-        "https://rpc.test.btcs.network"
-      );
-      const wallet = new ethers.Wallet(userData.privateKey, provider);
-      const contract = new ethers.Contract(
-        contractAddress,
-        nftContractABI,
-        wallet
-      );
+      const walletAddress = userData.walletAddress;
+      const privateKey = userData.privateKey;
+
+      // Create a web3 instance with the private key and provider
+      const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+      web3.eth.accounts.wallet.add(account);
+
+      const contract = new web3.eth.Contract(nftContractABI, contractAddress);
 
       // Get the next available token ID
       const nextTokenId = await getNextAvailableTokenId(contract);
@@ -128,15 +121,14 @@ export default function FetchNFT() {
       const newUri = `https://teal-deep-unicorn-287.mypinata.cloud/ipfs/${nextTokenId}`;
 
       // Check wallet balance
-      const balance = await provider.getBalance(userData.walletAddress);
-      const estimatedGasCost = BigInt(
-        await contract.mint.estimateGas(userData.walletAddress, newUri)
-      );
-      const feeData = await provider.getFeeData();
-      const gasPrice = BigInt(feeData.gasPrice);
-      const estimatedTotalCost = estimatedGasCost * gasPrice;
+      const balance = await web3.eth.getBalance(walletAddress);
+      const gasEstimate = await contract.methods
+        .mint(walletAddress, newUri)
+        .estimateGas({ from: walletAddress });
+      const gasPrice = await web3.eth.getGasPrice();
+      const estimatedTotalCost = gasEstimate * gasPrice;
 
-      if (balance < estimatedTotalCost) {
+      if (BigInt(balance) < BigInt(estimatedTotalCost)) {
         setError(
           "Insufficient funds in your wallet to cover the transaction cost. Please add more funds and try again."
         );
@@ -144,10 +136,10 @@ export default function FetchNFT() {
       }
 
       // Call the mint function with the new token ID
-      const tx = await contract.mint(userData.walletAddress, newUri);
-      await tx.wait();
-
-      console.log("Minting successful. Transaction hash:", tx.hash);
+      const tx = await contract.methods
+        .mint(walletAddress, newUri)
+        .send({ from: walletAddress });
+      console.log("Minting successful. Transaction hash:", tx.transactionHash);
 
       // Refresh the page after successful minting
       window.location.reload();
@@ -164,14 +156,17 @@ export default function FetchNFT() {
       ) : (
         <div>
           <h2 className="text-2xl font-bold mb-4">
-            NFT Information (CORE Testnet)
+            NFT Information (Edu Chain)
           </h2>
-          <p>Only NFTs minted on CORE testnet will be displayed here</p>
-          <p className="mb-2">
+          <p className="mb-2 text-gray-300 text-sm">
             Contract Address: {trimAddress(contractAddress)}
           </p>
-          <p className="mb-2">Contract Name: {contractName}</p>
-          <p className="mb-4">Contract Symbol: {contractSymbol}</p>
+          <p className="mb-2 text-gray-300 text-sm">
+            Contract Name: {contractName}
+          </p>
+          <p className="mb-4 text-gray-300 text-sm">
+            Contract Symbol: {contractSymbol}
+          </p>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           <h2 className="text-2xl font-bold mb-4">Available NFTs</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -180,8 +175,6 @@ export default function FetchNFT() {
                 <div
                   key={index}
                   className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                  <p className="text-lg font-semibold mb-2">ID: {nft.id}</p>
-                  <p className="mb-4">Owner: {trimAddress(nft.owner)}</p>
                   <div className="w-full h-48 bg-gray-700 rounded-lg overflow-hidden">
                     <img
                       alt={`NFT ${nft.id}`}
@@ -191,7 +184,7 @@ export default function FetchNFT() {
                   </div>
                   <div className="flex justify-between items-center my-2">
                     <span>
-                      Min {calculateRequiredPoints(index).toLocaleString()}
+                      Min {calculateRequiredPoints(index).toLocaleString()}{" "}
                       points
                     </span>
                     <Button
@@ -205,9 +198,7 @@ export default function FetchNFT() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-xl">
-                No NFTs found for this contract on CORE testnet.
-              </p>
+              <p className="text-center text-xl">No NFTs yet</p>
             )}
           </div>
         </div>
