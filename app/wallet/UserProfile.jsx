@@ -1,23 +1,42 @@
 "use client";
-import { useEffect } from "react";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Loader from "../loader";
 import UserInfo from "./UserInfo";
 import WalletSection from "./WalletSection";
 
 export default function UserProfile() {
-  const { userInfo, isLoading, fetchUserInfo } = useTelegramAuth();
+  const [userInfo, setUserInfo] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    const savedUserId = localStorage.getItem("userId");
-    if (savedUserId && (!userInfo || userInfo.userId !== savedUserId)) {
-      fetchUserInfo(savedUserId);
-    }
-  }, [fetchUserInfo, userInfo]);
+    const fetchUserInfo = async () => {
+      const savedUserId = localStorage.getItem("userId"); 
+      if (savedUserId) {
+        try {
+          const response = await fetch(
+            `/api/users?userId=${savedUserId}`
+          );
+          if (!response.ok) {
+            throw new Error("Failed to fetch user data");
+          }
+          const data = await response.json();
+          setUserInfo(data);
+        } catch (error) {
+          console.error("Error fetching user info:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setIsLoading(false);
+      }
+    };
 
-  if (isLoading || !userInfo || !userInfo.userId) {
+    fetchUserInfo();
+  }, []);
+
+  if (isLoading || !userInfo) {
     return <Loader />;
   }
 
@@ -30,11 +49,7 @@ export default function UserProfile() {
           </div>
           <div className="grid grid-cols-1 gap-6">
             <UserInfo userInfo={userInfo} />
-            <WalletSection
-              userInfo={userInfo}
-              fetchUserInfo={fetchUserInfo}
-              router={router}
-            />
+            <WalletSection userInfo={userInfo} router={router} />
           </div>
         </div>
       </div>
