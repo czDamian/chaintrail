@@ -20,11 +20,9 @@ export default function EditQuest() {
   useEffect(() => {
     const fetchQuests = async () => {
       try {
-        console.log("Fetching all quests...");
         const response = await fetch("/api/quests");
         if (response.ok) {
           const questsData = await response.json();
-          console.log("Fetched quests:", questsData);
           setQuests(questsData);
         } else {
           throw new Error("Failed to fetch quests");
@@ -41,11 +39,9 @@ export default function EditQuest() {
     if (selectedQuestId) {
       const fetchQuest = async () => {
         try {
-          console.log(`Fetching quest data for ID: ${selectedQuestId}`);
           const response = await fetch(`/api/quests/${selectedQuestId}`);
           if (response.ok) {
             const questData = await response.json();
-            console.log("Fetched quest data:", questData);
             setQuest({
               questName: questData.questName,
               questImage: questData.questImage,

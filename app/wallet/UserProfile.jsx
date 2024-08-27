@@ -28,7 +28,7 @@ export default function UserProfile() {
           <div className="mb-6 flex items-center gap-2 text-gold-500">
             <h2 className="text-2xl font-semibold">My Profile</h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-6">
             <UserInfo userInfo={userInfo} />
             <WalletSection
               userInfo={userInfo}
