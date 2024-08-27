@@ -25,7 +25,6 @@ const Navbar = () => {
   const hiddenPaths = [
     "/daily-reward",
     "/referrals",
-    "/collection",
     "/referrals",
     "/quests/",
     "/more",

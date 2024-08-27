@@ -1,5 +1,6 @@
 import SideNav from "../components/Reusable/SideNav";
 import DailyRewardComponent from "./DailyRewardComponent";
+import MoreCoins from "./MoreCoins";
 import Referrals from "./Referrals";
 
 export const metadata = {
@@ -12,6 +13,7 @@ const Wallet = () => {
     <div>
       <div className="flex flex-col gap-20 mb-20">
         <DailyRewardComponent />
+        <MoreCoins />
         <Referrals />
       </div>
       <SideNav />
