@@ -9,6 +9,12 @@ export async function POST(request) {
   try {
     await connectDb();
     const body = await request.json();
+    const userId = body.addedBy;
+    const user = await User.findOne({ userId });
+    if (!user || user.role !== "admin") {
+      throw new Error("Only admins can create quests");
+    }
+
     const newQuest = new Quest(body);
     const savedQuest = await newQuest.save();
     return NextResponse.json(savedQuest, { status: 201 });
@@ -82,6 +88,24 @@ export async function DELETE(request) {
       );
     }
 
+    const userId = request.headers.get("userId");
+
+    console.log("userid", userId);
+    console.log("id", id);
+
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+    }
+    const user = await User.findOne({ userId });
+    if (!user || user.role !== "admin") {
+      return NextResponse.json(
+        { error: "Only admins can delete quests" },
+        { status: 403 }
+      );
+    }
     const deletedQuest = await Quest.findByIdAndDelete(id);
 
     if (!deletedQuest) {
@@ -108,9 +132,31 @@ export async function PUT(request) {
       );
     }
 
-    const updatedQuest = await Quest.findByIdAndUpdate(id, updateData, {
-      new: true,
-    });
+    const userId = request.headers.get("userId");
+    if (!userId) {
+      return NextResponse.json(
+        { error: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const user = await User.findById(userId);
+    if (!user || user.role !== "admin") {
+      return NextResponse.json(
+        { error: "only admins can edit quests" },
+        { status: 403 }
+      );
+    }
+
+    const updatedQuest = await Quest.findByIdAndUpdate(
+      id,
+      {
+        ...updateData,
+      },
+      {
+        new: true,
+      }
+    );
 
     if (!updatedQuest) {
       return NextResponse.json({ error: "Quest not found" }, { status: 404 });

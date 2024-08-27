@@ -51,17 +51,12 @@ const FetchQuestsFromDb = () => {
 
     if (currentQuestionNumber > totalQuestions) return 100;
 
-    return Math.round(((currentQuestionNumber) / totalQuestions) * 100);
+    return Math.round((currentQuestionNumber / totalQuestions) * 100);
   };
 
   return (
     <section className=" mb-20 w-full">
-      <div className="flex justify-between items-center mx-4 my-4 py-2 text-gray-300">
-        <h1 className="font-bold text-gold-500 text-4xl">QUESTS</h1>
-        <div className="flex gap-2 cursor-pointer">
-          <SideNav />
-        </div>
-      </div>
+      <h1 className="font-bold my-8 text-gold-500 text-4xl">QUESTS</h1>
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
         {loading ? (
           Array.from({ length: 6 }).map((_, index) => (
@@ -80,26 +75,29 @@ const FetchQuestsFromDb = () => {
                 quest.isLinkDisabled ? "cursor-not-allowed" : ""
               }`}
               onClick={(e) => quest.isLinkDisabled && e.preventDefault()}>
-              <img
-                className="rounded-xl h-36 object-cover w-full"
-                src={quest.questImage}
-                alt={quest.questName}
-                onError={(e) => (e.target.src = "/quest/bitcoin.jpg")}
-              />
-              <div className="flex justify-between items-center w-full px-3 my-2">
-                <span className="uppercase font-bold text-gray-100">
-                  {quest.questName}
-                </span>
+              <div className="relative w-full">
+                <img
+                  className="rounded-xl h-36 object-cover w-full"
+                  src={quest.questImage}
+                  alt={quest.questName}
+                  onError={(e) => (e.target.src = "/quest/bitcoin.jpg")}
+                />
                 <Button
-                  className={`px-4 py-2 text-xs transition-colors duration-300 ${
+                  className={`absolute bottom-1 right-2 px-4 py-2 text-xs transition-colors duration-300 ${
                     quest.questStatus === "locked"
                       ? "bg-neutral-900 text-gray-300 cursor-not-allowed"
                       : quest.questStatus === "completed"
-                      ? "bg-blue-500 text-black hover:bg-blue-600 cursor-not-allowed"
+                      ? "bg-blue-500 text-black hover:bg-blue-600 cursor-not-allowed tex-xs"
                       : "bg-gold-500 text-black hover:bg-yellow-600"
                   }`}>
                   {quest.questStatus}
                 </Button>
+              </div>
+
+              <div className="flex justify-between items-center w-full px-3 my-2">
+                <span className="uppercase font-bold text-gray-100 ">
+                  {quest.questName}
+                </span>
               </div>
               <div className="mx-3 pb-2 text-xs text-justify">
                 {quest.questDescription ||
@@ -121,6 +119,7 @@ const FetchQuestsFromDb = () => {
           ))
         )}
       </div>
+      <SideNav />
     </section>
   );
 };

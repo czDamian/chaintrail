@@ -12,9 +12,9 @@ export default function EditQuest() {
   const [quest, setQuest] = useState({
     questName: "",
     questImage: "",
-    questStatus: "locked",
     questDescription: "",
   });
+  const [buttonText, setButtonText] = useState("Update Quest");
   const router = useRouter();
 
   useEffect(() => {
@@ -49,7 +49,6 @@ export default function EditQuest() {
             setQuest({
               questName: questData.questName,
               questImage: questData.questImage,
-              questStatus: questData.questStatus,
               questDescription: questData.questDescription,
             });
           } else {
@@ -74,29 +73,43 @@ export default function EditQuest() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setButtonText("Updating Quest");
     try {
-      console.log("Submitting updated quest data:", quest);
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("Login to continue");
+      }
       const response = await fetch(`/api/quests/${selectedQuestId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quest),
+        headers: {
+          "Content-Type": "application/json",
+          userId: userId,
+        },
+        body: JSON.stringify({
+          ...quest,
+          addedBy: userId,
+          lastEditedBy: userId,
+        }),
       });
       if (response.ok) {
         toast.success("Quest updated successfully!");
-        router.push("/quests"); 
+        // router.push("/quests");
       } else {
-        throw new Error("Failed to update quest");
+        const error = await response.json();
+        throw new Error(error.error || "Failed to update quest");
       }
     } catch (error) {
       console.error("Error updating quest:", error);
-      toast.error("Failed to update quest. Please try again.");
+      toast.error(error.message || "Failed to update quest. Please try again.");
+    } finally {
+      setButtonText("Update Quest");
     }
   };
 
   return (
     <section>
       <div className="max-w-md min-w-64 my-20 mx-auto p-6 bg-slate-800 text-white rounded-lg shadow-xl">
-        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+        <div className="flex text-gold-500 justify-start gap-6 items-center py-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">Edit Quest</h1>
         </div>
@@ -152,21 +165,6 @@ export default function EditQuest() {
               />
             </div>
             <div>
-              <label htmlFor="questStatus" className="block mb-2">
-                Quest Status
-              </label>
-              <select
-                id="questStatus"
-                name="questStatus"
-                value={quest.questStatus}
-                onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md">
-                <option value="locked">Locked</option>
-                <option value="open">Open</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-            <div>
               <label htmlFor="questDescription" className="block mb-2">
                 Quest Description
               </label>
@@ -182,7 +180,7 @@ export default function EditQuest() {
             <button
               type="submit"
               className="w-full bg-yellow-600 text-black py-2 px-4 rounded-md font-bold hover:bg-yellow-700 transition duration-300">
-              Update Quest
+              {buttonText}
             </button>
           </form>
         )}

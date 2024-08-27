@@ -11,7 +11,6 @@ export default function DeleteQuest() {
   const [selectedQuestId, setSelectedQuestId] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Fetch quests from the server
   useEffect(() => {
     const fetchQuests = async () => {
       try {
@@ -45,12 +44,20 @@ export default function DeleteQuest() {
   };
 
   const handleConfirmDelete = async () => {
-    setIsModalOpen(false); // Close the modal
+    setIsModalOpen(false);
 
     try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        throw new Error("User ID is not available");
+      }
+
       const response = await fetch("/api/quests", {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          userId: userId,
+        },
         body: JSON.stringify({ id: selectedQuestId }),
       });
 
@@ -67,7 +74,7 @@ export default function DeleteQuest() {
       }
     } catch (error) {
       console.error("Error deleting quest:", error);
-      toast.error("Failed to delete quest. Please try again.");
+      toast.error(error.message || "Server Error");
     }
   };
 

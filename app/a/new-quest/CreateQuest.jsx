@@ -9,9 +9,9 @@ export default function CreateQuest() {
   const [quest, setQuest] = useState({
     questName: "",
     questImage: "",
-    questStatus: "locked",
     questDescription: "",
   });
+  const [buttonText, setButtonText] = useState("Create Quest");
 
   const handleChange = (e) => {
     setQuest({ ...quest, [e.target.name]: e.target.value });
@@ -19,33 +19,37 @@ export default function CreateQuest() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setButtonText("Creating Quest");
     try {
+      const userId = localStorage.getItem("userId");
       const response = await fetch("/api/quests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(quest),
+        body: JSON.stringify({ ...quest, addedBy: userId, lastEditedBy: "" }),
       });
       if (response.ok) {
         toast.success("Quest created successfully!");
         setQuest({
           questName: "",
           questImage: "",
-          questStatus: "locked",
-          questDescription: "", // Reset questDescription field
+          questDescription: "",
         });
+        setButtonText("Create Quest");
       } else {
-        throw new Error("Failed to create quest");
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create quest");
       }
     } catch (error) {
       console.error("Error creating quest:", error);
-      toast.error("Failed to create quest. Please try again.");
+      toast.error(error.message || "Failed to create quest. Please try again.");
+      setButtonText("Create Quest");
     }
   };
 
   return (
     <section className="my-20">
       <div className="max-w-md mx-auto mt-10 p-6 bg-gray-800 text-white rounded-lg shadow-xl">
-        <div className="flex text-gold-500 justify-start gap-2 items-center p-4">
+        <div className="flex text-gold-500 justify-start gap-6 items-center py-4">
           <AdminNav />
           <h1 className="text-2xl font-bold">New Quest</h1>
         </div>
@@ -60,9 +64,10 @@ export default function CreateQuest() {
               name="questName"
               value={quest.questName}
               onChange={handleChange}
+              placeholder="eg: BlockChain"
               required
               autoFocus
-              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-yellow-500"
+              className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-1 focus:ring-yellow-500 text-sm"
             />
           </div>
           <div>
@@ -75,24 +80,10 @@ export default function CreateQuest() {
               name="questImage"
               value={quest.questImage}
               onChange={handleChange}
+              placeholder="https:example.com/bitcoin.jpg"
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 text-sm"
             />
-          </div>
-          <div>
-            <label htmlFor="questStatus" className="block mb-2">
-              Quest Status
-            </label>
-            <select
-              id="questStatus"
-              name="questStatus"
-              value={quest.questStatus}
-              onChange={handleChange}
-              className="w-full px-3 py-2 rounded-md">
-              <option value="locked">Locked</option>
-              <option value="open " className="">Open</option>
-              <option value="completed">Completed</option>
-            </select>
           </div>
           <div>
             <label htmlFor="questDescription" className="block mb-2">
@@ -103,14 +94,16 @@ export default function CreateQuest() {
               name="questDescription"
               value={quest.questDescription}
               onChange={handleChange}
+              placeholder="Learn how to make secure transactions"
+              minLength={30}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
             />
           </div>
           <button
             type="submit"
             className="w-full bg-yellow-600 text-black py-2 px-4 rounded-md font-bold hover:bg-yellow-700 transition duration-300">
-            Create Quest
+            {buttonText}
           </button>
         </form>
       </div>

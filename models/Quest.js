@@ -8,6 +8,8 @@ const questSchema = new mongoose.Schema(
     questImage: { type: String, required: true },
     questDescription: { type: String, required: true },
     questQuestions: { type: [QuestQuestion.schema], default: [] },
+    addedBy: { type: String, required: true },
+    lastEditedBy: { type: String },
   },
   { timestamps: true }
 );
