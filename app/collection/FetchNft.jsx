@@ -150,50 +150,46 @@ export default function FetchNFT() {
   };
 
   return (
-    <div className="p-6 bg-gray-900 text-white min-h-screen">
+    <div className="p-6  text-white min-h-10">
       {isLoading ? (
-        <div className="text-center text-xl">Loading...</div>
+        <div className="text-center text-xl mt-10">fetching NFTs...</div>
       ) : (
         <div>
-          <h2 className="text-2xl font-bold mb-4">
-            NFT Information (Edu Chain)
-          </h2>
-          <p className="mb-2 text-gray-300 text-sm">
-            Contract Address: {trimAddress(contractAddress)}
-          </p>
-          <p className="mb-2 text-gray-300 text-sm">
-            Contract Name: {contractName}
-          </p>
-          <p className="mb-4 text-gray-300 text-sm">
-            Contract Symbol: {contractSymbol}
-          </p>
           {error && <div className="text-red-500 mb-4">{error}</div>}
           <h2 className="text-2xl font-bold mb-4">Available NFTs</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <p className="text-sm my-2">
+            Below are available NFTs you can mint on EduChain after reaching a
+            certain point threshold
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-content-center place-items-center">
             {allNFTs.length > 0 ? (
               allNFTs.map((nft, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                  <div className="w-full h-48 bg-gray-700 rounded-lg overflow-hidden">
+                <div key={index} className="bg-gray-800 rounded-lg p-2 w-fit">
+                  <div className="w-full h-48 max-w-48 rounded-lg overflow-hidden relative">
                     <img
                       alt={`NFT ${nft.id}`}
                       src={nft.uri}
                       className="w-full h-full object-cover"
                     />
-                  </div>
-                  <div className="flex justify-between items-center my-2">
-                    <span>
-                      Min {calculateRequiredPoints(index).toLocaleString()}{" "}
-                      points
-                    </span>
                     <Button
-                      className="bg-gold-500 text-black"
+                      className="absolute bottom-1 right-1 bg-gold-500 text-black"
                       onClick={() =>
                         handleMint(calculateRequiredPoints(index))
                       }>
                       Mint
                     </Button>
+                  </div>
+                  <div className=" flex justify-between items-center my-2 text-sm">
+                    <span>
+                      Min {calculateRequiredPoints(index).toLocaleString()}
+                      <img
+                        src="/coins.png"
+                        alt="coins"
+                        width={24}
+                        height={24}
+                        className="inline ml-1 mr-4"
+                      />
+                    </span>
                   </div>
                 </div>
               ))

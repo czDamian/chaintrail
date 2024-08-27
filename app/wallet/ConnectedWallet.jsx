@@ -61,17 +61,14 @@ export default function ConnectedWallet({ userInfo }) {
 
   return (
     <>
-      <div className="flex flex-col xs:flex-row justify-between gap-2">
+      <div className="flex flex-col xs:flex-row flex-wrap justify-between gap-2">
         <button className="flex items-center gap-2 border p-2 rounded-md border-blue-500">
           <img
             src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
             alt="Chain Logo"
             className="w-6 h-6"
           />
-          <span className="text-gray-400 text-sm hidden md:block">
-            Edu Chain
-          </span>
-          <FaChevronDown />
+          <span className="text-gray-400 text-sm">Edu Chain</span>
         </button>
         <button
           onClick={() => setShowModal(true)}
@@ -93,25 +90,21 @@ export default function ConnectedWallet({ userInfo }) {
             <p className="text-center font-bold my-4">
               {truncateAddress(userInfo.walletAddress)}
             </p>
-            <p className="text-center text-sm text-gray-500 my-4">{balance} EDU</p>
+            <p className="text-center text-sm text-gray-500 my-4">
+              {balance} EDU
+            </p>
             <div className="flex text-sm justify-between gap-4">
               <button
                 onClick={copyAddressToClipboard}
                 className="bg-slate-900 text-white border border-transparent active:border-gray-400 w-full py-3 rounded-md flex flex-col items-center">
                 <FaCopy />
-                <span>
-                Copy Address
-
-                </span>
+                <span>Copy Address</span>
               </button>
               <button
                 onClick={handleDisconnect}
                 className="bg-slate-900 text-white border border-transparent active:border-gray-400 w-full py-3 rounded-md flex flex-col items-center">
                 <FaWallet />
-                    <span>
-                Disconnect
-
-                    </span>
+                <span>Disconnect</span>
               </button>
             </div>
           </div>

@@ -9,7 +9,7 @@ export const metadata = {
 
 const Collection = () => {
   return (
-    <div className="w-full min-w-96 mt-6">
+    <div className="min-w-full mt-10">
       <FetchNFT />
       <FetchUserNFTs />
       <SideNav />

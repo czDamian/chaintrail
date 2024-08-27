@@ -54,28 +54,17 @@ export default function FetchUserNFTs() {
   }, []);
 
   return (
-    <div className="p-6 bg-gray-900 text-white min-h-screen">
+    <div className="p-6 text-white min-h-10 mb-20">
       {isLoading ? (
-        <div className="text-center text-xl">Loading...</div>
+        <div className="text-center text-xl">fetching NFTs...</div>
       ) : (
         <div>
           <h2 className="text-2xl font-bold mb-4">My NFTs</h2>
-          {userAddress && (
-            <p className="mb-4">
-              Wallet Address:
-              {`${userAddress.substring(0, 6)}...${userAddress.substring(
-                userAddress.length - 4
-              )}`}
-            </p>
-          )}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 place-content-center place-items-center">
             {userNFTs.length > 0 ? (
               userNFTs.map((nft, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-800 rounded-lg p-4 shadow-lg">
-                  <p className="text-lg font-semibold mb-2">NFT ID: {nft.id}</p>
-                  <div className="w-full h-48 bg-gray-700 rounded-lg overflow-hidden">
+                <div key={index} className="bg-gray-800 rounded-lg p-2 w-fit">
+                  <div className="w-full h-48 max-w-48 rounded-lg overflow-hidden">
                     <img
                       alt={`NFT ${nft.id}`}
                       src={nft.uri}
@@ -85,7 +74,9 @@ export default function FetchUserNFTs() {
                 </div>
               ))
             ) : (
-              <p className="text-center text-xl">You have not minted any NFT yet</p>
+              <p className="text-center text-xl">
+                You have not minted any NFT yet
+              </p>
             )}
           </div>
         </div>

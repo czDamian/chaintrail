@@ -60,7 +60,7 @@ const Referrals = () => {
         <h1 className="font-bold">
           INVITE <span className="text-gold-500">FRIENDS!</span>
         </h1>
-        <p className="text-sm my-2">Refer & earn 1000 points</p>
+        <p className="text-sm my-2">Earn 1000 points for each friend you invite</p>
 
         <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 text-xs md:text-sm my-8">
           <div className="flex items-center justify-between gap-2 rounded-[10px] p-4 bg-gray-900">
@@ -83,18 +83,14 @@ const Referrals = () => {
         </div>
 
         <div className="flex items-center justify-center gap-2">
-          <span>My referrals:</span>
+          <span>You have</span>
           <span id="referrals" className="font-bold text-yellow-500">
             {referralCount}
-          </span>
+          </span> referrals
         </div>
       </div>
 
       <div className="my-12 flex flex-col gap-4 mx-4">
-        <h1 className="text-xl font-semibold text-gray-300">
-          YOUR ACHIEVEMENTS!
-        </h1>
-
         {/* Achievement 1 */}
         <div className="bg-gray-800 flex gap-4 rounded-xl p-4 items-center">
           {getAchievementIcon(referralCount >= 1)}

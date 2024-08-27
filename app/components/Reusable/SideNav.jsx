@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; 
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   FaHome,
@@ -13,7 +13,7 @@ import {
 import { useTelegramAuth } from "@/app/TelegramAuthProvider";
 
 const SideNav = () => {
-  const pathname = usePathname(); // Get the current pathname
+  const pathname = usePathname();
   const { userInfo } = useTelegramAuth();
   const [navLinks, setNavLinks] = useState([
     { href: "/", title: "Home", icon: FaHome },
@@ -45,7 +45,7 @@ const SideNav = () => {
     <nav className="fixed bottom-0 left-0 w-full bg-gradient-to-b from-blue-950 to-gray-950 text-white z-50">
       <ul className="flex justify-between items-center">
         {navLinks.map((link, index) => {
-          const isActive = pathname === link.href; 
+          const isActive = pathname === link.href;
 
           return (
             <li key={index} className="flex-1">

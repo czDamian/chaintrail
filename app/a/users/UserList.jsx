@@ -131,7 +131,7 @@ export default function UserList() {
 
   return (
     <div className="p-4 bg-gray-900 min-h-screen">
-      <div className="flex text-yellow-500 justify-start gap-2 items-center p-4">
+      <div className="flex text-yellow-500 justify-start gap-6 items-center py-4">
         <AdminNav />
         <h1 className="text-2xl font-bold">Registered Users</h1>
       </div>
