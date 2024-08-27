@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 
 export default function Profile() {
   const router = useRouter();
-  const { userInfo, fetchUserInfo, logout } = useTelegramAuth();
+  const { userInfo, registerUser, fetchUserInfo,logout } = useTelegramAuth();
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(true);
@@ -24,9 +24,10 @@ export default function Profile() {
   const handleAccountConnected = useCallback(async () => {
     const savedUserId = localStorage.getItem("userId");
     if (savedUserId) {
+      await registerUser(savedUserId);
       await fetchUserInfo(savedUserId);
     }
-  }, [fetchUserInfo]);
+  }, [registerUser, fetchUserInfo]);
 
   const handleLogout = async () => {
     await logout();
