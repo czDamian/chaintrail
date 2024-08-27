@@ -2,13 +2,10 @@ import { NextResponse } from "next/server";
 import User from "@/models/User";
 import Counter from "@/models/Counter";
 import connectDb from "@/lib/mongodb";
-import Web3 from "web3";
 import Quest from "@/models/Quest";
-import bcrypt from "bcrypt";
 
 await connectDb();
 
-const saltRounds = 10;
 export async function POST(request) {
   const { userId, username, referralCode } = await request.json();
 
@@ -16,11 +13,8 @@ export async function POST(request) {
     let user = await User.findOne({ userId });
 
     if (user) {
-      // Check if wallet details or referral code or current Quest is missing or invalid and update if needed
-      if (!user.walletAddress || !Web3.utils.isAddress(user.walletAddress)) {
-        const walletDetails = createWalletWithWeb3();
-        Object.assign(user, walletDetails);
-      }
+      // Check if referral code or current Quest is missing or invalid and update
+
       if (user.currentQuest === "" || user.currentQuest === null) {
         const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
         if (firstQuest) {
@@ -31,24 +25,17 @@ export async function POST(request) {
       if (!user.referralCode) {
         user.referralCode = await generateAutoIncrementalReferralCode();
       }
+
       await user.save();
 
       return NextResponse.json({
         message: "Welcome Back",
-        walletAddress: user.walletAddress,
-        referralCode: user.referralCode,
+        referredBy: user.referredBy || "No referrer",
+        referralCode: `Your referral code is ${user.referralCode}`,
       });
     }
 
-    // User does not exist, create a new user with a wallet and referral code
-   const walletDetails = createWalletWithWeb3();
-   const hashedPrivateKey = await bcrypt.hash(
-     walletDetails.privateKey,
-     saltRounds
-   );
-   const newReferralCode = await generateAutoIncrementalReferralCode();
-
-    // Fetch the first quest
+    const newReferralCode = await generateAutoIncrementalReferralCode();
     const firstQuest = await Quest.findOne({}).sort({ createdAt: 1 });
 
     user = new User({
@@ -56,8 +43,6 @@ export async function POST(request) {
       username,
       points: 1000,
       playPass: 2,
-      walletAddress: walletDetails.walletAddress,
-      privateKey: hashedPrivateKey,
       referralCode: newReferralCode,
       currentQuest: firstQuest ? firstQuest._id : null,
     });
@@ -69,39 +54,26 @@ export async function POST(request) {
         referringUser.referralCount = (referringUser.referralCount || 0) + 1;
         referringUser.points = (referringUser.points || 0) + 1000;
         await referringUser.save();
+        user.referredBy = (referringUser.username || referringUser.userId);
       } else {
         console.warn("Referral code not found:", referralCode);
       }
     }
 
     await user.save();
-    // Verify the saved user
-    const savedUser = await User.findOne({ userId }).lean();
-    console.log("Saved user from database:", savedUser);
 
     return NextResponse.json({
       message: "Registration successful",
-      walletAddress: user.walletAddress,
-      referralCode: user.referralCode,
+      referredBy: user.referredBy || "No referrer",
+      referralCode: `Your referral code is ${user.referralCode}`,
     });
   } catch (err) {
-    console.error("Error in POST route:", err);
+    console.error("Error registerring user:", err);
     return NextResponse.json(
       { message: "Server error", error: err.message },
       { status: 500 }
     );
   }
-}
-
-function createWalletWithWeb3() {
-  const web3 = new Web3();
-  const account = web3.eth.accounts.create();
-  const walletDetails = {
-    walletAddress: account.address,
-    privateKey: account.privateKey,
-  };
-  console.log("Created wallet details:", walletDetails);
-  return walletDetails;
 }
 
 async function generateAutoIncrementalReferralCode() {
@@ -111,6 +83,5 @@ async function generateAutoIncrementalReferralCode() {
     { new: true, upsert: true }
   );
 
-  const referralCode = counter.sequenceValue.toString().padStart(4, "0");
-  return referralCode;
+  return counter.sequenceValue.toString().padStart(4, "0");
 }

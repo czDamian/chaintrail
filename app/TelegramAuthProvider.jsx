@@ -16,7 +16,7 @@ export default function TelegramAuthProvider({ children }) {
   const [userInfo, setUserInfo] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [userPoints, setUserPoints] = useState(0);
-  const router= useRouter();
+  const router = useRouter();
 
   const fetchUserInfo = useCallback(async (userId) => {
     try {
@@ -38,40 +38,43 @@ export default function TelegramAuthProvider({ children }) {
     }
   }, []);
 
-  const registerUser = useCallback(async (userId, username, method) => {
-    const referralCode = localStorage.getItem("referralCode");
+  const registerUser = useCallback(
+    async (userId, username, method) => {
+      const referralCode = localStorage.getItem("referralCode");
 
-    try {
-      setIsLoading(true);
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, username, method, referralCode }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        const userData = {
-          id: userId,
-          username: username,
-          points: data.points || 0,
-        };
-        setUserInfo(userData);
-        setUserPoints(data.points || 0);
-        localStorage.setItem("userId", userId);
-        localStorage.removeItem("referralCode");
-        router.refresh();
-      } else {
+      try {
+        setIsLoading(true);
+        const response = await fetch("/api/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userId, username, method, referralCode }),
+        });
+        const data = await response.json();
+        if (response.ok) {
+          const userData = {
+            id: userId,
+            username: username,
+            points: data.points || 0,
+          };
+          setUserInfo(userData);
+          setUserPoints(data.points || 0);
+          localStorage.setItem("userId", userId);
+          localStorage.removeItem("referralCode");
+          router.refresh();
+        } else {
+          toast.error("Registration failed. Please try again.");
+        }
+      } catch (error) {
+        console.error("Error registering user:", error);
         toast.error("Registration failed. Please try again.");
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error("Error registering user:", error);
-      toast.error("Registration failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+    },
+    [router]
+  );
 
   useEffect(() => {
     if (window.Telegram?.WebApp) {
@@ -117,6 +120,13 @@ export default function TelegramAuthProvider({ children }) {
     }
   };
 
+  const logout = useCallback(() => {
+    setUserInfo(null);
+    setUserPoints(0);
+    localStorage.removeItem("userId");
+    window.location.reload();
+  }, []);
+
   return (
     <TelegramAuthContext.Provider
       value={{
@@ -126,6 +136,7 @@ export default function TelegramAuthProvider({ children }) {
         updatePoints,
         fetchUserInfo,
         registerUser,
+        logout,
       }}>
       {children}
       <ToastContainer />

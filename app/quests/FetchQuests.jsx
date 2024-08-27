@@ -55,7 +55,7 @@ const FetchQuestsFromDb = () => {
   };
 
   return (
-    <section className=" mb-20 w-full">
+    <section className=" my-20 w-full">
       <h1 className="font-bold my-8 text-gold-500 text-4xl">QUESTS</h1>
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
         {loading ? (
@@ -111,7 +111,7 @@ const FetchQuestsFromDb = () => {
                   <span>{1000 * quest.questQuestions.length}</span>
                   <img src="coins.png" width={20} alt="points" />
                 </div>
-                <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500">
+                <span className="border border-yellow-400 px-1 py-2 rounded-full text-gold-500 min-w-8 text-center">
                   {calculateProgress(quest)}%
                 </span>
               </div>

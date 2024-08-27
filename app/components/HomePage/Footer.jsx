@@ -61,7 +61,7 @@ const Footer = () => {
           <h2 className="text-3xl text-center font-bold mb-6 text-[#EEEEEE]">
             Meet Our Team
           </h2>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
             {teamMembers.map((member, index) => (
               <div
                 key={index}

@@ -4,12 +4,13 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true, unique: true },
-    username: String,
-    points: { type: Number, default: 950 },
-    playPass: { type: Number, default: 10 },
+    username: { type: String },
+    points: { type: Number },
+    playPass: { type: Number },
     lastClaimTimestamp: { type: Date },
     referralCount: { type: Number, default: 0 },
     referralCode: { type: String, unique: true },
+    referredBy: { type: String, default: "" },
     role: { type: String, enum: ["user", "admin"], default: "user" },
     currentQuest: { type: mongoose.Schema.Types.ObjectId, ref: "Quest" },
     completedQuests: {
@@ -20,13 +21,11 @@ const UserSchema = new mongoose.Schema(
     currentQuestion: { type: Object, default: {} },
     walletAddress: {
       type: String,
-      unique: true,
       sparse: true,
       default: null,
     },
     privateKey: {
       type: String,
-      unique: true,
       sparse: true,
       default: null,
     },
