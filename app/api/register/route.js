@@ -4,6 +4,7 @@ import Counter from "@/models/Counter";
 import connectDb from "@/lib/mongodb";
 import Web3 from "web3";
 import Quest from "@/models/Quest";
+import bcrypt from "bcrypt";
 
 await connectDb();
 
