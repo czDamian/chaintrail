@@ -12,9 +12,11 @@ import QuestUI from "./QuestUI";
 import { useRouter } from "next/navigation";
 import BackButton from "@/app/components/Reusable/BackButton";
 import QuestionLoader from "./QuestionLoader";
+import { useAuth } from "@/app/AuthenticationProvider";
 
 const QuestionComponent = ({ questId }) => {
   const router = useRouter();
+  const { userInfo } = useAuth();
   const [points, setPoints] = useState(0);
   const [playPass, setPlayPass] = useState(0);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -35,10 +37,18 @@ const QuestionComponent = ({ questId }) => {
   const congratsSound =
     typeof Audio !== "undefined" ? new Audio("/btn/congrats.mp3") : null;
 
+  // Get userId from userInfo
+  const userId = userInfo?.userId;
+
   // Fetch questions and user's current question index
   const fetchQuestions = async () => {
+    if (!userId) {
+      console.warn("User ID not found");
+      setLoading(false);
+      return;
+    }
+
     try {
-      const userId = localStorage.getItem("userId");
       const res = await fetch(`/api/quests/${questId}/questions`);
       const userRes = await fetch(`/api/users?userId=${userId}`);
       if (!res.ok || !userRes.ok) {
@@ -66,11 +76,12 @@ const QuestionComponent = ({ questId }) => {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (questId) {
       fetchQuestions();
     }
-  }, [questId]);
+  }, [questId, userId]);
 
   const handleAnswerClick = (answer) => {
     if (buttonSound) {
@@ -101,6 +112,11 @@ const QuestionComponent = ({ questId }) => {
   };
 
   const handleSubmit = async (answers = selectedAnswers) => {
+    if (!userId) {
+      console.warn("User ID not found");
+      return;
+    }
+
     const currentQuestion = questions[currentQuestionIndex] || {};
     const newQuestionIndex = currentQuestionIndex + 1; // Move to the next question regardless of correctness
 
@@ -146,11 +162,6 @@ const QuestionComponent = ({ questId }) => {
     }
 
     try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        throw new Error("User ID not found in local storage");
-      }
-
       const questsResponse = await fetch("/api/quests");
       const allQuests = await questsResponse.json();
       const currentQuestIndex = allQuests.findIndex(

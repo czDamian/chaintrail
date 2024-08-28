@@ -4,15 +4,25 @@ import SideNav from "../components/Reusable/SideNav";
 import Button from "../components/Reusable/Button";
 import Link from "next/link";
 import { QuestSkeleton } from "../components/HomePage/CustomLoader";
+import { useAuth } from "../AuthenticationProvider";
 
 const FetchQuestsFromDb = () => {
+  const { userInfo } = useAuth();
   const [quests, setQuests] = useState([]);
   const [userProgress, setUserProgress] = useState({});
   const [loading, setLoading] = useState(true);
 
+  // Get userId from userInfo
+  const userId = userInfo?.userId;
+
   useEffect(() => {
-    const fetchQuestsandProgress = async () => {
-      const userId = localStorage.getItem("userId");
+    const fetchQuestsAndProgress = async () => {
+      if (!userId) {
+        console.warn("User ID not found");
+        setLoading(false);
+        return;
+      }
+
       try {
         // Fetch quests
         const questsResponse = await fetch(`/api/quests?userId=${userId}`);
@@ -26,7 +36,6 @@ const FetchQuestsFromDb = () => {
 
           setQuests(questsData);
           setUserProgress(userData.currentQuestion || {});
-          console.log(userData.currentQuestion);
         } else {
           throw new Error("Failed to fetch data");
         }
@@ -37,17 +46,15 @@ const FetchQuestsFromDb = () => {
       }
     };
 
-    fetchQuestsandProgress();
-  }, []);
+    fetchQuestsAndProgress();
+  }, [userId]);
 
   const calculateProgress = (quest) => {
-    if (quest.questStatus == "completed") return 100;
-    if (quest.questStatus == "locked") return 0;
+    if (quest.questStatus === "completed") return 100;
+    if (quest.questStatus === "locked") return 0;
 
     const currentQuestionNumber = userProgress[quest._id] || 0;
-    console.log("currentQuestionNumber", currentQuestionNumber);
     const totalQuestions = quest.questQuestions.length;
-    console.log("totalQuestions", totalQuestions);
 
     if (currentQuestionNumber > totalQuestions) return 100;
 
@@ -55,7 +62,7 @@ const FetchQuestsFromDb = () => {
   };
 
   return (
-    <section className=" my-20 w-full">
+    <section className="my-20 w-full">
       <h1 className="font-bold my-8 text-gold-500 text-4xl">QUESTS</h1>
       <div className="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
         {loading ? (
@@ -64,7 +71,7 @@ const FetchQuestsFromDb = () => {
           ))
         ) : quests.length === 0 ? (
           <div className="text-center text-gray-300 col-span-full">
-            <p className=" min-h-[70vh] ">No quests available for now</p>
+            <p className="min-h-[70vh]">No quests available for now</p>
           </div>
         ) : (
           quests.map((quest) => (
@@ -95,7 +102,7 @@ const FetchQuestsFromDb = () => {
               </div>
 
               <div className="flex justify-between items-center w-full px-3 my-2">
-                <span className="uppercase font-bold text-gray-100 ">
+                <span className="uppercase font-bold text-gray-100">
                   {quest.questName}
                 </span>
               </div>

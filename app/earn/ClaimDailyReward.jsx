@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import Toast from "../components/Reusable/Toast";
 import Button from "../components/Reusable/Button";
+import { useAuth } from "../AuthenticationProvider";
 
 const ClaimDailyReward = () => {
+  const { userInfo } = useAuth();
   const [nextClaimTime, setNextClaimTime] = useState(null);
   const [canClaim, setCanClaim] = useState(false);
   const [timeLeft, setTimeLeft] = useState({});
@@ -11,15 +13,17 @@ const ClaimDailyReward = () => {
   const [toastBorderColor, setToastBorderColor] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Get userId from userInfo
+  const userId = userInfo?.userId;
+
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
     if (userId) {
       checkClaimStatus(userId);
     } else {
-      console.warn("User ID not found in local storage");
+      console.warn("User ID not found");
       setIsLoading(false);
     }
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
     if (nextClaimTime) {
@@ -86,14 +90,13 @@ const ClaimDailyReward = () => {
   };
 
   const claimRewardAndPass = async () => {
-    const userId = localStorage.getItem("userId");
     if (!userId) {
-      console.warn("User ID not found in local storage");
+      console.warn("User ID not found");
       return;
     }
 
-    setIsLoading(true);
     try {
+      setIsLoading(true);
       const response = await fetch("/api/claim", {
         method: "PUT",
         headers: {
@@ -127,7 +130,6 @@ const ClaimDailyReward = () => {
     } finally {
       setIsLoading(false);
       // Recheck claim status after attempting to claim
-      const userId = localStorage.getItem("userId");
       if (userId) {
         checkClaimStatus(userId);
       }

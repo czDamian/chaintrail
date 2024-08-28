@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 import Web3 from "web3";
+import { useAuth } from "@/app/AuthenticationProvider";
+import { useRouter } from "next/navigation";
 
-export default function ImportWallet({
-  userInfo,
-  fetchUserInfo,
-  router,
-  importMethod,
-  onCancel,
-}) {
+export default function ImportWallet({ importMethod, onCancel }) {
+  const { userInfo, fetchUserInfo } = useAuth();
   const [seedPhrase, setSeedPhrase] = useState(Array(12).fill(""));
   const [privateKey, setPrivateKey] = useState("");
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState(false);
+  const router = useRouter();
 
   const handleSeedPhraseChange = (index, value) => {
     const updatedSeedPhrase = [...seedPhrase];

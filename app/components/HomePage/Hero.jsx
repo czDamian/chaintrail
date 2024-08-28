@@ -2,31 +2,35 @@
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 import Button from "../Reusable/Button";
-import ConnectWalletPopup from "./ConnectWalletPopup";
 import { raleway } from "../Reusable/Font";
-import { useTelegramAuth } from "@/app/TelegramAuthProvider";
+import { useAuth } from "@/app/AuthenticationProvider";
+import { CgClose } from "react-icons/cg";
+import Cookies from "js-cookie";
 
 const Hero = () => {
-  const { userInfo, fetchUserInfo, logout } = useTelegramAuth();
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const { userInfo, fetchUserInfo, handleWalletConnect, isLoading } = useAuth();
   const [isMobile, setIsMobile] = useState(false);
+  const [isWalletPopupOpen, setIsWalletPopupOpen] = useState(false);
 
-  const openPopup = () => setIsPopupOpen(true);
-  const closePopup = () => setIsPopupOpen(false);
-
-  const handleAccountConnected = useCallback(async () => {
-    const savedUserId = localStorage.getItem("userId");
-    if (savedUserId) {
-      await fetchUserInfo(savedUserId);
-    }
-  }, [fetchUserInfo]);
+  const openWalletPopup = () => setIsWalletPopupOpen(true);
+  const closeWalletPopup = () => setIsWalletPopupOpen(false);
 
   useEffect(() => {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const userAgent = navigator.userAgent || window.opera;
     const isMobile =
       /android|iPhone|iPad|iPod|opera mini|IEMobile|WPDesktop/i.test(userAgent);
     setIsMobile(isMobile);
   }, []);
+
+  // Ensure userInfo is fetched on component mount if not already available
+  useEffect(() => {
+    if (!userInfo && !isLoading) {
+      const userId = Cookies.get("userId");
+      if (userId) {
+        fetchUserInfo(userId);
+      }
+    }
+  }, [userInfo, isLoading, fetchUserInfo]);
 
   return (
     <div className="relative mt-[-20px] md:mt-0 w-screen h-screen flex flex-col items-center justify-center">
@@ -46,22 +50,22 @@ const Hero = () => {
         <p
           className={`${raleway.className} text-white font-lato max-w-[340px] sm:max-w-[600px] mb-8 text-md md:text-xl`}>
           Embark on Word Trail, where every level takes you a step closer to a
-          unique nFT.
+          unique NFT.
         </p>
 
         {userInfo ? (
-          <>
+          <div className="flex flex-col gap-3 items-center justify-center">
             <Button
               href="/quests"
-              className="flex px-8 mb-4 mx-auto text-xs text-black bg-gold-500 hover:bg-yellow-400 transition-colors font-bold duration-300 py-3 hover:scale-105">
+              className="text-xs text-black bg-gold-500 transition-colors duration-300 py-3 hover:scale-105 w-48 text-center">
               Play now
             </Button>
             <Button
               href="/wallet"
-              className="flex px-8 mb-4 mx-auto text-xs bg-black border transition-colors font-normal duration-300 py-3 hover:scale-105">
-              dashboard
+              className="text-xs bg-slate-900 text-center transition-colors font-normal duration-300 py-3 hover:scale-105 w-48">
+              Dashboard
             </Button>
-          </>
+          </div>
         ) : (
           <>
             {isMobile ? (
@@ -82,15 +86,27 @@ const Hero = () => {
             ) : (
               <>
                 <Button
-                  onClick={openPopup}
-                  className="flex px-8 mb-4 mx-auto text-xs gap-2 text-black bg-gold-500 hover:bg-gold-400 transition-colors font-bold duration-300 py-3 hover:scale-105">
-                  Connect Wallet
+                  onClick={openWalletPopup}
+                  className={`flex items-center justify-center mb-4 mx-auto text-xs text-black bg-gold-500 transition-colors duration-300  hover:scale-105 w-48 gap-3 ${
+                    isLoading ? "py-3" : "py-2.5"
+                  }`}>
+                  <span>{isLoading ? "Connecting" : "Connect"}</span>
+
+                  <span>
+                    <Image
+                      src="metamask.svg"
+                      height={100}
+                      width={100}
+                      alt="telegram"
+                      className={`w-6 ${isLoading ? "hidden" : ""}`}
+                    />
+                  </span>
                 </Button>
                 <Button
                   href="https://t.me/ChainTrailBot"
-                  className="flex mx-auto text-xs gap-3 hover:scale-105 px-12 border items-center">
+                  className="flex mx-auto text-xs gap-3 hover:scale-105 items-center w-48 justify-center bg-slate-900 py-2.5">
                   <span>Play on</span>
-                  <span className="animate-pulse">
+                  <span>
                     <Image
                       src="telegram.svg"
                       height={100}
@@ -106,11 +122,46 @@ const Hero = () => {
         )}
       </div>
 
-      <ConnectWalletPopup
-        isOpen={isPopupOpen}
-        onClose={closePopup}
-        onAccountConnected={handleAccountConnected}
-      />
+      {isWalletPopupOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-slate-950 rounded-lg shadow-xl w-80">
+            <div className="p-4">
+              <div className="flex justify-end">
+                <button
+                  onClick={closeWalletPopup}
+                  className="text-gray-500 my-2 p-1 hover:text-gray-700 text-lg">
+                  <CgClose />
+                </button>
+              </div>
+              <div className="space-y-4 py-2 text-lg">
+                <div
+                  onClick={() => {
+                    closeWalletPopup();
+                    handleWalletConnect();
+                  }}
+                  className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded cursor-pointer">
+                  <p>Connect with MetaMask</p>
+                  <img
+                    src="metamask.svg"
+                    alt="metamask"
+                    width={30}
+                    height={30}
+                  />
+                </div>
+              </div>
+              <div
+                onClick={() => {
+                  closeWalletPopup();
+                  handleWalletConnect();
+                }}
+                className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded cursor-pointer">
+                <p>Wallet Connect</p>
+                <img src="metamask.svg" alt="metamask" width={30} height={30} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

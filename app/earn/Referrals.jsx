@@ -1,31 +1,27 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  IoCopy,
-  IoCheckmarkCircle,
-  IoTimeOutline,
-  IoStar,
-} from "react-icons/io5";
+import { IoCopy, IoCheckmarkCircle, IoTimeOutline } from "react-icons/io5";
 import Toast from "../components/Reusable/Toast";
+import { useAuth } from "../AuthenticationProvider";
 
 const Referrals = () => {
+  const { userInfo } = useAuth(); 
   const [referralLink, setReferralLink] = useState("");
   const [referralCount, setReferralCount] = useState(0);
   const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const fetchReferralData = async () => {
-      const userId = localStorage.getItem("userId");
-      if (userId) {
+      if (userInfo) {
         try {
-          const response = await fetch(`/api/users?userId=${userId}`);
+          const response = await fetch(`/api/users?userId=${userInfo.userId}`);
           const data = await response.json();
 
           if (response.ok) {
-            const referralCode = data.referralCode || "0000"; // Default to "0000" if referralCode is missing
+            const referralCode = data.referralCode || "0000";
             setReferralLink(`https://t.me/ChainTrailBot?start=${referralCode}`);
-            setReferralCount(data.referralCount || 0); // Set referral count if available
+            setReferralCount(data.referralCount || 0);
           } else {
             console.error("Failed to fetch referral code:", data.message);
           }
@@ -33,12 +29,12 @@ const Referrals = () => {
           console.error("Error fetching referral code:", error);
         }
       } else {
-        console.error("No userId found in localStorage");
+        console.error("No userId found");
       }
     };
 
     fetchReferralData();
-  }, []);
+  }, [userInfo]);
 
   const copyReferralLink = () => {
     navigator.clipboard.writeText(referralLink);
@@ -60,7 +56,9 @@ const Referrals = () => {
         <h1 className="font-bold">
           INVITE <span className="text-gold-500">FRIENDS!</span>
         </h1>
-        <p className="text-sm my-2">Earn 1000 points for each friend you invite</p>
+        <p className="text-sm my-2">
+          Earn 1000 points for each friend you invite
+        </p>
 
         <div className="hover:animate-background rounded-xl bg-gradient-to-r from-green-300 via-blue-500 to-purple-600 p-0.5 shadow-xl transition hover:bg-[length:400%_400%] hover:shadow-sm hover:[animation-duration:_4s] dark:shadow-gray-700/25 text-xs md:text-sm my-8">
           <div className="flex items-center justify-between gap-2 rounded-[10px] p-4 bg-gray-900">
@@ -86,7 +84,8 @@ const Referrals = () => {
           <span>You have</span>
           <span id="referrals" className="font-bold text-yellow-500">
             {referralCount}
-          </span> referrals
+          </span>{" "}
+          referrals
         </div>
       </div>
 

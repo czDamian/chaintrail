@@ -9,6 +9,7 @@ const UserSchema = new mongoose.Schema(
     playPass: { type: Number },
     lastClaimTimestamp: { type: Date },
     referralCount: { type: Number, default: 0 },
+    platform: { type: String, enum: ["telegram", "wallet"] },
     referralCode: { type: String, unique: true },
     referredBy: { type: String, default: "" },
     role: { type: String, enum: ["user", "admin"], default: "user" },

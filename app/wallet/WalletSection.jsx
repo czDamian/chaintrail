@@ -2,7 +2,7 @@ import { useState } from "react";
 import ConnectedWallet from "./ConnectedWallet";
 import ImportWallet from "./ImportWallet";
 
-export default function WalletSection({ userInfo, fetchUserInfo, router }) {
+export default function WalletSection({ userInfo, fetchUserInfo }) {
   const [showImportOptions, setShowImportOptions] = useState(false);
   const [importMethod, setImportMethod] = useState(null);
 
@@ -21,7 +21,6 @@ export default function WalletSection({ userInfo, fetchUserInfo, router }) {
         <ConnectedWallet
           userInfo={userInfo}
           fetchUserInfo={fetchUserInfo}
-          router={router}
         />
       ) : (
         <>
@@ -53,7 +52,6 @@ export default function WalletSection({ userInfo, fetchUserInfo, router }) {
             <ImportWallet
               userInfo={userInfo}
               fetchUserInfo={fetchUserInfo}
-              router={router}
               importMethod={importMethod}
               onCancel={handleCancel}
             />

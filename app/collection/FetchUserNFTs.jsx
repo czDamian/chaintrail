@@ -56,7 +56,7 @@ export default function FetchUserNFTs() {
   return (
     <div className="p-6 text-white min-h-10 mb-20">
       {isLoading ? (
-        <div className="text-center text-xl">fetching NFTs...</div>
+        <div className="text-center text-xl"></div>
       ) : (
         <div>
           <h2 className="text-2xl font-bold mb-4">My NFTs</h2>

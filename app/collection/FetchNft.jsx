@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Web3 from "web3";
 import nftContractABI from "./EduNft.json";
 import Button from "../components/Reusable/Button";
+import Loader from "../loader";
 
 export default function FetchNFT() {
   const [contractAddress, setContractAddress] = useState("");
@@ -152,7 +153,7 @@ export default function FetchNFT() {
   return (
     <div className="p-6  text-white min-h-10">
       {isLoading ? (
-        <div className="text-center text-xl mt-10">fetching NFTs...</div>
+         <Loader/>
       ) : (
         <div>
           {error && <div className="text-red-500 mb-4">{error}</div>}

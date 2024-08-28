@@ -10,12 +10,12 @@ import {
   FaLock,
   FaWallet,
 } from "react-icons/fa";
+import { useAuth } from "@/app/AuthenticationProvider";
 
 const SideNav = () => {
   const pathname = usePathname();
-  const savedUserId = localStorage.getItem("userId");
+  const { userInfo } = useAuth();
 
-  const [userInfo, setUserInfo] = useState(null);
   const [navLinks, setNavLinks] = useState([
     { href: "/", title: "Home", icon: FaHome },
     { href: "/quests", title: "Quests", icon: FaTasks },
@@ -23,26 +23,6 @@ const SideNav = () => {
     { href: "/earn", title: "Earn", icon: FaUser },
     { href: "/wallet", title: "Wallet", icon: FaWallet },
   ]);
-
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
-        const response = await fetch(`/api/users?userId=${savedUserId}`);
-        if (response.ok) {
-          const data = await response.json();
-          setUserInfo(data);
-        } else {
-          console.error("Failed to fetch user information");
-        }
-      } catch (error) {
-        console.error("Error fetching user information:", error);
-      }
-    };
-
-    if (savedUserId) {
-      fetchUserInfo();
-    }
-  }, [savedUserId]);
 
   useEffect(() => {
     if (userInfo?.role === "admin") {

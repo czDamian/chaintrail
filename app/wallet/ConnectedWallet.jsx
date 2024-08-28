@@ -1,3 +1,4 @@
+import Cookies from "js-cookie";
 import { useState, useEffect } from "react";
 import { FaChevronDown, FaTimes, FaCopy, FaWallet } from "react-icons/fa";
 import Modal from "../components/Reusable/Modal";
@@ -45,6 +46,16 @@ export default function ConnectedWallet({ userInfo }) {
       if (!response.ok) {
         throw new Error("Failed to disconnect wallet");
       }
+
+      // Update the cookie with the new user information
+      Cookies.set(
+        "userInfo",
+        JSON.stringify({
+          ...userInfo,
+          walletAddress: null,
+          privateKey: null,
+        })
+      );
 
       window.location.reload();
     } catch (err) {

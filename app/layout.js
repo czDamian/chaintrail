@@ -1,7 +1,7 @@
 import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/HomePage/Nav";
-import TelegramAuthProvider from "./TelegramAuthProvider";
+import AuthenticationProvider from "./AuthenticationProvider";
 
 export const metadata = {
   title: "Chain Trail",
@@ -18,10 +18,10 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <TelegramAuthProvider>
+        <AuthenticationProvider>
           <Navbar />
           {children}
-        </TelegramAuthProvider>
+        </AuthenticationProvider>
       </body>
     </html>
   );
