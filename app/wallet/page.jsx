@@ -8,7 +8,7 @@ export const metadata = {
 
 const Wallet = () => {
   return (
-    <div>
+    <div className="px-2">
       <div className="mb-20">
         <div className="my-20"></div>
         <UserProfile />

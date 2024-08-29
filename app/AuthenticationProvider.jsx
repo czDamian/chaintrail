@@ -6,6 +6,7 @@ import {
   useContext,
   useCallback,
 } from "react";
+import { SessionProvider } from "next-auth/react";
 import { ethers } from "ethers";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -126,50 +127,52 @@ export default function AuthenticationProvider({ children }) {
   }, [registerUser]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        userInfo,
-        isLoading,
-        registerUser,
-        fetchUserInfo,
-        logout,
-        handleWalletConnect,
-      }}>
-      {children}
-      <ToastContainer />
-      {isWalletPopupOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-slate-950 rounded-lg shadow-xl w-80">
-            <div className="p-4">
-              <div className="flex justify-end">
-                <button
-                  onClick={() => setIsWalletPopupOpen(false)}
-                  className="text-gray-500 my-2 p-1 hover:text-gray-700 text-lg">
-                  <CgClose />
-                </button>
-              </div>
-              <div className="space-y-4 py-2 text-lg">
-                <div
-                  onClick={handleWalletConnect}
-                  className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded">
-                  <p>Connect Wallet</p>
-                  <img
-                    src="metamask.svg"
-                    alt="metamask"
-                    width={30}
-                    height={30}
-                  />
+    <SessionProvider>
+      <AuthContext.Provider
+        value={{
+          userInfo,
+          isLoading,
+          registerUser,
+          fetchUserInfo,
+          logout,
+          handleWalletConnect,
+        }}>
+        {children}
+        <ToastContainer />
+        {isWalletPopupOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+            <div className="bg-slate-950 rounded-lg shadow-xl w-80">
+              <div className="p-4">
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => setIsWalletPopupOpen(false)}
+                    className="text-gray-500 my-2 p-1 hover:text-gray-700 text-lg">
+                    <CgClose />
+                  </button>
+                </div>
+                <div className="space-y-4 py-2 text-lg">
+                  <div
+                    onClick={handleWalletConnect}
+                    className="flex items-center justify-between px-2 py-4 hover:bg-slate-900 rounded">
+                    <p>Connect Wallet</p>
+                    <img
+                      src="metamask.svg"
+                      alt="metamask"
+                      width={30}
+                      height={30}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
+            <Toast
+              message="Please install MetaMask extension!"
+              borderLeftColor="border-l-red-500"
+            />
           </div>
-          <Toast
-            message="Please install MetaMask extension!"
-            borderLeftColor="border-l-red-500"
-          />
-        </div>
-      )}
-    </AuthContext.Provider>
+        )}
+      </AuthContext.Provider>
+    </SessionProvider>
   );
 }
 
