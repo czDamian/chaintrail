@@ -1,15 +1,22 @@
 "use client";
+import { useState, useEffect } from "react";
 import {
   getDefaultConfig,
   RainbowKitProvider,
   ConnectButton,
   darkTheme,
 } from "@rainbow-me/rainbowkit";
-import { WagmiProvider } from "wagmi";
+import {
+  WagmiProvider,
+  createConfig,
+  useAccount,
+  useSignMessage,
+  useConnect,
+  useDisconnect,
+} from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
-import { SessionProvider } from "next-auth/react";
-import { RainbowKitSiweNextAuthProvider } from "@rainbow-me/rainbowkit-siwe-next-auth";
+import { SiweMessage } from "siwe";
 
 import "@rainbow-me/rainbowkit/styles.css";
 
@@ -46,23 +53,124 @@ const config = getDefaultConfig({
 
 const queryClient = new QueryClient();
 
+function CustomConnectButton() {
+  const { address, isConnected } = useAccount();
+  const { signMessageAsync } = useSignMessage();
+  const { connectAsync } = useConnect();
+  const { disconnectAsync } = useDisconnect();
+  const [signInError, setSignInError] = useState(null);
+  const [isSigned, setIsSigned] = useState(false);
+
+  useEffect(() => {
+    const checkPersistence = async () => {
+      const persistedState = localStorage.getItem("walletConnection");
+      if (persistedState && isConnected) {
+        const { isSigned: storedIsSigned } = JSON.parse(persistedState);
+        setIsSigned(storedIsSigned);
+      }
+    };
+
+    checkPersistence();
+  }, [isConnected]);
+
+  const generateNonce = () => {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    for (let i = 0; i < 32; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
+  const signMessage = async () => {
+    try {
+      const nonce = generateNonce();
+      const message = new SiweMessage({
+        domain: window.location.host,
+        address: address,
+        statement:
+          "Sign in with Ethereum to the app. You are not paying for any transaction",
+        uri: window.location.origin,
+        version: "1",
+        chainId: 1,
+        nonce: nonce,
+      });
+      const signature = await signMessageAsync({
+        message: message.prepareMessage(),
+      });
+      console.log("Signature:", signature);
+      // Here you would typically send the message and signature to your server for verification
+      console.log("Successfully signed in!");
+      setSignInError(null);
+      setIsSigned(true);
+
+      // Persist the connection state including the signed status
+      localStorage.setItem(
+        "walletConnection",
+        JSON.stringify({ address, isSigned: true })
+      );
+    } catch (error) {
+      console.error("Error signing in:", error);
+      setSignInError(error.message);
+    }
+  };
+
+  const handleDisconnect = async () => {
+    await disconnectAsync();
+    localStorage.removeItem("walletConnection");
+    setIsSigned(false);
+  };
+
+  if (!isConnected) {
+    return <ConnectButton />;
+  }
+
+  if (isConnected && !isSigned) {
+    return (
+      <div>
+        <button
+          onClick={signMessage}
+          className="px-4 py-2 font-bold text-white bg-blue-500 rounded hover:bg-blue-700">
+          Sign Message
+        </button>
+        {signInError && <p className="text-red-500 mt-2">{signInError}</p>}
+      </div>
+    );
+  }
+
+  if (isConnected && isSigned) {
+    return (
+      <div>
+        <ConnectButton />
+      </div>
+    );
+  }
+}
+
 const InjectedWallet = ({ children }) => {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
-        <SessionProvider refetchInterval={0}>
-          <RainbowKitSiweNextAuthProvider>
-            <RainbowKitProvider
-              chains={config.chains}
-              theme={darkTheme()}
-              modalSize="compact">
+        <RainbowKitProvider
+          chains={config.chains}
+          theme={darkTheme()}
+          modalSize="compact">
+          {mounted && (
+            <>
               <div className="rounded-lg">
-                <ConnectButton />
+                <CustomConnectButton />
               </div>
               {children}
-            </RainbowKitProvider>
-          </RainbowKitSiweNextAuthProvider>
-        </SessionProvider>
+            </>
+          )}
+        </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
   );
