@@ -142,14 +142,13 @@ function CustomConnectButton() {
   if (isConnected && isSigned) {
     return (
       <div>
-        <ConnectButton />
         <ConnectButton chainStatus="none" showBalance={false} />
       </div>
     );
   }
 }
 
-const InjectedWallet = ({ children }) => {
+const RainbowWallet = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -177,4 +176,4 @@ const InjectedWallet = ({ children }) => {
   );
 };
 
-export default InjectedWallet;
+export default RainbowWallet;

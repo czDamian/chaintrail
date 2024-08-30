@@ -6,13 +6,16 @@ import { FaCheckCircle } from "react-icons/fa";
 import Logout from "./Logout";
 import { useRouter } from "next/navigation";
 import { CgClose } from "react-icons/cg";
+import RainbowWallet from "@/app/wallet/ConnectButton"; // Ensure RainbowWallet is correctly imported
 
 export default function Profile() {
   const router = useRouter();
   const { userInfo, logout, handleWalletConnect, isLoading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(true);
   const [isWalletPopupOpen, setIsWalletPopupOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTelegramWebAppAvailable, setIsTelegramWebAppAvailable] =
+    useState(false);
 
   const trimWalletAddress = (address) => {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
@@ -29,10 +32,18 @@ export default function Profile() {
 
   useEffect(() => {
     const userAgent = navigator.userAgent || window.opera;
-    const isMobile =
+    const mobileCheck =
       /android|iPhone|iPad|iPod|opera mini|IEMobile|WPDesktop/i.test(userAgent);
-    setIsDesktop(!isMobile);
+    setIsMobile(mobileCheck);
+
+    // Check if Telegram WebApp is available
+    setIsTelegramWebAppAvailable(!!window.Telegram?.WebApp);
   }, []);
+
+  // If not on mobile or Telegram WebApp is not available, show RainbowWallet
+  if (!isMobile || !isTelegramWebAppAvailable) {
+    return <RainbowWallet />;
+  }
 
   return (
     <div className="text-xs md:text-lg font-raleway relative">
