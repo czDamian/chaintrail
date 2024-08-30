@@ -8,16 +8,25 @@ import { useRouter } from "next/navigation";
 import { CgClose } from "react-icons/cg";
 import RainbowWallet from "@/app/wallet/ConnectButton";
 
+// Function to check if the user is on a mobile device
+const isMobileDevice = () => {
+  return /Mobi|Android/i.test(navigator.userAgent);
+};
+
 export default function Profile() {
   const router = useRouter();
   const { userInfo, logout, handleWalletConnect, isLoading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isWalletPopupOpen, setIsWalletPopupOpen] = useState(false);
-  const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    if (window.Telegram?.WebApp) {
-      setIsTelegramWebApp(true);
+    if (typeof window !== "undefined") {
+      const telegramWebAppDefined = window.Telegram?.WebApp;
+      const isMobile = isMobileDevice();
+
+      // Show content if on mobile device and Telegram Web App is defined
+      setShowContent(isMobile && telegramWebAppDefined);
     }
   }, []);
 
@@ -34,7 +43,8 @@ export default function Profile() {
   const openWalletPopup = () => setIsWalletPopupOpen(true);
   const closeWalletPopup = () => setIsWalletPopupOpen(false);
 
-  if (isTelegramWebApp !== true) {
+  // Display RainbowWallet if conditions are not met
+  if (!showContent) {
     return <RainbowWallet />;
   }
 

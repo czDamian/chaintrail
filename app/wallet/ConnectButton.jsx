@@ -53,6 +53,7 @@ function CustomConnectButton() {
   const { address, isConnected } = useAccount();
   const { disconnectAsync } = useDisconnect();
   const { registerUser } = useAuth();
+
   useEffect(() => {
     if (isConnected && address) {
       registerUser(address, "", "wallet");
@@ -74,7 +75,6 @@ function CustomConnectButton() {
       console.error("Error disconnecting:", error);
     }
   };
-
 
   if (!isConnected) {
     return <ConnectButton />;
