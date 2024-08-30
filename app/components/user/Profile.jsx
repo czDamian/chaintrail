@@ -13,6 +13,13 @@ export default function Profile() {
   const { userInfo, logout, handleWalletConnect, isLoading } = useAuth();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isWalletPopupOpen, setIsWalletPopupOpen] = useState(false);
+  const [isTelegramWebApp, setIsTelegramWebApp] = useState(false);
+
+  useEffect(() => {
+    if (window.Telegram?.WebApp) {
+      setIsTelegramWebApp(true);
+    }
+  }, []);
 
   const trimWalletAddress = (address) => {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
@@ -27,7 +34,7 @@ export default function Profile() {
   const openWalletPopup = () => setIsWalletPopupOpen(true);
   const closeWalletPopup = () => setIsWalletPopupOpen(false);
 
-  if (!window.Telegram?.WebApp) {
+  if (isTelegramWebApp !== true) {
     return <RainbowWallet />;
   }
 

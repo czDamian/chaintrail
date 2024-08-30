@@ -66,7 +66,7 @@ function CustomConnectButton() {
       Object.keys(cookies).forEach((cookieName) => {
         Cookies.remove(cookieName, { path: "/" });
       });
-
+      router.push("/");
       if (typeof window !== "undefined") {
         window.location.reload();
       }
