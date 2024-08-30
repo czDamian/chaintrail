@@ -6,7 +6,6 @@ import {
   useContext,
   useCallback,
 } from "react";
-import { SessionProvider } from "next-auth/react";
 import { ethers } from "ethers";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -31,8 +30,7 @@ export default function AuthenticationProvider({ children }) {
         const userData = await response.json();
         setUserInfo(userData);
 
-        // Save user info to cookies
-        Cookies.set("userInfo", JSON.stringify(userData), { expires: 1 }); // expires in 1 day
+        Cookies.set("userInfo", JSON.stringify(userData), { expires: 1 }); 
       } else {
         console.error("Failed to fetch user data");
         setUserInfo(null);
@@ -58,7 +56,7 @@ export default function AuthenticationProvider({ children }) {
         });
 
         if (response.ok) {
-          await fetchUserInfo(userId); // Fetch user details after successful registration
+          await fetchUserInfo(userId); 
           router.refresh();
         } else {
           toast.error("Registration failed. Please try again.");
@@ -127,7 +125,6 @@ export default function AuthenticationProvider({ children }) {
   }, [registerUser]);
 
   return (
-    <SessionProvider>
       <AuthContext.Provider
         value={{
           userInfo,
@@ -172,7 +169,6 @@ export default function AuthenticationProvider({ children }) {
           </div>
         )}
       </AuthContext.Provider>
-    </SessionProvider>
   );
 }
 

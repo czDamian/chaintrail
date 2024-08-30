@@ -5,7 +5,6 @@ import Loader from "../loader";
 import UserInfo from "./UserInfo";
 import WalletSection from "./WalletSection";
 import { useAuth } from "@/app/AuthenticationProvider";
-import InjectedWallet from "./InjectedWallet";
 
 export default function UserProfile() {
   const { userInfo, isLoading } = useAuth();
@@ -52,7 +51,7 @@ export default function UserProfile() {
             {shouldShowWalletSection ? (
               <WalletSection userInfo={userInfo} router={router} />
             ) : (
-              <InjectedWallet />
+              <></>
             )}
           </div>
         </div>
