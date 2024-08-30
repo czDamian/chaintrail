@@ -104,9 +104,10 @@ export const Wrong = () => {
   );
 };
 
-export const Complete = () => {
+export const Complete = ({ points, playPass }) => {
   const [showConfetti, setShowConfetti] = useState(true);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
   useEffect(() => {
     const updateDimensions = () => {
       setDimensions({ width: window.innerWidth, height: window.innerHeight });
@@ -172,7 +173,7 @@ export const Complete = () => {
                     alt="Chain Coins"
                     className="w-16 h-16"
                   />
-                  <span className="text-2xl">40</span>
+                  <span className="text-2xl text-gold-500">{points}</span>
                 </div>
               </div>
               <div className=" gap-1 text-2xl flex items-center">
@@ -181,7 +182,7 @@ export const Complete = () => {
                   alt="Play Pass"
                   className="w-16 h-16"
                 />
-                <span className="text-gold-500">2</span>
+                <span className="text-gold-500">{playPass}</span>
               </div>
             </div>
 

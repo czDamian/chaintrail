@@ -37,7 +37,8 @@ const steps = [
   {
     step: "STEP 6",
     image: "mainNft3.svg",
-    title: "Refer friends and earn more points. The more you refer, the higher you earn",
+    title:
+      "Refer friends and earn more points. The more you refer, the higher you earn",
   },
 ];
 
@@ -83,19 +84,19 @@ const HowToPlay = () => {
           autoplay={{ delay: 2000, disableOnInteraction: false }}
           className="mySwiper">
           {steps.map((step, index) => (
-            <SwiperSlide key={index}>
-              <div className="bg-gray-800 p-4 rounded-lg h-full">
+            <SwiperSlide key={index} className="h-auto">
+              <div className="bg-gray-800 p-4 rounded-lg flex flex-col h-full">
                 <h3 className="text-lg font-bold mb-2">{step.step}</h3>
-                <div className="relative w-full h-32 mb-4">
+                <div className="relative w-full h-32 mb-4 flex-shrink-0">
                   <Image
                     src={step.image}
                     alt={step.title}
                     layout="fill"
                     objectFit="contain"
-                    className="rounded-lg min-w-28"
+                    className="rounded-lg"
                   />
                 </div>
-                <p className="text-sm text-gray-300 leading-6 mb-6">
+                <p className="text-sm text-gray-300 leading-6 flex-grow">
                   {step.title}
                 </p>
               </div>

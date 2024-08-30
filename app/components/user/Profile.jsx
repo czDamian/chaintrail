@@ -6,7 +6,7 @@ import { FaCheckCircle } from "react-icons/fa";
 import Logout from "./Logout";
 import { useRouter } from "next/navigation";
 import { CgClose } from "react-icons/cg";
-import RainbowWallet from "@/app/wallet/ConnectButton";
+import CustomConnectButton from "@/app/wallet/ConnectButton";
 
 // Function to check if the user is on a mobile device
 const isMobileDevice = () => {
@@ -30,22 +30,25 @@ export default function Profile() {
     }
   }, []);
 
+  // Trims the wallet address for a cleaner display
   const trimWalletAddress = (address) => {
     return address ? `${address.slice(0, 4)}...${address.slice(-3)}` : "";
   };
 
+  // Handles user logout
   const handleLogout = async () => {
     await logout();
     localStorage.removeItem("userId");
     router.push("/");
   };
 
+  // Controls the visibility of the wallet popup
   const openWalletPopup = () => setIsWalletPopupOpen(true);
   const closeWalletPopup = () => setIsWalletPopupOpen(false);
 
-  // Display RainbowWallet if conditions are not met
+  // Display CustomConnectButton if the Telegram Web App and mobile conditions are not met
   if (!showContent) {
-    return <RainbowWallet />;
+    return <CustomConnectButton />;
   }
 
   return (
@@ -87,6 +90,7 @@ export default function Profile() {
                     </button>
                   </div>
                   <div className="space-y-4 py-2 text-lg">
+                    {/* Wallet options */}
                     <div
                       onClick={() => {
                         closeWalletPopup();

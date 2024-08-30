@@ -2,7 +2,6 @@ import Script from "next/script";
 import "./globals.css";
 import Navbar from "./components/HomePage/Nav";
 import AuthenticationProvider from "./AuthenticationProvider";
-
 export const metadata = {
   title: "Chain Trail",
   description: "earn NFTs while playing your favorite game",

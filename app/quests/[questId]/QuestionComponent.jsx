@@ -215,7 +215,7 @@ const QuestionComponent = ({ questId }) => {
       } else {
         setTimeout(() => {
           handleNext();
-        }, 1500);
+        }, 3000);
       }
     } catch (error) {
       console.error("Error updating points:", error);
@@ -283,9 +283,12 @@ const QuestionComponent = ({ questId }) => {
           isCompleted={isCompleted}
           showComplete={showComplete}
           isCorrect={isCorrect}
+          points={points}
+          playPass={playPass}
         />
       </section>
       <ToastContainer />
+
     </section>
   );
 };

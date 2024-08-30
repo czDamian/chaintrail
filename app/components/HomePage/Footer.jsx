@@ -55,52 +55,52 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="w-full bg-slate-700 py-12">
-      <div>
-        <div className="p-2 my-4">
-          <h2 className="text-3xl text-center font-bold mb-6 text-[#EEEEEE]">
-            Meet Our Team
-          </h2>
-          <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-1">
-            {teamMembers.map((member, index) => (
-              <div
-                key={index}
-                className="bg-slate-800 p-2 rounded-lg text-center shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out max-w-64 w-full mx-auto text-sm">
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  width={1000}
-                  height={1000}
-                  className="mx-auto w-32 h-32 border-4 border-gray-900 rounded-full object-cover"
-                />
-                <h5 className="font-bold uppercase text-[#EEEEEE] mt-4">
+    <footer className="w-full bg-slate-700 py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-2xl sm:text-3xl text-center font-bold my-12 text-[#EEEEEE]">
+          Meet Our Team
+        </h2>
+        <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-3">
+          {teamMembers.map((member, index) => (
+            <div
+              key={index}
+              className="bg-slate-800 p-3 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out flex items-center">
+              <Image
+                src={member.image}
+                alt={member.name}
+                width={80}
+                height={80}
+                className="w-16 h-16 border-2 border-gray-900 rounded-full object-cover mr-4"
+              />
+              <div className="flex-grow">
+                <h5 className="font-bold text-[#EEEEEE] text-sm">
                   {member.name}
                 </h5>
-                <p className="text-[#D4D0E0] text-sm">{member.role}</p>
-                <div className="flex justify-center gap-4 mt-4">
+                <p className="text-[#D4D0E0] text-xs mb-1">{member.role}</p>
+                <div className="flex gap-2">
                   {member.github && (
                     <Link href={member.github} target="_blank">
-                      <FaGithub className="text-[#EEEEEE] hover:text-gray-400 text-2xl" />
+                      <FaGithub className="text-[#EEEEEE] hover:text-gray-400 text-lg" />
                     </Link>
                   )}
                   {member.twitter && (
                     <Link href={member.twitter} target="_blank">
-                      <FaTwitter className="text-[#EEEEEE] hover:text-gray-400 text-2xl" />
+                      <FaTwitter className="text-[#EEEEEE] hover:text-gray-400 text-lg" />
                     </Link>
                   )}
                   {member.linkedin && (
                     <Link href={member.linkedin} target="_blank">
-                      <FaLinkedin className="text-[#EEEEEE] hover:text-gray-400 text-2xl" />
+                      <FaLinkedin className="text-[#EEEEEE] hover:text-gray-400 text-lg" />
                     </Link>
                   )}
                 </div>
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
       <div className="mt-8 text-center">
-        <span className="text-[#D4D0E0] text-xs">(c) 2024 CryptoTrail</span>
+        <span className="text-[#D4D0E0] text-xs">&copy; 2024 CryptoTrail</span>
       </div>
     </footer>
   );

@@ -6,7 +6,7 @@ import "swiper/css/bundle";
 import { Autoplay } from "swiper/modules";
 
 const NFTSection = () => {
-  const nftImages = ["/nft1.png", "/nft2.png", "/nft01.png"];
+  const nftImages = ["/nft1.png", "/nft2.png", "/nft1.png"];
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
 
