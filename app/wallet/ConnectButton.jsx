@@ -66,12 +66,15 @@ function CustomConnectButton() {
       Object.keys(cookies).forEach((cookieName) => {
         Cookies.remove(cookieName, { path: "/" });
       });
-      router.push("/");
-      window.location.reload();
+
+      if (typeof window !== "undefined") {
+        window.location.reload();
+      }
     } catch (error) {
       console.error("Error disconnecting:", error);
     }
   };
+
 
   if (!isConnected) {
     return <ConnectButton />;
@@ -101,13 +104,10 @@ const RainbowWallet = ({ children }) => {
         <RainbowKitProvider
           chains={config.chains}
           theme={darkTheme({
-            accentColor: "#4B5563",
-            accentColorForeground: "white",
+            accentColor: "#E4AD00",
+            accentColorForeground: "black",
             borderRadius: "medium",
-            connectButton: {
-              backgroundColor: "red",
-              borderRadius: "medium",
-            },
+            fontStack: "system",
           })}
           modalSize="compact">
           {mounted && (
