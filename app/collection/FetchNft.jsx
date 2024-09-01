@@ -4,6 +4,7 @@ import Web3 from "web3";
 import nftContractABI from "./EduNft.json";
 import Button from "../components/Reusable/Button";
 import Loader from "../loader";
+import { useAuth } from "@/app/AuthenticationProvider";
 
 export default function FetchNFT() {
   const [contractAddress, setContractAddress] = useState("");
@@ -12,6 +13,7 @@ export default function FetchNFT() {
   const [allNFTs, setAllNFTs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { userInfo } = useAuth();
 
   // Web3 provider for Edu Chain
   const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
@@ -84,7 +86,7 @@ export default function FetchNFT() {
 
   const handleMint = async (requiredPoints) => {
     setError(null);
-    const userId = localStorage.getItem("userId");
+    const userId = userInfo.userId;
     if (!userId) {
       setError("User not logged in. Please log in first.");
       return;
@@ -153,7 +155,7 @@ export default function FetchNFT() {
   return (
     <div className="p-6  text-white min-h-10">
       {isLoading ? (
-         <Loader/>
+        <Loader />
       ) : (
         <div>
           {error && <div className="text-red-500 mb-4">{error}</div>}

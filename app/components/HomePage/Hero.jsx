@@ -57,12 +57,12 @@ const Hero = () => {
           <div className="flex flex-col gap-3 items-center justify-center">
             <Button
               href="/quests"
-              className="text-xs text-black bg-gold-500 transition-colors duration-300 py-3 hover:scale-105 w-48 text-center">
+              className="text-xs text-black bg-gold-500 transition-colors duration-300 py-3 hover:scale-95 w-48 text-center">
               Play now
             </Button>
             <Button
               href="/wallet"
-              className="text-xs bg-slate-900 text-center transition-colors font-normal duration-300 py-3 hover:scale-105 w-48">
+              className="text-xs bg-slate-900 text-center transition-colors font-normal duration-300 py-3 hover:scale-95 w-48">
               Dashboard
             </Button>
           </div>
@@ -71,7 +71,7 @@ const Hero = () => {
             {isMobile ? (
               <Button
                 href="https://t.me/ChainTrailBot"
-                className="flex mx-auto text-xs gap-0.5 hover:scale-105 border items-center">
+                className="text-xs text-black bg-gold-500 transition-colors duration-300 py-2 hover:scale-95 w-48 text-center flex justify-center gap-2 mx-auto items-center">
                 <span>Play on</span>
                 <span className="animate-pulse">
                   <Image
@@ -87,7 +87,7 @@ const Hero = () => {
               <>
                 <Button
                   onClick={openWalletPopup}
-                  className={`flex items-center justify-center mb-4 mx-auto text-xs text-black bg-gold-500 transition-colors duration-300  hover:scale-105 w-48 gap-3 ${
+                  className={`flex items-center justify-center mb-4 mx-auto text-xs text-black bg-gold-500 transition-colors duration-300  hover:scale-5 w-48 gap-3 ${
                     isLoading ? "py-3" : "py-2.5"
                   }`}>
                   <span>{isLoading ? "Connecting" : "Connect"}</span>
@@ -104,7 +104,7 @@ const Hero = () => {
                 </Button>
                 <Button
                   href="https://t.me/ChainTrailBot"
-                  className="flex mx-auto text-xs gap-3 hover:scale-105 items-center w-48 justify-center bg-slate-900 py-2.5">
+                  className="text-xs text-black bg-gold-500 transition-colors duration-300 py-2 hover:scale-95 w-48 text-center flex justify-center gap-2 mx-auto items-center">
                   <span>Play on</span>
                   <span>
                     <Image

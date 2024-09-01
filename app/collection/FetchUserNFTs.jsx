@@ -2,18 +2,20 @@
 import { useState, useEffect } from "react";
 import Web3 from "web3";
 import nftContractABI from "./EduNft.json";
+import { useAuth } from "@/app/AuthenticationProvider";
 
 export default function FetchUserNFTs() {
   const [userAddress, setUserAddress] = useState("");
   const [userNFTs, setUserNFTs] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { userInfo } = useAuth();
 
   const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
 
   useEffect(() => {
     const fetchUserNFTs = async () => {
       try {
-        const userId = localStorage.getItem("userId");
+    const userId = userInfo.userId;
 
         const response = await fetch(`/api/users?userId=${userId}`);
         const userData = await response.json();
