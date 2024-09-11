@@ -1,7 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { MdClose } from "react-icons/md";
-
+import { RxCaretLeft } from "react-icons/rx";
 const BackButton = () => {
   const router = useRouter();
 
@@ -10,8 +9,10 @@ const BackButton = () => {
   };
 
   return (
-    <button onClick={handleBack}>
-      <MdClose className="text-white text-3xl inline" />
+    <button
+      onClick={handleBack}
+      className="flex items-center justify-center  hover:bg-gray-600 text-white rounded-full transition duration-300 ease-in-out">
+      <RxCaretLeft className="text-3xl" />
     </button>
   );
 };

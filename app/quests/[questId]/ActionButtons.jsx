@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { MdDelete } from "react-icons/md";
+import { FaSpinner } from "react-icons/fa";
 import Modal from "@/app/components/Reusable/Modal";
 
-const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
+const ActionButtons = ({
+  currentQuestion,
+  deleteLast,
+  points,
+  setPoints,
+  userId,
+}) => {
   const [modalState, setModalState] = useState({
     isOpen: false,
     type: null, // 'confirm' or 'hint'
   });
+    const [isLoading, setIsLoading] = useState(false);
+
 
   const openConfirmModal = () => {
     if (points >= 200) {
@@ -20,9 +29,9 @@ const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
 
   const confirmHint = async () => {
     try {
-      const userId = localStorage.getItem("userId");
+      setIsLoading(true);
       if (!userId) {
-        throw new Error("User ID not found in local storage");
+        throw new Error("User ID not provided");
       }
       const response = await fetch("/api/claim", {
         method: "PATCH",
@@ -31,8 +40,8 @@ const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
         },
         body: JSON.stringify({
           userId: userId,
-          pointsDelta: -200, // Deduct 200 points
-          playPassDelta: 0, // No change to play pass
+          pointsDelta: -200, 
+          playPassDelta: 0,
         }),
       });
 
@@ -41,12 +50,14 @@ const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
       }
 
       const data = await response.json();
-      setPoints(data.points); // Update points with the new value from the server
+      setPoints(data.points);
+      setIsLoading(false);
       setModalState({ isOpen: true, type: "hint" });
     } catch (error) {
       console.error("Error updating points:", error);
       alert("Failed to update points. Please try again.");
       closeModal();
+      setIsLoading(false);
     }
   };
 
@@ -61,13 +72,22 @@ const ActionButtons = ({ currentQuestion, deleteLast, points, setPoints }) => {
           <div className="flex justify-end gap-2">
             <button
               onClick={closeModal}
-              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400">
+              className="bg-gray-300 text-black px-4 py-2 rounded hover:bg-gray-400"
+              disabled={isLoading}>
               Cancel
             </button>
             <button
               onClick={confirmHint}
-              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-              Confirm
+              className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading}>
+              {isLoading ? (
+                <span className="flex items-center justify-center px-7">
+                  <FaSpinner className="animate-spin cursor-not-allowed"/>
+                  
+                </span>
+              ) : (
+                "Confirm"
+              )}
             </button>
           </div>
         </>

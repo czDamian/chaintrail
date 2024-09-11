@@ -5,6 +5,7 @@ import nftContractABI from "./EduNft.json";
 import Button from "../components/Reusable/Button";
 import Loader from "../loader";
 import { useAuth } from "@/app/AuthenticationProvider";
+import { FaSpinner } from "react-icons/fa";
 
 export default function FetchNFT() {
   const [contractAddress, setContractAddress] = useState("");
@@ -14,6 +15,7 @@ export default function FetchNFT() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { userInfo } = useAuth();
+  const [isMinting, setIsMinting] = useState(false);
 
   // Web3 provider for Edu Chain
   const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
@@ -86,9 +88,11 @@ export default function FetchNFT() {
 
   const handleMint = async (requiredPoints) => {
     setError(null);
+    setIsMinting(true);
     const userId = userInfo.userId;
     if (!userId) {
       setError("User not logged in. Please log in first.");
+      setIsMinting(false);
       return;
     }
 
@@ -96,46 +100,78 @@ export default function FetchNFT() {
       const response = await fetch(`/api/users?userId=${userId}`);
       const userData = await response.json();
 
-      if (!userData.walletAddress || !userData.privateKey) {
-        setError("Please connect your wallet first.");
-        return;
-      }
-
       if (userData.points < requiredPoints) {
         setError(
           `Insufficient points. You need ${requiredPoints} points to mint this NFT.`
         );
+        setIsMinting(false);
         return;
       }
 
-      const walletAddress = userData.walletAddress;
-      const privateKey = userData.privateKey;
+      let web3Instance;
+      let walletAddress;
 
-      // Create a web3 instance with the private key and provider
-      const account = web3.eth.accounts.privateKeyToAccount(privateKey);
-      web3.eth.accounts.wallet.add(account);
+      if (typeof window.ethereum !== "undefined") {
+        // Use MetaMask or other injected Ethereum provider
+        try {
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          web3Instance = new Web3(window.ethereum);
 
-      const contract = new web3.eth.Contract(nftContractABI, contractAddress);
+          // Check if the user is on the correct network
+          const chainId = await web3Instance.eth.getChainId();
+          console.log(chainId);
+          if (!chainId.toString().startsWith('656476') && !chainId.toString().startsWith('0xa045c')) {
+            throw new Error(
+              "Please switch to the Open Edu Network to mint NFTs."
+            );
+          }
+          const accounts = await web3Instance.eth.getAccounts();
+          walletAddress = accounts[0];
+        } catch (error) {
+          throw new Error(`Error with Ethereum provider: ${error.message}`);
+        }
+      } else {
+        // Use saved wallet
+        if (!userData.walletAddress || !userData.privateKey) {
+          throw new Error("Please connect your wallet first.");
+        }
 
-      // Get the next available token ID
+        walletAddress = userData.walletAddress;
+        const privateKey = userData.privateKey;
+
+        // Create a web3 instance with the private key and provider
+        const account = web3.eth.accounts.privateKeyToAccount(privateKey);
+        web3.eth.accounts.wallet.add(account);
+        web3Instance = web3;
+
+        // Check if the user is on the correct network
+        const chainId = await web3Instance.eth.getChainId();
+        if (!chainId.toString().startsWith('656476') && !chainId.toString().startsWith('0xa045c')) {
+          throw new Error(
+            "Please switch to the Open Edu Network to mint NFTs."
+          );
+        }
+      }
+
+      const contract = new web3Instance.eth.Contract(
+        nftContractABI,
+        contractAddress
+      );
       const nextTokenId = await getNextAvailableTokenId(contract);
-
-      // Generate a new URI for the token
       const newUri = `https://teal-deep-unicorn-287.mypinata.cloud/ipfs/${nextTokenId}`;
 
       // Check wallet balance
-      const balance = await web3.eth.getBalance(walletAddress);
+      const balance = await web3Instance.eth.getBalance(walletAddress);
       const gasEstimate = await contract.methods
         .mint(walletAddress, newUri)
         .estimateGas({ from: walletAddress });
-      const gasPrice = await web3.eth.getGasPrice();
+      const gasPrice = await web3Instance.eth.getGasPrice();
       const estimatedTotalCost = gasEstimate * gasPrice;
 
       if (BigInt(balance) < BigInt(estimatedTotalCost)) {
-        setError(
+        throw new Error(
           "Insufficient funds in your wallet to cover the transaction cost. Please add more funds and try again."
         );
-        return;
       }
 
       // Call the mint function with the new token ID
@@ -148,7 +184,11 @@ export default function FetchNFT() {
       window.location.reload();
     } catch (error) {
       console.error("Minting error:", error);
-      setError("An error occurred while minting. Please try again.");
+      setError(
+        error.message || "An error occurred while minting. Please try again."
+      );
+    } finally {
+      setIsMinting(false);
     }
   };
 
@@ -176,10 +216,15 @@ export default function FetchNFT() {
                     />
                     <Button
                       className="absolute bottom-1 right-1 bg-gold-500 text-black"
-                      onClick={() =>
-                        handleMint(calculateRequiredPoints(index))
-                      }>
-                      Mint
+                      onClick={() => handleMint(calculateRequiredPoints(index))}
+                      disabled={isMinting}>
+                      {isMinting ? (
+                        <div className="px-4 py-0.5">
+                          <FaSpinner className="animate-spin" />
+                        </div>
+                      ) : (
+                        "Mint"
+                      )}
                     </Button>
                   </div>
                   <div className=" flex justify-between items-center my-2 text-sm">

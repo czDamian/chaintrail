@@ -10,7 +10,6 @@ import ActionButtons from "./ActionButtons";
 import PopupHandler from "./PopupHandler";
 import QuestUI from "./QuestUI";
 import { useRouter } from "next/navigation";
-import BackButton from "@/app/components/Reusable/BackButton";
 import QuestionLoader from "./QuestionLoader";
 import { useAuth } from "@/app/AuthenticationProvider";
 
@@ -254,7 +253,6 @@ const QuestionComponent = ({ questId }) => {
 
   return (
     <section className="max-w-screen-xl mt-2 mx-auto px-4 sm:px-6 lg:px-8">
-      <BackButton />
       <QuestUI />
       <UserInfoBar
         points={points}
@@ -277,6 +275,7 @@ const QuestionComponent = ({ questId }) => {
           deleteLast={deleteLast}
           points={points}
           setPoints={setPoints}
+          userId={userId}
         />
         <PopupHandler
           showPopup={showPopup}

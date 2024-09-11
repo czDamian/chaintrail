@@ -23,10 +23,6 @@ export default function UserInfo({ userInfo }) {
           {userInfo.playPass}
         </p>
       </div>
-      <p>
-        <span className="font-bold">Username:</span>
-        {userInfo.username || " not set"}
-      </p>
     </div>
   );
 }
