@@ -10,9 +10,9 @@ run `npx hardhat run scripts/mint.js --network coreTestnet` to mint the nft on c
 the nfts were minted separately so confirm the ipfshash before minting
 
 
-## About Edu Chain
-Network name: Open Campus Codex Sepolia
-New RPC URL https://open-campus-codex-sepolia.drpc.org
-Chain ID: 0xa045c
-Currency Symbol: EDU
-Block Explorer URL (Optional): https://opencampus-codex.blockscout.com
+## About Avalanche Fuji
+Network name: Avalanche Fuji Testnet
+New RPC URL: https://api.avax-test.network/ext/bc/C/rpc
+Chain ID: 43113
+Currency Symbol: AVAX
+Block Explorer URL: https://testnet.snowtrace.io

@@ -14,10 +14,10 @@ export default function ConnectedWallet({ userInfo }) {
 
   const checkBalance = async () => {
     try {
-      const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
+      const web3 = new Web3("https://api.avax-test.network/ext/bc/C/rpc");
       const balanceWei = await web3.eth.getBalance(userInfo.walletAddress);
-      const balanceEDU = web3.utils.fromWei(balanceWei, "ether");
-      setBalance(parseFloat(balanceEDU).toFixed(3));
+      const balanceAVAX = web3.utils.fromWei(balanceWei, "ether");
+      setBalance(parseFloat(balanceAVAX).toFixed(3));
     } catch (error) {
       console.error("Error fetching balance:", error);
       setBalance("Error");
@@ -75,16 +75,16 @@ export default function ConnectedWallet({ userInfo }) {
       <div className="flex flex-col xs:flex-row flex-wrap justify-between gap-2">
         <button className="flex items-center gap-2 border p-2 rounded-md border-blue-500">
           <img
-            src="https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg"
+            src="https://cryptologos.cc/logos/avalanche-avax-logo.png"
             alt="Chain Logo"
             className="w-6 h-6"
           />
-          <span className="text-gray-400 text-sm">Edu Chain</span>
+          <span className="text-gray-400 text-sm">Avalanche Fuji</span>
         </button>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 text-blue-500 border p-2 rounded-md border-blue-500 text-sm">
-          <span className="text-gray-300">{balance} EDU</span>
+          <span className="text-gray-300">{balance} AVAX</span>
           <span>{truncateAddress(userInfo.walletAddress)}</span>
           <FaChevronDown />
         </button>
@@ -102,7 +102,7 @@ export default function ConnectedWallet({ userInfo }) {
               {truncateAddress(userInfo.walletAddress)}
             </p>
             <p className="text-center text-sm text-gray-500 my-4">
-              {balance} EDU
+              {balance} AVAX
             </p>
             <div className="flex text-sm justify-between gap-4">
               <button

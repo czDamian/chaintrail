@@ -36,7 +36,7 @@ export default function ImportWallet({ importMethod, onCancel }) {
 
   const handleImportWallet = async () => {
     try {
-      const web3 = new Web3("https://open-campus-codex-sepolia.drpc.org");
+      const web3 = new Web3("https://api.avax-test.network/ext/bc/C/rpc");
       let account;
 
       if (importMethod === "seedPhrase") {
@@ -59,6 +59,7 @@ export default function ImportWallet({ importMethod, onCancel }) {
           : `0x${privateKey}`;
         try {
           account = web3.eth.accounts.privateKeyToAccount(formattedPrivateKey);
+          console.log(account.address);
         } catch (error) {
           setImportError("Invalid private key format");
           return;
@@ -83,6 +84,9 @@ export default function ImportWallet({ importMethod, onCancel }) {
       setImportSuccess(true);
       setImportError("");
       fetchUserInfo(userInfo.userId);
+      console.log(userInfo.userId, "is the userId");
+      console.log(userInfo);
+      console.log(userInfo.walletAddress, "is the address");
       router.refresh();
     } catch (err) {
       console.error("Error importing wallet:", err);
