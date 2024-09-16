@@ -7,42 +7,25 @@ import {
   darkTheme,
 } from "@rainbow-me/rainbowkit";
 import { WagmiProvider, useAccount, useDisconnect } from "wagmi";
-import { mainnet, polygon, optimism, arbitrum, base } from "wagmi/chains";
+import { mainnet, polygon, optimism, arbitrum, base, avalancheFuji } from "wagmi/chains";
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { useAuth } from "../AuthenticationProvider";
 import { useRouter } from "next/navigation";
 
 import "@rainbow-me/rainbowkit/styles.css";
+import Button from "../components/Reusable/Button";
 
-// Define the Open Campus Codex Sepolia network
-const openCampusCodexSepolia = {
-  id: 0xa045c,
-  name: "Sepolia",
-  network: "open-campus-codex-sepolia",
-  nativeCurrency: {
-    decimals: 18,
-    name: "EDU",
-    symbol: "EDU",
-  },
-  rpcUrls: {
-    public: { http: ["https://open-campus-codex-sepolia.drpc.org"] },
-    default: { http: ["https://open-campus-codex-sepolia.drpc.org"] },
-  },
-  blockExplorers: {
-    default: {
-      name: "Blockscout",
-      url: "https://opencampus-codex.blockscout.com",
-    },
-  },
-  iconUrl:
-    "https://www.opencampus.xyz/static/media/coin-logo.39cbd6c42530e57817a5b98ac7621ca7.svg",
+// Define the Avalanche Fuji network
+const avalancheFujiNetwork = {
+  ...avalancheFuji,
+  iconUrl: "https://cryptologos.cc/logos/avalanche-avax-logo.png",
 };
 
 const config = getDefaultConfig({
   appName: "Chain Trail",
   projectId: "24911ae43d4f2f85e9408da2d8c99868",
-  chains: [openCampusCodexSepolia, mainnet, polygon, optimism, arbitrum, base],
+  chains: [avalancheFujiNetwork, mainnet, polygon, optimism, arbitrum, base],
   ssr: true,
 });
 
@@ -77,16 +60,114 @@ function CustomConnectButton() {
   };
 
   if (!isConnected) {
-    return <ConnectButton />;
+    return (
+      <ConnectButton.Custom>
+        {({
+          account,
+          chain,
+          openAccountModal,
+          openChainModal,
+          openConnectModal,
+          authenticationStatus,
+          mounted,
+        }) => {
+          const ready = mounted && authenticationStatus !== 'loading';
+          const connected =
+            ready &&
+            account &&
+            chain &&
+            (!authenticationStatus ||
+              authenticationStatus === 'authenticated');
+
+          return (
+            <div
+              {...(!ready && {
+                'aria-hidden': true,
+                'style': {
+                  opacity: 0,
+                  pointerEvents: 'none',
+                  userSelect: 'none',
+                },
+              })}
+            >
+              {(() => {
+                if (!connected) {
+                  return (
+                    <Button
+                      onClick={openConnectModal}
+                      className=" bg-slate-900 text-xs md:text-base animate-bounce-in-down flex items-center gap-2 justify-center">
+                      <p>Connect</p>
+                      <img
+                        src="metamask.svg"
+                        alt="metamask"
+                        width={20}
+                        height={20}
+                      />
+                    </Button>
+                  );
+                }
+
+                if (chain.unsupported) {
+                  return (
+                    <Button onClick={openChainModal} className="text-white bg-red-500 hover:bg-red-600 text-xs rounded-md">
+                      Wrong network
+                    </Button>
+                  );
+                }
+
+                return (
+                  <div style={{ display: 'flex', gap: 12 }}>
+                    <Button
+                      onClick={openChainModal}
+                      style={{ display: 'flex', alignItems: 'center' }}
+                      className="text-white bg-gray-800 hover:bg-gray-700 text-xs rounded-md"
+                    >
+                      {chain.hasIcon && (
+                        <div
+                          style={{
+                            background: chain.iconBackground,
+                            width: 12,
+                            height: 12,
+                            borderRadius: 999,
+                            overflow: 'hidden',
+                            marginRight: 4,
+                          }}
+                        >
+                          {chain.iconUrl && (
+                            <img
+                              alt={chain.name ?? 'Chain icon'}
+                              src={chain.iconUrl}
+                              style={{ width: 12, height: 12 }}
+                            />
+                          )}
+                        </div>
+                      )}
+                      {chain.name}
+                    </Button>
+
+                    <Button onClick={openAccountModal} className="text-white bg-gray-800 hover:bg-gray-700 text-xs rounded-md">
+                      {account.displayName}
+                      {account.displayBalance
+                        ? ` (${account.displayBalance})`
+                        : ''}
+                    </Button>
+                  </div>
+                );
+              })()}
+            </div>
+          );
+        }}
+      </ConnectButton.Custom>
+    );
   }
 
   return (
     <div>
-      <button
+      <Button
         onClick={handleDisconnect}
-        className="px-4 py-2 text-white bg-gray-950 text-base rounded-md border border-gray-700">
-        Sign Out
-      </button>
+        className="text-white bg-gray-950 text-xs rounded-md border border-gray-700 hover:bg-gray-800">
+        Logout
+      </Button>
     </div>
   );
 }

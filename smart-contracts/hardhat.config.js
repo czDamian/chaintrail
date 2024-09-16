@@ -7,25 +7,16 @@ module.exports = {
     artifacts: "./src",
   },
   networks: {
-    opencampus: {
-      url: `https://rpc.open-campus-codex.gelato.digital/`,
+    fuji: {
+      url: "https://api.avax-test.network/ext/bc/C/rpc",
+      chainId: 43113,
       accounts: [process.env.PRIVATE_KEY],
     },
   },
   etherscan: {
     apiKey: {
-      opencampus: "your-etherscan-api-key",
+      avalancheFujiTestnet: "your-snowtrace-api-key",
     },
-    customChains: [
-      {
-        network: "opencampus",
-        chainId: 656476,
-        urls: {
-          apiURL: "https://opencampus-codex.blockscout.com/api",
-          browserURL: "https://opencampus-codex.blockscout.com",
-        },
-      },
-    ],
   },
 };
 

@@ -1,6 +1,6 @@
 //deploy script using hardhat 
 //npx hardhat compile
-//npx hardhat run scripts/deploy.js --network opencampus
+//npx hardhat run scripts/deploy.js --network fuji
 const hre = require("hardhat");
 
 async function main() {

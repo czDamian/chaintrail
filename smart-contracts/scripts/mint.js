@@ -1,5 +1,5 @@
 //mint nft using hardhat
-//npx hardhat run scripts/mint.js --network opencampus
+//npx hardhat run scripts/mint.js --network fuji
 
 const hre = require("hardhat");
 
@@ -17,7 +17,7 @@ async function main() {
     "https://teal-deep-unicorn-287.mypinata.cloud/ipfs/QmUzdF5yyFjwj1eJzFv2fJfDaS7iTLNVHwqQ7CzJ7yhLHu";
 
   // Replace with the deployed contract address
-  const contractAddress = "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922";
+  const contractAddress = "0xAedC12560864D6E0ba952977AD28556F848c9151";
 
   // Get the contract factory and attach it to the deployed contract
   const EduNFT = await hre.ethers.getContractFactory("EDUNFT");
@@ -45,7 +45,6 @@ main()
   });
 
 // once its successful, you will get a message like this
-//   Using account: 0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC
-// Minted NFT to: 0x8db97C7cEcE249c2b98bDC0226Cc4C2A57BF52FC
-// FC
-// Transaction hash: 0xdd9f532cc04d70c0ed76ee622ad9833095e7dbda2e33d8ea68fe49aaef8446f4
+// Using account: 0x367C4eF565EA335df0516d094661bE3C7a2A6423
+// Minted NFT to: 0x367C4eF565EA335df0516d094661bE3C7a2A6423
+// Transaction hash: 0x0d73703152c54bdfbf82e9df53f88cd0821d7dfa5bcb7e1d3b4093ed6303bd76

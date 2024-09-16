@@ -20,10 +20,11 @@ export default function FetchUserNFTs() {
         const response = await fetch(`/api/users?userId=${userId}`);
         const userData = await response.json();
         const walletAddress = userData.walletAddress;
+        console.log("walletAddress is", walletAddress);
 
         setUserAddress(walletAddress);
 
-        const contractAddress = "0x52C84043CD9c865236f11d9Fc9F56aa003c1f922";
+        const contractAddress = "0xAedC12560864D6E0ba952977AD28556F848c9151";
         const contract = new web3.eth.Contract(nftContractABI, contractAddress);
 
         // Query the Transfer event to get all token IDs minted by this address

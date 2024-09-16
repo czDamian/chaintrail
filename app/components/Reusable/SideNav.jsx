@@ -52,7 +52,7 @@ const SideNav = () => {
             <li key={index} className="flex-1">
               <Link
                 href={link.href}
-                className={`flex flex-col items-center justify-center rounded transition duration-300 py-4 px-1 sm:px-2 md:py-5 ${
+                className={`flex flex-col items-center justify-center rounded transition duration-300 py-4 px-1 sm:px-2 md:py-5 hover:bg-blue-900 ${
                   isActive ? "bg-blue-900" : ""
                 }`}>
                 <link.icon className="text-lg sm:text-xl mb-1" />
